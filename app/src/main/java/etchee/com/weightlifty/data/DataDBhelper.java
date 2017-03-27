@@ -10,6 +10,10 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import etchee.com.weightlifty.data.DataContract.CalendarEntry;
+import etchee.com.weightlifty.data.DataContract.EventEntry;
+import etchee.com.weightlifty.data.DataContract.EventTypeEntry;
+
 import static android.R.attr.version;
 
 /**
@@ -20,16 +24,43 @@ public class DataDBhelper extends SQLiteOpenHelper {
 
     public static final String LOG_TAG = DataDBhelper.class.getSimpleName();
 
-    private static final String DATABASE_NAME = "mLog.db";
+    private static final String DATABASE_NAME = "log.db";
     private static final int DATABASE_VERSION = 1;
 
     public DataDBhelper(Context context) {
+
         super(context, DATABASE_NAME, null, version);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+    public void onCreate(SQLiteDatabase db) {
+        //Create the Calendar table
+        final String CREATE_CALENDAR_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + CalendarEntry.TABLE_NAME + " ("
+                + CalendarEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + CalendarEntry.COLUMN_DATE + " TEXT, " //ここDateが入るけど、フォーマット？
+                + CalendarEntry.COLUMN_EVENT_IDs + " INTEGER, " //どの種目をやったのか、順番にIDでいれてく
+                + CalendarEntry.COLUMN_DAY_TAG + " TEXT);";    //その日の状態のノート。オプショナル
 
+        //This table will contain events of workout. i.e. Barbell bench press, pull up, preacher curls...
+        //Each event will have its own unique key
+        //because I might use Java Rx to search for desired key later on.
+        final String CREATE_EVENT_TYPE_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + DataContract.EventTypeEntry.TABLE_NAME + " ("
+                + EventTypeEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + EventTypeEntry.COLUMN_EVENT_NAME + " TEXT NOT NULL);";
+
+        final String CREATE_EVENT_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
+                + EventEntry._ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SET_COUNT + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_REP_SEQUENCE + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_WEIGHT_SEQUENCE + " TEXT);";
+
+        db.execSQL(CREATE_CALENDAR_TABLE);
+        db.execSQL(CREATE_EVENT_TYPE_TABLE);
+        db.execSQL(CREATE_EVENT_TABLE);
     }
 
     @Override
@@ -39,7 +70,7 @@ public class DataDBhelper extends SQLiteOpenHelper {
 
 
     /*
-    *   For the helper class to read and write databse from device.
+    *   For the helper class to read and write database from device.
     * */
     public ArrayList<Cursor> getData(String Query){
         //get writable database

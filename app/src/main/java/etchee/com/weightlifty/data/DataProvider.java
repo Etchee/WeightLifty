@@ -2,6 +2,7 @@ package etchee.com.weightlifty.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -12,6 +13,12 @@ import android.support.annotation.Nullable;
  */
 
 public class DataProvider extends ContentProvider {
+
+    //sURIMatcher declaration. Call a static reference here
+    UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+    static {
+
+    }
 
     private DataDBhelper dBhelper;
 
