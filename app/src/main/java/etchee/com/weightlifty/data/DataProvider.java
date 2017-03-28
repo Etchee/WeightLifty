@@ -7,8 +7,9 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
+
 import etchee.com.weightlifty.data.DataContract.*;
 
 import static etchee.com.weightlifty.data.DataContract.CONTENT_AUTHORITY;
@@ -165,50 +166,86 @@ public class DataProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
         int match = matcher.match(uri);
+        Uri uri_new = null;
         switch (match) {
 
             //query entire calendar table
             case CODE_CALENDAR:
-
-                break;
-            //query specific in calendar table
-            case CODE_CALENDAR_ID:
-                // Example URI: content://etchee.com.weightlifty/calendar/3 ←wildcard, "?"
-                //since I only have one question mark, I only need one element in the String array
-
-
+                uri_new = insertInCalendarTable(uri, contentValues);
                 break;
 
             //query the entire event table
             case CODE_EVENT:
-
-                break;
-
-            //query specific in event table
-            case CODE_EVENT_ID:
-
+                uri_new = insertInEventTable(uri, contentValues);
                 break;
 
             //query entire event_type table
             case CODE_EVENT_TYPE:
-
-                break;
-
-            //query specific in event_type table
-            case CODE_EVENT_TYPE_ID:
-
+                uri_new = insertInEventTypeTable(uri, contentValues);
                 break;
 
             //if URI matches to none of the above, return an exception
             default: throw new IllegalArgumentException("Query method cannot handle " +
                     "unsupported URI: " + uri);
         }
-        return null;
+
+        //if URI is returned with null value, then there's something wrong.
+        if (uri == null) throw new IllegalArgumentException("ContentProvider;s insert method is " +
+                "returning a null URI.");
+
+        return uri_new;
     }
 
-    private Uri insertInCalendar(Uri uri, ContentValues contentValues) {
-        
-        return uri;
+    //to be used for the actual insert implementation
+    private Uri insertInCalendarTable(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        //id is the ID of the newly inserted row. Returns -1 in case of an error with insertion.
+        long id = database.insert(CalendarEntry.TABLE_NAME, null, contentValues);
+
+        String testString = contentValues.getAsString(CalendarEntry.COLUMN_DATE);
+        if (testString == null) {
+            throw new IllegalArgumentException("Content provider's insert method of " +
+                    "the calendar table has received" +
+                    "null for the date value. Check what is passed into the insert method.");
+        }
+
+        if (id < 0) {
+            throw new IllegalArgumentException("Content provider's insertion has failed.");
+        }
+
+        //append the id of the newly inserted row, append at the end of the CONTENT_AUTHORITY,
+        //then return it.
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+    private Uri insertInEventTable(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        long id = database.insert(EventEntry.TABLE_NAME, null, contentValues);
+
+        String testString = contentValues.getAsString(EventEntry.COLUMN_REP_SEQUENCE);
+        if (testString == null) throw new IllegalArgumentException("Content provider's insert " +
+                "method for Event Table has received" +
+                "null for the date value. Check what is passed into the insert method");
+        if (id < 0) throw new IllegalArgumentException("Content provider's insertion (" +
+                "Event Table) has failed.");
+
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+    private Uri insertInEventTypeTable(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        long id = database.insert(EventTypeEntry.TABLE_NAME, null, contentValues);
+
+        String testString = contentValues.getAsString(EventTypeEntry.COLUMN_EVENT_NAME);
+        if (testString == null) throw new IllegalArgumentException("Content provider's insert" +
+                "method for event type table has received null for the event name value.");
+        if (id < 0) throw new IllegalArgumentException("Content provider's insertion (Event" +
+                "type table) has failed.");
+
+        return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
