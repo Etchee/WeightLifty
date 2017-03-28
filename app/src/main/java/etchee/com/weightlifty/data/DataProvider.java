@@ -166,7 +166,7 @@ public class DataProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
         int match = matcher.match(uri);
-        Uri uri_new = null;
+        Uri uri_new;
         switch (match) {
 
             //query entire calendar table
@@ -250,7 +250,60 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        int numOfRowsDeleted;
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        int match = matcher.match(uri);
+
+        switch (match) {
+
+            case CODE_CALENDAR:
+                numOfRowsDeleted = database.delete(CalendarEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            //query specific in calendar table
+            case CODE_CALENDAR_ID:
+                // Example URI: content://etchee.com.weightlifty/calendar/3 ←wildcard, "?"
+                //since I only have one question mark, I only need one element in the String array
+                selection = CalendarEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+
+                numOfRowsDeleted = database.delete(CalendarEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            //query the entire event table
+            case CODE_EVENT:
+                numOfRowsDeleted = database.delete(EventEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            //query specific in event table
+            case CODE_EVENT_ID:
+                selection = EventEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+
+                numOfRowsDeleted = database.delete(EventEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            //query entire event_type table
+            case CODE_EVENT_TYPE:
+                numOfRowsDeleted = database.delete(EventTypeEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            //query specific in event_type table
+            case CODE_EVENT_TYPE_ID:
+                selection = EventTypeEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                numOfRowsDeleted = database.delete(EventTypeEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            //if URI matches to none of the above, return an exception
+            default: throw new IllegalArgumentException("Query method cannot handle " +
+                    "unsupported URI: " + uri);
+        }
+
+        if (numOfRowsDeleted < 0) throw new IllegalArgumentException("Content Provider (delete" +
+                "method) gave an error. Number of deleted row was 0 or less.");
+
+        return numOfRowsDeleted;
     }
 
     @Override
