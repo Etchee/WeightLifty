@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WeightLifty</string>
+    <string name="view_tables">View Tables</string>
 </resources>
