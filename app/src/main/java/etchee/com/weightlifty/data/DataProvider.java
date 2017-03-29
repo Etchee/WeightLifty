@@ -309,26 +309,20 @@ public class DataProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
         int match = matcher.match(uri);
-        int numOfRowsUpdated;
 
         switch (match) {
 
             case CODE_CALENDAR:
-                numOfRowsUpdated = updateCalendar(uri, contentValues, selection, selectionArgs);
-                return numOfRowsUpdated;
-                break;
+                return updateCalendar(uri, contentValues, selection, selectionArgs);
 
             case CODE_CALENDAR_ID:
                 selection = CalendarEntry._ID + "=?";
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
-                numOfRowsUpdated = updateCalendar(uri, contentValues, selection, selectionArgs);
-                if (numOfRowsUpdated < 0) throw new IllegalArgumentException("Content provider" +
-                        "(update method, calendar) did not update any rows. Check.");
+                return updateCalendar(uri, contentValues, selection, selectionArgs);
+
+            default: throw new IllegalArgumentException("ContentProvider (update) cannot" +
+                    "handle unsupported URI" + uri);
         }
-
-
-
-
     }
 
     private int updateCalendar(Uri uri, ContentValues contentValues,
