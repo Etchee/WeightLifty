@@ -87,6 +87,8 @@ public class DataProvider extends ContentProvider {
                 // Example URI: content://etchee.com.weightlifty/calendar/3 ←wildcard, "?"
                 //since I only have one question mark, I only need one element in the String array
 
+                //TODO When "event" column is updated, insert corresponding rows in the Event Table
+
                 selection = CalendarEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
@@ -320,6 +322,14 @@ public class DataProvider extends ContentProvider {
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
                 return updateCalendar(uri, contentValues, selection, selectionArgs);
 
+            case CODE_EVENT_TYPE:
+                return updateEventType(uri, contentValues, selection, selectionArgs);
+
+            case CODE_EVENT_ID:
+                selection = EventTypeEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return updateEventType(uri, contentValues, selection, selectionArgs);
+
             default: throw new IllegalArgumentException("ContentProvider (update) cannot" +
                     "handle unsupported URI" + uri);
         }
@@ -362,9 +372,55 @@ public class DataProvider extends ContentProvider {
         return numOfRowsUpdated;
     }
 
+    private int updateEventType(Uri uri, ContentValues contentValues, String selection,
+                                String[] selectionArgs) {
+        int numOfRowsUpdated;
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        //sanity checks
+        if (contentValues.size() == 0) throw new IllegalArgumentException("Content Provider " +
+                "(Update method, event type table) received null value for contentValues");
+
+        ///sanity check: if any value comes empty with a key, then tehre's something wrong.
+        if (contentValues.containsKey(EventTypeEntry.COLUMN_EVENT_NAME)) {
+            String sample_type = contentValues.getAsString(EventTypeEntry.COLUMN_EVENT_NAME);
+            if (sample_type == null) throw new IllegalArgumentException("ContentProvider " +
+                    "(Update method, event type table) has received null for the new event type.");
+        }
+
+        numOfRowsUpdated = database.update(EventTypeEntry.TABLE_NAME, contentValues, selection,
+                selectionArgs);
+
+        return numOfRowsUpdated;
+    }
+
+    // Not planning to export this content provider to any other applications--
+    // No need to implement this as of now.
     @Nullable
     @Override
     public String getType(Uri uri) {
+        /*int match = matcher.match(uri);
+
+        switch (match) {
+
+            case CODE_CALENDAR:
+                break;
+            case CODE_CALENDAR_ID:
+                break;
+
+            case CODE_EVENT:
+                break;
+
+            case CODE_EVENT_ID:
+                break;
+
+            case CODE_EVENT_TYPE:
+                break;
+            case CODE_EVENT_TYPE_ID:
+                break;
+
+        }*/
+
         return null;
     }
 }
