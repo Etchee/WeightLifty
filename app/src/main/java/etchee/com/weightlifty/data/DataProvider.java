@@ -308,7 +308,64 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
-        return 0;
+        int match = matcher.match(uri);
+        int numOfRowsUpdated;
+
+        switch (match) {
+
+            case CODE_CALENDAR:
+                numOfRowsUpdated = updateCalendar(uri, contentValues, selection, selectionArgs);
+                return numOfRowsUpdated;
+                break;
+
+            case CODE_CALENDAR_ID:
+                selection = CalendarEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                numOfRowsUpdated = updateCalendar(uri, contentValues, selection, selectionArgs);
+                if (numOfRowsUpdated < 0) throw new IllegalArgumentException("Content provider" +
+                        "(update method, calendar) did not update any rows. Check.");
+        }
+
+
+
+
+    }
+
+    private int updateCalendar(Uri uri, ContentValues contentValues,
+                               String selection, String[] selectionArgs) {
+        int numOfRowsUpdated;
+        SQLiteDatabase database= dbHelper.getWritableDatabase();
+
+        //sanity check: don't need to proceed if contentValues is empty
+        if (contentValues.size() == 0) throw new IllegalArgumentException("Content Provider" +
+                "(Update method) received null value for contentValues");
+
+        //sanity check: if any value comes empty with a key, then there's something wrong.
+        if (contentValues.containsKey(CalendarEntry.COLUMN_DATE)) {
+            String date = contentValues.getAsString(CalendarEntry.COLUMN_DATE);
+            if (date == null) throw new IllegalArgumentException("ContentProvider" +
+                    "(update method, calendarEntry) has received null for date value");
+        }
+
+        if (contentValues.containsKey(CalendarEntry.COLUMN_EVENT_IDs)) {
+            String eventIDs = contentValues.getAsString(CalendarEntry.COLUMN_EVENT_IDs);
+            if (eventIDs == null) throw new IllegalArgumentException("ContentProvider" +
+                    "(Update method, calendarEntry) has received null for the EventIDs");
+        }
+
+        if (contentValues.containsKey(CalendarEntry.COLUMN_DAY_TAG)) {
+            String dayTag = contentValues.getAsString(CalendarEntry.COLUMN_DAY_TAG);
+            if (dayTag == null) throw new IllegalArgumentException("ContentProvider " +
+                    "(Update method, calendarEntry) has received null for day tag value." );
+        }
+
+        numOfRowsUpdated = database.update(CalendarEntry.TABLE_NAME, contentValues, selection,
+                selectionArgs);
+        if (numOfRowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return numOfRowsUpdated;
     }
 
     @Nullable
