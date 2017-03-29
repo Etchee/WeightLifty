@@ -311,29 +311,51 @@ public class DataProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
         int match = matcher.match(uri);
+        int rowsUpdated;
 
         switch (match) {
 
             case CODE_CALENDAR:
-                return updateCalendar(uri, contentValues, selection, selectionArgs);
+                rowsUpdated = updateCalendar(uri, contentValues, selection, selectionArgs);
+                break;
 
             case CODE_CALENDAR_ID:
                 selection = CalendarEntry._ID + "=?";
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
-                return updateCalendar(uri, contentValues, selection, selectionArgs);
+                rowsUpdated = updateCalendar(uri, contentValues, selection, selectionArgs);
+                break;
 
             case CODE_EVENT_TYPE:
-                return updateEventType(uri, contentValues, selection, selectionArgs);
+                rowsUpdated = updateEventType(uri, contentValues, selection, selectionArgs);
+                break;
+
+            case CODE_EVENT_TYPE_ID:
+                selection = EventTypeEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                rowsUpdated = updateEventType(uri, contentValues, selection, selectionArgs);
+                break;
+
+            case CODE_EVENT:
+                rowsUpdated = updateEvent(uri, contentValues, selection, selectionArgs);
+                break;
 
             case CODE_EVENT_ID:
                 selection = EventTypeEntry._ID + "=?";
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
-                return updateEventType(uri, contentValues, selection, selectionArgs);
+                rowsUpdated = updateEvent(uri, contentValues, selection, selectionArgs);
+                break;
 
             default: throw new IllegalArgumentException("ContentProvider (update) cannot" +
                     "handle unsupported URI" + uri);
         }
+            if (rowsUpdated != 0) {
+                getContext().getContentResolver().notifyChange(uri, null);
+            }
+
+            return rowsUpdated;
     }
+
+    //TODO sanity check is right now applied for all columns. Exclude nullable values.
 
     private int updateCalendar(Uri uri, ContentValues contentValues,
                                String selection, String[] selectionArgs) {
@@ -389,6 +411,35 @@ public class DataProvider extends ContentProvider {
         }
 
         numOfRowsUpdated = database.update(EventTypeEntry.TABLE_NAME, contentValues, selection,
+                selectionArgs);
+
+        return numOfRowsUpdated;
+    }
+
+    private int updateEvent (Uri uri, ContentValues contentValues, String selection,
+                             String[] selectionArgs) {
+        int numOfRowsUpdated;
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+
+        //sanity checks
+        if (contentValues.size() == 0) throw new IllegalArgumentException("Content Provider " +
+                "(Update method, event table) received null value for contentValues");
+
+        //sanity check: if any value comes empty with a key, then there's something wrong
+
+        if (contentValues.containsKey(EventEntry.COLUMN_SUB_ID)) {
+            String sample_ID = contentValues.getAsString(EventEntry.COLUMN_SUB_ID);
+            if (sample_ID == null) throw new IllegalArgumentException("ContentProvider " +
+                    "(Update method, event table) received null value for contentValues");
+        }
+
+        if (contentValues.containsKey(EventEntry.COLUMN_WEIGHT_SEQUENCE)) {
+            String sample_weight_sequence = contentValues.getAsString(EventEntry.COLUMN_REP_SEQUENCE);
+            if (sample_weight_sequence == null) throw new IllegalArgumentException("ContentProvider" +
+                    "(Update method, event table) has received null value for contentValues");
+        }
+
+        numOfRowsUpdated = database.update(EventEntry.TABLE_NAME, contentValues, selection,
                 selectionArgs);
 
         return numOfRowsUpdated;
