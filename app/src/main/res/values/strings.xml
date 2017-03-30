@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">WeightLifty</string>
     <string name="view_tables">View Tables</string>
+    <string name="insert_dummy_data">Insert Dummy Data</string>
+    <string name="begin_workout">Begin Workout</string>
+    <string name="plan_workout">Plan Workout</string>
+    <string name="search_bar_goes_here">Search Bar Goes Here</string>
 </resources>
