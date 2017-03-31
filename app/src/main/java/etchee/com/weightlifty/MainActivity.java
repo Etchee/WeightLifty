@@ -8,8 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.Toast;
 
+import java.util.Arrays;
+import etchee.com.weightlifty.data.DataContract.CalendarEntry;
+import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 
@@ -20,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Button to view SQLite table
+        //Button to view SQLite tables
         Button viewTableButton = (Button)findViewById(R.id.view_tables_button);
         viewTableButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -30,12 +33,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Button to insert dummy data for testing purposes
-        Button insert_dummy_data = (Button)findViewById(R.id.insert_dummy_data);
+        //Button to insert dummy data to calendar
+        Button insert_dummy_data = (Button)findViewById(R.id.insert_dummy_calendar_data);
         insert_dummy_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO insert dummy data here
                 calendar_insertDummyValues();
             }
         });
@@ -58,6 +60,24 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //delete button for all data in calednar table
+        Button delete_dummy_button = (Button)findViewById(R.id.button_delete_dummy);
+        delete_dummy_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int numberOfDeletedRows = deleteAllTableData();
+            }
+        });
+
+        final Button insertDummy_eventType = (Button)findViewById(R.id.button_insert_dummy_eventType);
+        insertDummy_eventType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                eventType_inserDummyValues();
+            }
+        });
+
     }
 
     //insert fake values to all the tables to test if the tables are properly working
@@ -65,10 +85,12 @@ public class MainActivity extends AppCompatActivity {
 
         int eventIDs[] = new int[]{2,5,3,14,2};
 
+        String eventIDsString = Arrays.toString(eventIDs);
+
         ContentValues dummyValues = new ContentValues();
-        dummyValues.put(DataContract.CalendarEntry.COLUMN_DATE, "2017/02/14");
-        dummyValues.put(DataContract.CalendarEntry.COLUMN_EVENT_IDs, eventIDs.toString());
-        dummyValues.put(DataContract.CalendarEntry.COLUMN_DAY_TAG, "");
+        dummyValues.put(CalendarEntry.COLUMN_DATE, "2017/02/14");
+        dummyValues.put(CalendarEntry.COLUMN_EVENT_IDs, eventIDsString);
+        dummyValues.put(CalendarEntry.COLUMN_DAY_TAG, "");
 
         Uri uri = getContentResolver().insert(DataContract.CalendarEntry.CONTENT_URI, dummyValues);
 
@@ -76,5 +98,72 @@ public class MainActivity extends AppCompatActivity {
                 "failed to insert data. check the MainActivity method and the table.");
 
         Log.v("DUMMYDATA", "Data inserted in: " + uri);
+        Toast.makeText(this, eventIDsString, Toast.LENGTH_SHORT).show();
+    }
+
+
+    /*
+    * TODO: this method should add the number of sub IDs that matches to the number of EventEntry
+    * */
+    private void event_insertDummyValues() {
+
+        ContentValues dummyValues = new ContentValues();
+
+        int repSequence[] = new int[] {7,7,7,7,7};
+        int set_count = 5;
+        int weightSequence[] = new int[]{70,70,70,70,70};
+
+        int sub_ID[] = new int[]{0,0,0,0,0};
+
+        dummyValues.put(EventEntry.COLUMN_SUB_ID, Arrays.toString(sub_ID));
+        dummyValues.put(EventEntry.COLUMN_REP_SEQUENCE, Arrays.toString(repSequence));
+        dummyValues.put(EventEntry.COLUMN_SET_COUNT, set_count);
+        dummyValues.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, Arrays.toString(weightSequence));
+
+        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, dummyValues);
+
+        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
+                "failed to insert data. check the MainActivity method and the table.");
+
+        Log.v("DUMMYDATA", "Data inserted in: " + uri);
+        Toast.makeText(this, "Event Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void eventType_inserDummyValues() {
+
+        ContentValues dummyValues = new ContentValues();
+
+        dummyValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, "Test Event");
+
+        Uri uri = getContentResolver().insert(DataContract.EventTypeEntry.CONTENT_URI, dummyValues);
+
+        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
+                "failed to insert data. check the MainActivity method and the table.");
+
+        Log.v("DUMMYDATA", "Data inserted in: " + uri);
+        Toast.makeText(this, "EventType Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    private int deleteAllTableData() {
+        int numberOfDeletedRows = getContentResolver().delete(
+                CalendarEntry.CONTENT_URI,
+                null,
+                null);
+
+        //if succeeded
+        if (numberOfDeletedRows > 0) {
+            Toast.makeText(this,
+                    "Deleted: " + String.valueOf(numberOfDeletedRows) + " rows",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        //if failed
+        if (numberOfDeletedRows <= 0) {
+            Toast.makeText(this, "reset failed", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+        return numberOfDeletedRows;
     }
 }

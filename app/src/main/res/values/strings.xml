@@ -5,4 +5,8 @@
     <string name="begin_workout">Begin Workout</string>
     <string name="plan_workout">Plan Workout</string>
     <string name="search_bar_goes_here">Search Bar Goes Here</string>
+    <string name="delete_dummy_data">Delete all data in calendar</string>
+    <string name="developer_options">↓↓Developer Options↓↓</string>
+    <string name="insert_dummy_eventtype_data">Insert Dummy EventType data</string>
+    <string name="insert_dummy_calendar_data">Insert dummy calendar data</string>
 </resources>
