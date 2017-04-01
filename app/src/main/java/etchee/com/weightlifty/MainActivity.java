@@ -16,8 +16,6 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 
-import static android.R.attr.button;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -77,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         insertDummy_eventType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                eventType_inserDummyValues();
+                eventType_insertDummyValues();
             }
         });
 
@@ -138,10 +136,12 @@ public class MainActivity extends AppCompatActivity {
         int weightSequence[] = new int[]{70,70,70,70,70};
         int sub_ID = 0;
         int id = 0;
+        int eventID = 2;
 
 
         dummyValues.put(EventEntry._ID, id);
         dummyValues.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        dummyValues.put(EventEntry.COLUMN_EVENT_ID, eventID);
         dummyValues.put(EventEntry.COLUMN_REP_SEQUENCE, Arrays.toString(repSequence));
         dummyValues.put(EventEntry.COLUMN_SET_COUNT, set_count);
         dummyValues.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, Arrays.toString(weightSequence));
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Event Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
     }
 
-    private void eventType_inserDummyValues() {
+    private void eventType_insertDummyValues() {
 
         ContentValues dummyValues = new ContentValues();
 

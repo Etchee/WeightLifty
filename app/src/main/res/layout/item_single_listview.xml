@@ -24,7 +24,8 @@
         android:layout_marginStart="34dp"
         android:layout_toEndOf="@+id/name_workout"
         android:layout_toRightOf="@+id/name_workout"
-        android:text="@string/rep" />
+        android:text="@string/rep"
+        android:textColor="@android:color/darker_gray" />
 
     <TextView
         android:id="@+id/item_text_set"
@@ -33,7 +34,8 @@
         android:layout_above="@+id/item_text_rep"
         android:layout_alignLeft="@+id/item_text_rep"
         android:layout_alignStart="@+id/item_text_rep"
-        android:text="@string/set" />
+        android:text="@string/set"
+        android:textColor="@android:color/darker_gray" />
 
     <TextView
         android:id="@+id/item_count_rep"
@@ -44,7 +46,8 @@
         android:layout_marginStart="17dp"
         android:layout_toEndOf="@+id/item_text_set"
         android:layout_toRightOf="@+id/item_text_set"
-        android:text="@string/sample_rep" />
+        android:text="@string/sample_rep"
+        android:textColor="@android:color/darker_gray" />
 
     <TextView
         android:id="@+id/item_count_set"
@@ -53,6 +56,7 @@
         android:layout_alignLeft="@+id/item_count_rep"
         android:layout_alignStart="@+id/item_count_rep"
         android:layout_alignTop="@+id/item_text_set"
-        android:text="@string/sample_set" />
+        android:text="@string/sample_set"
+        android:textColor="@android:color/darker_gray" />
 
 </RelativeLayout>

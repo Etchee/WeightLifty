@@ -52,6 +52,7 @@ public final class DataContract {
 
         //and the columns
         public static final String COLUMN_SUB_ID = "sub_ID";
+        public static final String COLUMN_EVENT_ID = "event_ID";
         public static final String COLUMN_SET_COUNT = "set_count";
         public static final String COLUMN_REP_SEQUENCE = "rep_sequence";
         public static final String COLUMN_WEIGHT_SEQUENCE = "weight_sequence";
