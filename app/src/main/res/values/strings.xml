@@ -9,4 +9,10 @@
     <string name="developer_options">↓↓Developer Options↓↓</string>
     <string name="insert_dummy_eventtype_data">Insert Dummy EventType data</string>
     <string name="insert_dummy_calendar_data">Insert dummy calendar data</string>
+    <string name="sample_workout_name">Sample Workout Name</string>
+    <string name="set">Set:</string>
+    <string name="rep">rep:</string>
+    <string name="sample_rep">77</string>
+    <string name="sample_set">66</string>
+    <string name="insert_dummy_event">Insert dummy event value</string>
 </resources>

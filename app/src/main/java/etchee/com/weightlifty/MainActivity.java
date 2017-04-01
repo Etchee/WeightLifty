@@ -16,6 +16,8 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 
+import static android.R.attr.button;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Button to insert dummy eventType data
         final Button insertDummy_eventType = (Button)findViewById(R.id.button_insert_dummy_eventType);
         insertDummy_eventType.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +80,16 @@ public class MainActivity extends AppCompatActivity {
                 eventType_inserDummyValues();
             }
         });
+
+        final Button insert_dummy_event = (Button)findViewById(R.id.button_insert_dummy_event);
+        insert_dummy_event.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                event_insertDummyValues();
+            }
+        });
+
+
 
     }
 
@@ -107,15 +120,28 @@ public class MainActivity extends AppCompatActivity {
     * */
     private void event_insertDummyValues() {
 
+        /*
+        *   From the helper class
+        *    final String CREATE_EVENT_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
+                + EventEntry._ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SET_COUNT + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_REP_SEQUENCE + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_WEIGHT_SEQUENCE + " TEXT);";
+        * */
+
         ContentValues dummyValues = new ContentValues();
 
         int repSequence[] = new int[] {7,7,7,7,7};
         int set_count = 5;
         int weightSequence[] = new int[]{70,70,70,70,70};
+        int sub_ID = 0;
+        int id = 0;
 
-        int sub_ID[] = new int[]{0,0,0,0,0};
 
-        dummyValues.put(EventEntry.COLUMN_SUB_ID, Arrays.toString(sub_ID));
+        dummyValues.put(EventEntry._ID, id);
+        dummyValues.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         dummyValues.put(EventEntry.COLUMN_REP_SEQUENCE, Arrays.toString(repSequence));
         dummyValues.put(EventEntry.COLUMN_SET_COUNT, set_count);
         dummyValues.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, Arrays.toString(weightSequence));

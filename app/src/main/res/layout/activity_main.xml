@@ -101,6 +101,12 @@
                 android:layout_alignParentStart="true"
                 android:text="@string/insert_dummy_eventtype_data"
                 />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_insert_dummy_event"
+                android:text="@string/insert_dummy_event"
+                />
         </LinearLayout>
 
     </HorizontalScrollView>

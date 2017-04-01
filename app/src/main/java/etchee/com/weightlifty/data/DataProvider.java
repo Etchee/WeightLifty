@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import etchee.com.weightlifty.data.DataContract.*;
 
@@ -88,6 +89,8 @@ public class DataProvider extends ContentProvider {
                 //since I only have one question mark, I only need one element in the String array
 
                 //TODO When "event" column is updated, insert corresponding rows in the Event Table
+
+
 
                 selection = CalendarEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
@@ -232,9 +235,8 @@ public class DataProvider extends ContentProvider {
         if (testString == null) throw new IllegalArgumentException("Content provider's insert " +
                 "method for Event Table has received" +
                 "null for the date value. Check what is passed into the insert method");
-        if (id < 0) throw new IllegalArgumentException("Content provider's insertion (" +
-                "Event Table) has failed.");
 
+        Log.v("Content provider", "ID: " + String.valueOf(id));
         return ContentUris.withAppendedId(uri, id);
     }
 
