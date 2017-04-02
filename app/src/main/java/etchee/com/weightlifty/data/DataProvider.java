@@ -11,6 +11,9 @@ import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.sql.Date;
+import java.util.Arrays;
+
 import etchee.com.weightlifty.data.DataContract.*;
 
 import static etchee.com.weightlifty.data.DataContract.CONTENT_AUTHORITY;
@@ -89,7 +92,6 @@ public class DataProvider extends ContentProvider {
                 //since I only have one question mark, I only need one element in the String array
 
                 //TODO When "event" column is updated, insert corresponding rows in the Event Table
-
 
 
                 selection = CalendarEntry._ID + "=?";
@@ -203,7 +205,6 @@ public class DataProvider extends ContentProvider {
         return uri_new;
     }
 
-    //to be used for the actual insert implementation
     private Uri insertInCalendarTable(Uri uri, ContentValues contentValues) {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
@@ -359,12 +360,17 @@ public class DataProvider extends ContentProvider {
             return rowsUpdated;
     }
 
-    //TODO sanity check is right now applied for all columns. Exclude nullable values.
-
+    //TODO: when this method is called, check the # of events, then insert that # of rows to event table.
     private int updateCalendar(Uri uri, ContentValues contentValues,
                                String selection, String[] selectionArgs) {
         int numOfRowsUpdated;
         SQLiteDatabase database= dbHelper.getWritableDatabase();
+
+        //get the current day's date to insert as the new calendar row
+        java.util.Date today = new java.util.Date();
+        java.sql.Date sqlDate = new java.sql.Date(today.getTime());
+        String currentDate = sqlDate.toString();
+        Log.v("Date example", "date is set as: " + currentDate);
 
         //sanity check: don't need to proceed if contentValues is empty
         if (contentValues.size() == 0) throw new IllegalArgumentException("Content Provider" +
@@ -383,19 +389,53 @@ public class DataProvider extends ContentProvider {
                     "(Update method, calendarEntry) has received null for the EventIDs");
         }
 
+        //sanity check
         if (contentValues.containsKey(CalendarEntry.COLUMN_DAY_TAG)) {
             String dayTag = contentValues.getAsString(CalendarEntry.COLUMN_DAY_TAG);
             if (dayTag == null) throw new IllegalArgumentException("ContentProvider " +
                     "(Update method, calendarEntry) has received null for day tag value." );
         }
 
+        //finally, update the specified row.
         numOfRowsUpdated = database.update(CalendarEntry.TABLE_NAME, contentValues, selection,
                 selectionArgs);
         if (numOfRowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
+        //check the number of items in event column
+//        String events[] = getEventColumnAsArray();
+
         return numOfRowsUpdated;
+    }
+
+
+
+
+    private String[] getEventColumnAsArray(String date) {
+
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+
+        String projection[] = new String[]{CalendarEntry.COLUMN_EVENT_IDs};
+
+        //convert the day into ID here.　→ pass to selection.
+
+        Cursor rawEvent = database.query(
+                CalendarEntry.TABLE_NAME,
+                projection,
+                date,
+                null,
+                null,
+                null,
+                null
+        );
+
+        int columnIndex_eventIDs = rawEvent.getColumnIndex(EventEntry.COLUMN_SUB_ID);
+        String events = rawEvent.getString(columnIndex_eventIDs);
+        // これが　→ [5,5,5,5]みたいになってるので
+        String eventsArray[] = events.split(",");
+
+        return eventsArray;
     }
 
     private int updateEventType(Uri uri, ContentValues contentValues, String selection,
