@@ -231,6 +231,7 @@ public class DataProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, id);
     }
 
+
     private Uri insertInEventTable(Uri uri, ContentValues contentValues) {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
@@ -434,8 +435,8 @@ public class DataProvider extends ContentProvider {
 
     /**
      *
-     * @param date UTC formatted date to specify specific row in date column.
-     * @return teh event_id column of the row specified.
+     * @param date: format is yyyymmdd. For example, June 22 2017 would be 20170622
+     * @return the event_id column of the row specified.
      */
     private String[] getEventColumnAsArray(int date) {
 
