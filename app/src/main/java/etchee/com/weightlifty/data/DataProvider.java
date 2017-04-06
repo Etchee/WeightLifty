@@ -8,11 +8,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.provider.Settings;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.sql.Date;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import etchee.com.weightlifty.data.DataContract.*;
 
@@ -60,6 +63,7 @@ public class DataProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         dbHelper = new DataDBhelper(getContext());
+        getDateAsInt();
         return true;
     }
 
@@ -255,6 +259,19 @@ public class DataProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, id);
     }
 
+    private int getDateAsInt() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
+        Log.v("Concatenated", concatenated);
+
+        return Integer.parseInt(concatenated);
+    }
+
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int numOfRowsDeleted;
@@ -366,11 +383,15 @@ public class DataProvider extends ContentProvider {
         int numOfRowsUpdated;
         SQLiteDatabase database= dbHelper.getWritableDatabase();
 
+        /*
         //get the current day's date to insert as the new calendar row
         java.util.Date today = new java.util.Date();
         java.sql.Date sqlDate = new java.sql.Date(today.getTime());
         String currentDate = sqlDate.toString();
         Log.v("Date example", "date is set as: " + currentDate);
+        */
+
+        int dateAsInt = getDateAsInt();
 
         //sanity check: don't need to proceed if contentValues is empty
         if (contentValues.size() == 0) throw new IllegalArgumentException("Content Provider" +
@@ -403,6 +424,7 @@ public class DataProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
+
         //check the number of items in event column
 //        String events[] = getEventColumnAsArray();
 
@@ -410,20 +432,25 @@ public class DataProvider extends ContentProvider {
     }
 
 
-
-
-    private String[] getEventColumnAsArray(String date) {
+    /**
+     *
+     * @param date UTC formatted date to specify specific row in date column.
+     * @return teh event_id column of the row specified.
+     */
+    private String[] getEventColumnAsArray(int date) {
 
         SQLiteDatabase database = dbHelper.getReadableDatabase();
 
         String projection[] = new String[]{CalendarEntry.COLUMN_EVENT_IDs};
+
+        String dateAsString = String.valueOf(date);
 
         //convert the day into ID here.　→ pass to selection.
 
         Cursor rawEvent = database.query(
                 CalendarEntry.TABLE_NAME,
                 projection,
-                date,
+                dateAsString,
                 null,
                 null,
                 null,
@@ -434,6 +461,8 @@ public class DataProvider extends ContentProvider {
         String events = rawEvent.getString(columnIndex_eventIDs);
         // これが　→ [5,5,5,5]みたいになってるので
         String eventsArray[] = events.split(",");
+
+        Log.v("Event checker", eventsArray[2].toString());
 
         return eventsArray;
     }

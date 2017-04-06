@@ -38,8 +38,8 @@ public class DataDBhelper extends SQLiteOpenHelper {
         final String CREATE_CALENDAR_TABLE =
                 "CREATE TABLE IF NOT EXISTS " + CalendarEntry.TABLE_NAME + " ("
                 + CalendarEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + CalendarEntry.COLUMN_DATE + " TEXT, " //ここDateが入るけど、フォーマット？
-                + CalendarEntry.COLUMN_EVENT_IDs + " INTEGER, " //どの種目をやったのか、順番にIDでいれてく
+                + CalendarEntry.COLUMN_DATE + " INTEGER, " //ここDateが入るけど、フォーマット？
+                + CalendarEntry.COLUMN_EVENT_IDs + " TEXT, " //どの種目をやったのか、順番にIDでいれてく
                 + CalendarEntry.COLUMN_DAY_TAG + " TEXT);";    //その日の状態のノート。オプショナル
 
         //This table will contain events of workout. i.e. Barbell bench press, pull up, preacher curls...

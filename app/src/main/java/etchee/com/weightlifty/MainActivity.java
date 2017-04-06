@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.Calendar;
+
 import etchee.com.weightlifty.data.DataContract.CalendarEntry;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
@@ -91,6 +93,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private int getDateAsInt() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
+        Log.v("Concatenated", concatenated);
+
+        return Integer.parseInt(concatenated);
+    }
+
     //insert fake values to all the tables to test if the tables are properly working
     private void calendar_insertDummyValues() {
 
@@ -98,8 +113,10 @@ public class MainActivity extends AppCompatActivity {
 
         String eventIDsString = Arrays.toString(eventIDs);
 
+        int date = getDateAsInt();
+
         ContentValues dummyValues = new ContentValues();
-        dummyValues.put(CalendarEntry.COLUMN_DATE, "2017/02/14");
+        dummyValues.put(CalendarEntry.COLUMN_DATE, date);
         dummyValues.put(CalendarEntry.COLUMN_EVENT_IDs, eventIDsString);
         dummyValues.put(CalendarEntry.COLUMN_DAY_TAG, "");
 
