@@ -1,7 +1,10 @@
 package etchee.com.weightlifty;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,13 +20,17 @@ import etchee.com.weightlifty.data.DataContract.CalendarEntry;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
+import etchee.com.weightlifty.data.DataDBhelper;
 
 public class MainActivity extends AppCompatActivity {
+
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = getApplicationContext();
 
         //Button to view SQLite tables
         Button viewTableButton = (Button)findViewById(R.id.view_tables_button);
@@ -35,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         *     When this button is clicked, system checks if database has dates up to April 30th.
+         *     If not, system adds date from April 1st to April 30th for testing purpose.
+         */
         //Button to insert dummy data to calendar
         Button insert_dummy_data = (Button)findViewById(R.id.insert_dummy_calendar_data);
         insert_dummy_data.setOnClickListener(new View.OnClickListener() {
@@ -89,15 +100,54 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         *  onCreate, insert about 30 days worth of calendar data into the calendar table.
+         *
+         *  Dummy data: 2017/04/01 - 2017/04/30.
+         *
+         *  For testing purposes, program checks if the last row is April 30 row, then inserts
+         *  data up to that date if missing.
+         */
+        test_toastLastDateInCalendar();
+    }
 
+    private void test_toastLastDateInCalendar() {
+        int rowsInserted;
+        Cursor cursor;
 
+        SQLiteDatabase readDb = new DataDBhelper(context).getReadableDatabase();
+
+        //for now, I'm looking at the date column only.
+        String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
+
+        cursor = getContentResolver().query(
+                CalendarEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null,
+                null
+                );
+
+        // get the data from the last row
+        if (cursor.moveToLast()) {
+            int lastdate = cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
+            Toast.makeText(context, "Last date is: " + String.valueOf(lastdate),
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        //error handling
+        if (cursor == null) {
+            throw new IllegalArgumentException("test_toastLastDateInCalendar() function has " +
+                    "failed. Check the method or the calendar table.");
+        }
     }
 
     private int getDateAsInt() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
@@ -109,18 +159,55 @@ public class MainActivity extends AppCompatActivity {
     //insert fake values to all the tables to test if the tables are properly working
     private void calendar_insertDummyValues() {
 
-        int eventIDs[] = new int[]{2,5,3,14,2};
+        //get the date data from the last row in the calendar table
+        int rowsInserted;
+        Cursor cursor;
+        int lastDate = 0;
+        SQLiteDatabase readDb = new DataDBhelper(context).getReadableDatabase();
 
+        //for now, I'm looking at the date column only.
+        String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
+
+        cursor = getContentResolver().query(
+                CalendarEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null,
+                null
+        );
+
+        // get the data from the last row
+        if (cursor.moveToLast()) {
+            lastDate = cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
+        }
+
+        //error handling
+        if (cursor == null) {
+            throw new IllegalArgumentException("test_toastLastDateInCalendar() function has " +
+                    "failed. Check the method or the calendar table.");
+        }
+
+        int eventIDs[] = new int[]{2,5,3,14,2};
         String eventIDsString = Arrays.toString(eventIDs);
 
-        int date = getDateAsInt();
-
+        int date;
         ContentValues dummyValues = new ContentValues();
-        dummyValues.put(CalendarEntry.COLUMN_DATE, date);
-        dummyValues.put(CalendarEntry.COLUMN_EVENT_IDs, eventIDsString);
-        dummyValues.put(CalendarEntry.COLUMN_DAY_TAG, "");
+        Uri uri = null;
 
-        Uri uri = getContentResolver().insert(DataContract.CalendarEntry.CONTENT_URI, dummyValues);
+        for (int i = 1; i < 31; i++) {
+            String dateAsStr = "20174" + String.valueOf(i);
+            date = Integer.parseInt(dateAsStr);
+
+            dummyValues.put(CalendarEntry.COLUMN_DATE, date);
+            dummyValues.put(CalendarEntry.COLUMN_EVENT_IDs, eventIDsString);
+            dummyValues.put(CalendarEntry.COLUMN_DAY_TAG, "");
+
+            uri = getContentResolver().insert(DataContract.CalendarEntry.CONTENT_URI, dummyValues);
+
+            dummyValues.clear();
+            dateAsStr = "";
+        }
 
         if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
@@ -208,5 +295,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         return numberOfDeletedRows;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        test_toastLastDateInCalendar();
     }
 }

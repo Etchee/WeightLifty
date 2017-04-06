@@ -5,9 +5,12 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -31,7 +34,7 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
 
         //create the fabs
-        onCreatefabCreator();
+        onCreateFabCreator();
 
         //for the empty view
         View emptyView= findViewById(R.id.view_empty);
@@ -43,6 +46,17 @@ public class ListActivity extends AppCompatActivity {
 
         mAdapter = new listActivityAdapter(getApplicationContext(), cursor, 0);
         listview.setAdapter(mAdapter);
+        listview.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+                Toast.makeText(ListActivity.this, "Scrolled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+            }
+        });
     }
 
     private Cursor createCursor() {
@@ -57,41 +71,50 @@ public class ListActivity extends AppCompatActivity {
         };
 
         cursor = getContentResolver().query(
-          EventEntry.CONTENT_URI,
+                EventEntry.CONTENT_URI,
                 projection,
                 null,
                 null,
-                null
-        );
+                null );
         return cursor;
     }
 
-    private void onCreatefabCreator() {
+    private void onCreateFabCreator() {
 
-
-        final View actionB = findViewById(R.id.action_b);
-
-        FloatingActionButton actionC = new FloatingActionButton(getBaseContext());
-        actionC.setTitle("Hide/Show Action above");
-        actionC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                actionB.setVisibility(actionB.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-            }
-        });
-
-        final FloatingActionsMenu menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
-        menuMultipleActions.addButton(actionC);
-
-        ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
-        drawable.getPaint().setColor(getResources().getColor(R.color.white));
-
+        //Action button A  (Top)
         final FloatingActionButton actionA = (FloatingActionButton) findViewById(R.id.action_a);
         actionA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                actionA.setTitle("Action A clicked");
+
             }
         });
+
+        //Action button B (Middle)
+        final View actionB = findViewById(R.id.action_b);
+        actionB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        //Action button C (Bottom)
+        FloatingActionButton actionC = new FloatingActionButton(getBaseContext());
+        actionC.setTitle("Chest");
+        actionC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        final FloatingActionsMenu menuMultipleActions =
+                (FloatingActionsMenu)findViewById(R.id.multiple_actions);
+        menuMultipleActions.addButton(actionC);
+
+        ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+        drawable.getPaint().setColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+
     }
 }
