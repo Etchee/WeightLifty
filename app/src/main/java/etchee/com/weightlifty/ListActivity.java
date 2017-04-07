@@ -1,5 +1,6 @@
 package etchee.com.weightlifty;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -9,12 +10,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
+import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 
 /**
@@ -57,6 +60,20 @@ public class ListActivity extends AppCompatActivity {
 
             }
         });
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Toast.makeText(ListActivity.this, "Item" + String.valueOf(position) + " clicked!",
+                        Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(DataContract.CalendarEntry.COLUMN_EVENT_IDs, "selection");
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
     }
 
     private Cursor createCursor() {
@@ -90,7 +107,8 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        //Action button B (Middle)
+        //Action button B (
+        // iddle)
         final View actionB = findViewById(R.id.action_b);
         actionB.setOnClickListener(new View.OnClickListener() {
             @Override

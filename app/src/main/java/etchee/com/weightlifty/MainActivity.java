@@ -100,14 +100,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /**
-         *  onCreate, insert about 30 days worth of calendar data into the calendar table.
-         *
-         *  Dummy data: 2017/04/01 - 2017/04/30.
-         *
-         *  For testing purposes, program checks if the last row is April 30 row, then inserts
-         *  data up to that date if missing.
-         */
+
         test_toastLastDateInCalendar();
     }
 
@@ -132,8 +125,13 @@ public class MainActivity extends AppCompatActivity {
         // get the data from the last row
         if (cursor.moveToLast()) {
             int lastdate = cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
-            Toast.makeText(context, "Last date is: " + String.valueOf(lastdate),
-                    Toast.LENGTH_SHORT).show();
+            
+            if (lastdate == 2017430) {
+                Toast.makeText(context, "Valid calendar data!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Fix calendar data.", Toast.LENGTH_SHORT).show();
+            }
+            
         }
 
         //error handling

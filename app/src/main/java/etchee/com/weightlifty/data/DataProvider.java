@@ -209,6 +209,7 @@ public class DataProvider extends ContentProvider {
         return uri_new;
     }
 
+
     private Uri insertInCalendarTable(Uri uri, ContentValues contentValues) {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
@@ -329,6 +330,19 @@ public class DataProvider extends ContentProvider {
                 "method) gave an error. Number of deleted row was 0 or less.");
 
         return numOfRowsDeleted;
+    }
+
+    private int deleteEventIdInCalendarTable() {
+        int rowsDeleted;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String projection[] = new String[] {CalendarEntry.COLUMN_EVENT_IDs};
+        rowsDeleted = db.delete(
+                CalendarEntry.TABLE_NAME,
+                null,
+                projection
+        );
+
+        return rowsDeleted;
     }
 
     @Override

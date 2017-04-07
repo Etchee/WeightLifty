@@ -18,6 +18,7 @@
         </activity>
         <activity android:name=".data.DBviewer" />
         <activity android:name=".ListActivity" />
+        <activity android:name=".EditEventActivity"/>
 
         <provider
             android:authorities="etchee.com.weightlifty"

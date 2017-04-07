@@ -15,4 +15,5 @@
     <string name="sample_rep">77</string>
     <string name="sample_set">66</string>
     <string name="insert_dummy_event">Insert dummy event value</string>
+    <string name="delete_event">Delete Event</string>
 </resources>
