@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
          *     If not, system adds date from April 1st to April 30th for testing purpose.
          */
         //Button to insert dummy data to calendar
-        Button insert_dummy_data = (Button)findViewById(R.id.insert_dummy_calendar_data);
+        Button insert_dummy_data = (Button)findViewById(R.id.button_calendar_insert_dummy);
         insert_dummy_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //delete button for all data in calednar table
-        Button delete_dummy_button = (Button)findViewById(R.id.button_delete_dummy);
+        Button delete_dummy_button = (Button)findViewById(R.id.button_calendar_delete_dummy);
         delete_dummy_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Button to insert dummy eventType data
-        final Button insertDummy_eventType = (Button)findViewById(R.id.button_insert_dummy_eventType);
+        final Button insertDummy_eventType = (Button)findViewById(R.id.button_insert_eventtype);
         insertDummy_eventType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final Button insert_dummy_event = (Button)findViewById(R.id.button_insert_dummy_event);
+        final Button insert_dummy_event = (Button)findViewById(R.id.button_insert_event);
         insert_dummy_event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

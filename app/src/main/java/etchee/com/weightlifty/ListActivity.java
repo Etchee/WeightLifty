@@ -74,6 +74,14 @@ public class ListActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        FloatingActionsMenu floatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.button_chest);
+        floatingActionsMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private Cursor createCursor() {
@@ -128,7 +136,7 @@ public class ListActivity extends AppCompatActivity {
         });
 
         final FloatingActionsMenu menuMultipleActions =
-                (FloatingActionsMenu)findViewById(R.id.multiple_actions);
+                (FloatingActionsMenu)findViewById(R.id.button_chest);
         menuMultipleActions.addButton(actionC);
 
         ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
