@@ -16,4 +16,8 @@
     <string name="sample_set">66</string>
     <string name="insert_dummy_event">Insert dummy event value</string>
     <string name="delete_event">Delete Event</string>
+    <string name="hint_text_weight">Weight</string>
+    <string name="for_calendar">For Calendar</string>
+    <string name="for_event_table">For Event Table</string>
+    <string name="for_event_type_table">For Event Type Table</string>
 </resources>

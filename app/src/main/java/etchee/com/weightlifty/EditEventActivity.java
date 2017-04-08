@@ -49,6 +49,14 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         getSupportLoaderManager().initLoader(1, bundleForLoader, this);
     }
 
+    /**
+     *
+     *     This method loads data of the tapped item.
+     *
+     * @param id    onCreate sets this to 1
+     * @param args  bundle received from the UI thread. Open this magic box to get specific item
+     * @return      passes cursor to onLoadFinished
+     */
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
 
@@ -73,7 +81,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+
 
     }
 
