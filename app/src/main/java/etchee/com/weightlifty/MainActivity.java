@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         insert_dummy_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                calendar_insertDummyValues();
+//                calendar_insertDummyValues();
             }
         });
 
@@ -100,9 +100,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        test_toastLastDateInCalendar();
+        Button insert_today_data = (Button)findViewById(R.id.insert_calendar_today);
+        insert_today_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                calendar_insertTodaysRow();
+            }
+        });
     }
+/*
 
     private void test_toastLastDateInCalendar() {
         int rowsInserted;
@@ -125,11 +131,11 @@ public class MainActivity extends AppCompatActivity {
         // get the data from the last row
         if (cursor.moveToLast()) {
             int lastdate = cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
-            
+
             if (lastdate == 2017430) {
                 Toast.makeText(context, "Valid calendar data!", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(context, "Fix calendar data.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Invalid today calendar date", Toast.LENGTH_SHORT).show();
             }
             
         }
@@ -140,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     "failed. Check the method or the calendar table.");
         }
     }
+*/
 
     private int getDateAsInt() {
         Calendar calendar = Calendar.getInstance();
@@ -154,14 +161,59 @@ public class MainActivity extends AppCompatActivity {
         return Integer.parseInt(concatenated);
     }
 
+    /**
+     *  This method does the following:
+     *  1. Checks if the last row in the calendar entry is today
+     *  2. If yes, do nothing
+     *      If not, insert today's row
+     */
+    private void calendar_insertTodaysRow() {
+
+        // query the calendar table to check the last row
+        Cursor cursor;
+        int dateFromLastRow = 0;
+        String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
+
+        cursor = getContentResolver().query(
+                CalendarEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null
+                );
+        if (cursor.moveToLast()) {
+            int dateColumnIndex = cursor.getColumnIndex(CalendarEntry.COLUMN_DATE);
+            dateFromLastRow = cursor.getInt(dateColumnIndex);
+        }
+
+        //check if the date matches to that of today
+        int dateOfToday = getDateAsInt();
+
+        //if today's date doesn't match to that of the last row in calendar table, insert.
+        if (dateFromLastRow != dateOfToday) {
+            ContentValues dummyValues = new ContentValues();
+            Uri uri;
+
+            dummyValues.put(CalendarEntry.COLUMN_DATE, dateOfToday);
+            dummyValues.put(CalendarEntry.COLUMN_EVENT_IDs, "");
+            dummyValues.put(CalendarEntry.COLUMN_DAY_TAG, "");
+
+            uri = getContentResolver().insert(DataContract.CalendarEntry.CONTENT_URI, dummyValues);
+
+            //error handling block
+            if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
+                    "failed to insert data. check the MainActivity method and the table.");
+            else Toast.makeText(context, "Row inserted. Date: " + String.valueOf(dateOfToday), Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(context, "Calendar: today's record is there!", Toast.LENGTH_SHORT).show();
+
+    }
+/*
+
     //insert fake values to all the tables to test if the tables are properly working
     private void calendar_insertDummyValues() {
 
         //get the date data from the last row in the calendar table
-        int rowsInserted;
         Cursor cursor;
-        int lastDate = 0;
-        SQLiteDatabase readDb = new DataDBhelper(context).getReadableDatabase();
 
         //for now, I'm looking at the date column only.
         String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
@@ -177,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 
         // get the data from the last row
         if (cursor.moveToLast()) {
-            lastDate = cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
+            cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
         }
 
         //error handling
@@ -213,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v("DUMMYDATA", "Data inserted in: " + uri);
         Toast.makeText(this, eventIDsString, Toast.LENGTH_SHORT).show();
     }
+*/
 
 
     /*
@@ -298,6 +351,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        test_toastLastDateInCalendar();
+        calendar_insertTodaysRow();
     }
+
+
 }

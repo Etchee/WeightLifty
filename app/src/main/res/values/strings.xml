@@ -20,4 +20,5 @@
     <string name="for_calendar">For Calendar</string>
     <string name="for_event_table">For Event Table</string>
     <string name="for_event_type_table">For Event Type Table</string>
+    <string name="insert_today_calendar">Insert today Calendar</string>
 </resources>
