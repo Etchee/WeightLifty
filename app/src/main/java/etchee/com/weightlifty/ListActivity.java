@@ -1,13 +1,16 @@
 package etchee.com.weightlifty;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -82,6 +85,15 @@ public class ListActivity extends AppCompatActivity {
                 Toast.makeText(ListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
             }
         });
+
+        FloatingActionButton fab_leg = (FloatingActionButton) findViewById(R.id.fab_leg);
+        fab_leg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ChooseEventActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private Cursor createCursor() {
@@ -107,7 +119,7 @@ public class ListActivity extends AppCompatActivity {
     private void onCreateFabCreator() {
 
         //Action button A  (Top)
-        final FloatingActionButton actionA = (FloatingActionButton) findViewById(R.id.action_a);
+        final FloatingActionButton actionA = (FloatingActionButton) findViewById(R.id.fab_leg);
         actionA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,5 +154,44 @@ public class ListActivity extends AppCompatActivity {
         ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
         drawable.getPaint().setColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
 
+    }
+
+
+    /*
+    * TODO: this method should add the number of sub IDs that matches to the number of EventEntry
+    * */
+    private void event_insertDummyValues() {
+
+        /*
+        *   From the helper class
+        *    final String CREATE_EVENT_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
+                + EventEntry._ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SET_COUNT + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_REP_SEQUENCE + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_WEIGHT_SEQUENCE + " TEXT);";
+        * */
+
+        ContentValues dummyValues = new ContentValues();
+        int sub_ID = 0;
+        int id = 0;
+        int eventID = 2;
+
+
+        dummyValues.put(EventEntry._ID, id);
+        dummyValues.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        dummyValues.put(EventEntry.COLUMN_EVENT_ID, eventID);
+        dummyValues.put(EventEntry.COLUMN_REP_SEQUENCE, "");
+        dummyValues.put(EventEntry.COLUMN_SET_COUNT, 0);
+        dummyValues.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, "");
+
+        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, dummyValues);
+
+        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
+                "failed to insert data. check the MainActivity method and the table.");
+
+        Log.v("DUMMYDATA", "Data inserted in: " + uri);
+        Toast.makeText(this, "Event Data inserted in: " + uri.toString(), Toast.LENGTH_SHORT).show();
     }
 }

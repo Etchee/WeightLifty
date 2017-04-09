@@ -263,9 +263,6 @@ public class MainActivity extends AppCompatActivity {
 */
 
 
-    /*
-    * TODO: this method should add the number of sub IDs that matches to the number of EventEntry
-    * */
     private void event_insertDummyValues() {
 
         /*

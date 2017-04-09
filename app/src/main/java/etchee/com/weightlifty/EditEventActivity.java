@@ -1,5 +1,7 @@
 package etchee.com.weightlifty;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
 import etchee.com.weightlifty.data.DataContract;
 
@@ -32,6 +35,26 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_edit);
+
+        /*
+        *   Quoted contentValue making statement from the ChooseEventActivity.class
+        *
+        int set_count = 5;
+        int sub_ID = 0;
+        int id = 0;
+        int eventID = 2;
+
+        squatValues.put(EventEntry._ID, id);
+        squatValues.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        squatValues.put(EventEntry.COLUMN_EVENT_ID, eventID);
+        squatValues.put(EventEntry.COLUMN_SET_COUNT, set_count);
+        * */
+
+        //get the intent
+        Bundle bundle = getIntent().getExtras();
+        ContentValues values = (ContentValues) bundle.get("values");
+        int set_count = values.getAsInteger(DataContract.EventEntry.COLUMN_SET_COUNT);
+        Toast.makeText(this, "Sets: " + String.valueOf(set_count), Toast.LENGTH_SHORT).show();
 
         //number picker for set
         numberPicker_set = (NumberPicker)findViewById(R.id.set_numberPicker);
