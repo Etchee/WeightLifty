@@ -42,19 +42,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /**
-         *     When this button is clicked, system checks if database has dates up to April 30th.
-         *     If not, system adds date from April 1st to April 30th for testing purpose.
-         */
-        //Button to insert dummy data to calendar
-        Button insert_dummy_data = (Button)findViewById(R.id.button_calendar_insert_dummy);
-        insert_dummy_data.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                calendar_insertDummyValues();
-            }
-        });
-
         //"Begin Workout" button to launch listActivity
         Button begin_workout = (Button)findViewById(R.id.begin_workout_button);
         begin_workout.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +92,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 calendar_insertTodaysRow();
+            }
+        });
+
+        final Button delete_event_data = (Button)findViewById(R.id.button_remove_events);
+        delete_event_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteEventTable();
             }
         });
     }
@@ -323,6 +318,16 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v("DUMMYDATA", "Data inserted in: " + uri);
         Toast.makeText(this, "EventType Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    private int deleteEventTable() {
+        int numberofDeletedRows = getContentResolver().delete(
+                EventEntry.CONTENT_URI,
+                null,
+                null
+        );
+        Toast.makeText(context, String.valueOf(numberofDeletedRows) + " rows deleted.", Toast.LENGTH_SHORT).show();
+        return numberofDeletedRows;
     }
 
     private int deleteAllTableData() {
