@@ -24,6 +24,14 @@ public final class DataContract {
 
     }
 
+    public static final class GlobalConstants {
+
+        //When an item in listActivity is clicked, pass the item ID
+        public static final String ITEM_ID = "item_id";
+        //From ChooseEventActivity, contentValues will be passed.
+        public static final String CONTENT_VALUES = "contentValues";
+    }
+
     public static final class CalendarEntry implements BaseColumns {
 
         //content URI for this table

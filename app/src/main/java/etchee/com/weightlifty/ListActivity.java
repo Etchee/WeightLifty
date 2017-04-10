@@ -43,7 +43,7 @@ public class ListActivity extends AppCompatActivity {
         onCreateFabCreator();
 
         //for the empty view
-        View emptyView= findViewById(R.id.view_empty);
+        View emptyView = findViewById(R.id.view_empty);
         listview = (ListView)findViewById(R.id.listview_workout);
         listview.setEmptyView(emptyView);
         Cursor cursor = createCursor();
@@ -52,18 +52,11 @@ public class ListActivity extends AppCompatActivity {
 
         mAdapter = new listActivityAdapter(getApplicationContext(), cursor, 0);
         listview.setAdapter(mAdapter);
-        listview.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-                Toast.makeText(ListActivity.this, "Scrolled", Toast.LENGTH_SHORT).show();
-            }
 
-            @Override
-            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
-
-            }
-        });
-
+        /**
+         *  When an item on the listView is clicked, get the (INT) item id, put on the bundle and deliver
+         *      to EditActivity.
+         */
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -72,7 +65,8 @@ public class ListActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString(DataContract.CalendarEntry.COLUMN_EVENT_IDs, "selection");
+                //put ID in the bundle
+                bundle.putInt(DataContract.GlobalConstants.ITEM_ID, position);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }

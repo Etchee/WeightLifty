@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DataContract.CalendarEntry;
 
@@ -34,7 +36,7 @@ public class ChooseEventActivity extends AppCompatActivity {
             public void onClick(View view) {
                 ContentValues values = addSquatEvent();
                 Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
-                intent.putExtra("values", values);
+                intent.putExtra(DataContract.GlobalConstants.CONTENT_VALUES, values);
                 startActivity(intent);
             }
         });

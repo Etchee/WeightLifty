@@ -31,8 +31,12 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     private static final int REP_MAXVALUE = 500;
     private static final int REP_MINVALUE = 1;
 
+    private static final String ORDER_DECENDING = " DESC";
+    private static final String ORDER_ASCENDING = " ASC";
+
     private static final int LOADER_CREATE_NEW_EVENT_MODE = 0;
     private static final int LOADER_MODIFY_EVENT_MODE = 1;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,7 +55,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         /**
          *  When this activity is opened, two modes:
          *  1. From ListActivity, tapping on already existing item.
-         *      → Modify event, bundle w/ item ID, and selection(Column to load data from).
+         *      → Modify event, bundle w/ selection. Select that in the event table, query, display.
          *
          *  2. From ChooseEventActivity, selecting which workout.
          *      → Create event, bundle w/ contentValues.
@@ -59,14 +63,14 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         Bundle bundle = getIntent().getExtras();
 
         // Case 1: creating a new event → bundle with contentValues.
-        if (bundle.get("values")!= null) {
+        if (bundle.get(DataContract.GlobalConstants.CONTENT_VALUES)!= null) {
 
             getSupportLoaderManager().initLoader(LOADER_CREATE_NEW_EVENT_MODE, bundle, this);
 
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
         }
         // Case 2: modifying an already existing event → bundle with selection.
-        else if (bundle.get("selection") != null) {
+        else if (bundle.get(DataContract.GlobalConstants.ITEM_ID) != null) {
             //init the loader
             Toast.makeText(this, "Modify event mode", Toast.LENGTH_SHORT).show();
             getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
@@ -87,6 +91,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
      */
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
+
+        CursorLoader cursorLoader = null;
 
          /*
         *   Quoted contentValue making statement from the ChooseEventActivity.class
@@ -112,24 +118,40 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             //イベントのID
             int event_id = values.getAsInteger(DataContract.EventEntry.COLUMN_EVENT_ID);
             */
+        if (id == LOADER_CREATE_NEW_EVENT_MODE) {
+            //get all the variables from the contentValues, then display on the fields
 
-        String ORDER_DECENDING = " DESC";
-        String ORDER_ASCENDING = " ASC";
-        String selection = args.getString("selection");
-        String projection[] = new String[]{DataContract.CalendarEntry.COLUMN_EVENT_IDs};
-        //sort order is "column_name ASC" or "column_name DESC"
-        String sortorder = DataContract.CalendarEntry.COLUMN_EVENT_IDs + ORDER_DECENDING;
+        }
+
+        else if (id == LOADER_MODIFY_EVENT_MODE) {
+
+            /*  Example selection selectionArgs
+
+            Cursor cursor = mDb.query(DATABASE_TABLE,
+            new String [] {KEY_DATE, KEY_REPS, KEY_REPS_FEEL, KEY_WEIGHT, KEY_WEIGHT_FEEL}, "KEY_WORKOUT = ? AND KEY_EXERCISE = ?",
+            new String[] { workout, exercise },
+            null,
+            null,
+            KEY_DATE);
+
+            * */
+            String selection = args.getString("selection");
+            String projection[] = new String[]{DataContract.CalendarEntry.COLUMN_EVENT_IDs};
+            //sort order is "column_name ASC" or "column_name DESC"
+            String sortorder = DataContract.CalendarEntry.COLUMN_EVENT_IDs + ORDER_DECENDING;
 
 
-        CursorLoader cursorLoader = new CursorLoader(
-                getApplicationContext(),
-                DataContract.CalendarEntry.CONTENT_URI,
-                projection,
-                selection,
-                null,
-                null
-                );
+            cursorLoader = new CursorLoader(
+                    getApplicationContext(),
+                    DataContract.CalendarEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    null,
+                    null
+            );
 
+            
+        }
         return cursorLoader;
     }
 
