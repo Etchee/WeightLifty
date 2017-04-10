@@ -27,7 +27,7 @@ public final class DataContract {
     public static final class GlobalConstants {
 
         //When an item in listActivity is clicked, pass the item ID
-        public static final String ITEM_ID = "item_id";
+        public static final String SUB_ID = "item_sub_id";
         //From ChooseEventActivity, contentValues will be passed.
         public static final String CONTENT_VALUES = "contentValues";
     }

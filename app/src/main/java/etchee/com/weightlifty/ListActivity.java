@@ -66,7 +66,7 @@ public class ListActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
                 Bundle bundle = new Bundle();
                 //put ID in the bundle
-                bundle.putInt(DataContract.GlobalConstants.ITEM_ID, position);
+                bundle.putInt(DataContract.GlobalConstants.SUB_ID, position);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }

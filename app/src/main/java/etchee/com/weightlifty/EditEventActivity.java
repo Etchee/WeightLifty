@@ -1,9 +1,6 @@
 package etchee.com.weightlifty;
 
-import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -12,6 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.widget.NumberPicker;
 import android.widget.Toast;
+import etchee.com.weightlifty.data.DataContract.EventEntry;
 
 import etchee.com.weightlifty.data.DataContract;
 
@@ -70,7 +68,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
         }
         // Case 2: modifying an already existing event → bundle with selection.
-        else if (bundle.get(DataContract.GlobalConstants.ITEM_ID) != null) {
+        else if (bundle.get(DataContract.GlobalConstants.SUB_ID) != null) {
             //init the loader
             Toast.makeText(this, "Modify event mode", Toast.LENGTH_SHORT).show();
             getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
@@ -86,11 +84,11 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
      *     If modifying data, fire up loader for background thread data loading.
      *
      * @param id    onCreate sets this to 1
-     * @param args  bundle received from the UI thread. Open this magic box to get specific item
+     * @param bundle  bundle received from the UI thread. Open this magic box to get specific item
      * @return      passes cursor to onLoadFinished
      */
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle bundle) {
 
         CursorLoader cursorLoader = null;
 
@@ -135,22 +133,27 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             KEY_DATE);
 
             * */
-            String selection = args.getString("selection");
-            String projection[] = new String[]{DataContract.CalendarEntry.COLUMN_EVENT_IDs};
+
+            //this would be the selection number
+            int rowID = bundle.getInt(DataContract.GlobalConstants.SUB_ID);
+            String projection[] = new String[]{
+                    EventEntry.COLUMN_EVENT_ID,
+                    EventEntry.COLUMN_SET_COUNT,
+                    EventEntry.COLUMN_REP_SEQUENCE,
+                    EventEntry.COLUMN_WEIGHT_SEQUENCE
+            };
             //sort order is "column_name ASC" or "column_name DESC"
             String sortorder = DataContract.CalendarEntry.COLUMN_EVENT_IDs + ORDER_DECENDING;
 
 
             cursorLoader = new CursorLoader(
                     getApplicationContext(),
-                    DataContract.CalendarEntry.CONTENT_URI,
+                    DataContract.EventEntry.CONTENT_URI,
                     projection,
-                    selection,
+                    String.valueOf(rowID),
                     null,
                     null
             );
-
-            
         }
         return cursorLoader;
     }
@@ -158,7 +161,22 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
+        /*
+        EventEntry.COLUMN_EVENT_ID,
+                    EventEntry.COLUMN_SET_COUNT,
+                    EventEntry.COLUMN_REP_SEQUENCE,
+                    EventEntry.COLUMN_WEIGHT_SEQUENCE
+        * */
 
+        if (cursor.moveToFirst()) {
+            int setCountIndex = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
+            int repSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_REP_SEQUENCE);
+            int weightSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_SEQUENCE);
+
+            int setCount = cursor.getInt(setCountIndex);
+            String repSequence = cursor.getString(repSequenceIndex);
+            String weightSequence = cursor.getString(weightSequenceIndex);
+        }
     }
 
     @Override
