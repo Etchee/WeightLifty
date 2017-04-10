@@ -265,18 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void event_insertDummyValues() {
 
-        /*
-        *   From the helper class
-        *    final String CREATE_EVENT_TABLE =
-                "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
-                + EventEntry._ID + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_SET_COUNT + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_REP_SEQUENCE + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_WEIGHT_SEQUENCE + " TEXT);";
-        * */
-
-        ContentValues dummyValues = new ContentValues();
+        ContentValues values = new ContentValues();
 
         int repSequence[] = new int[] {7,7,7,7,7};
         int set_count = 5;
@@ -286,16 +275,16 @@ public class MainActivity extends AppCompatActivity {
         int eventID = 2;
 
 
-        dummyValues.put(EventEntry._ID, id);
-        dummyValues.put(EventEntry.COLUMN_SUB_ID, sub_ID);
-        dummyValues.put(EventEntry.COLUMN_EVENT_ID, eventID);
-        dummyValues.put(EventEntry.COLUMN_REP_SEQUENCE, Arrays.toString(repSequence));
-        dummyValues.put(EventEntry.COLUMN_SET_COUNT, set_count);
-        dummyValues.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, Arrays.toString(weightSequence));
+        values.put(EventEntry._ID, id);
+        values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        values.put(EventEntry.COLUMN_EVENT_ID, eventID);
+        values.put(EventEntry.COLUMN_REP_SEQUENCE, Arrays.toString(repSequence));
+        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
+        values.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, Arrays.toString(weightSequence));
 
-        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, dummyValues);
+        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
 
-        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
+        if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
 
         Log.v("DUMMYDATA", "Data inserted in: " + uri);

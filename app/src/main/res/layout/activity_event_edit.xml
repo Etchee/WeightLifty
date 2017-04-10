@@ -32,10 +32,10 @@
         android:id="@+id/delete_workout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/delete_event"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="14dp"
-        android:text="@string/delete_event" />
+        android:layout_alignLeft="@+id/hint_text_set"
+        android:layout_alignStart="@+id/hint_text_set" />
 
     <NumberPicker
         android:id="@+id/set_numberPicker"
@@ -84,5 +84,14 @@
         android:layout_alignTop="@+id/hint_text_rep"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/add_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/input_weight_number"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/input_weight_number"
+        android:text="@string/add_event" />
 
 </RelativeLayout>

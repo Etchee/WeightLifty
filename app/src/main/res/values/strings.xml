@@ -22,4 +22,5 @@
     <string name="for_event_type_table">For Event Type Table</string>
     <string name="insert_today_calendar">Insert today Calendar</string>
     <string name="delete_all_events">Delete All Events</string>
+    <string name="add_event">Add Event</string>
 </resources>

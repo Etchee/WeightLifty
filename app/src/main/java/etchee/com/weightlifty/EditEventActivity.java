@@ -1,14 +1,25 @@
 package etchee.com.weightlifty;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 
 import etchee.com.weightlifty.data.DataContract;
@@ -22,8 +33,13 @@ import etchee.com.weightlifty.data.DataContract;
 
 public class EditEventActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, NumberPicker.OnValueChangeListener {
 
+    //component declaration
     private NumberPicker numberPicker_set;
     private NumberPicker numberPicker_rep;
+    private TextView name_workout;
+    private TextView weight_sequence;
+    private Button add_event;
+
     private static final int SET_MAXVALUE = 30;
     private static final int SET_MINVALUE = 1;
     private static final int REP_MAXVALUE = 500;
@@ -50,6 +66,11 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         numberPicker_rep.setMaxValue(REP_MAXVALUE);
         numberPicker_rep.setMinValue(REP_MINVALUE);
 
+        //other components assignment
+        name_workout = (TextView) findViewById(R.id.name_workout);
+        weight_sequence = (TextView)findViewById(R.id.input_weight_number);
+        add_event = (Button)findViewById(R.id.add_event);
+
         /**
          *  When this activity is opened, two modes:
          *  1. From ListActivity, tapping on already existing item.
@@ -61,11 +82,17 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         Bundle bundle = getIntent().getExtras();
 
         // Case 1: creating a new event → bundle with contentValues.
+        // use inner class to just get the title of the workout, then display.
         if (bundle.get(DataContract.GlobalConstants.CONTENT_VALUES)!= null) {
-
-            getSupportLoaderManager().initLoader(LOADER_CREATE_NEW_EVENT_MODE, bundle, this);
-
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
+
+            ContentValues values = (ContentValues) bundle.get(DataContract.GlobalConstants.CONTENT_VALUES);
+            int sampleValue = values.getAsInteger(EventEntry.COLUMN_EVENT_ID);
+
+            //TODO fix onQueryComplete nullpointer
+            String eventName = getEventTypeAsString(sampleValue);
+
+            name_workout.setText(eventName);
         }
         // Case 2: modifying an already existing event → bundle with selection.
         else if (bundle.get(DataContract.GlobalConstants.SUB_ID) != null) {
@@ -92,32 +119,9 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
         CursorLoader cursorLoader = null;
 
-         /*
-        *   Quoted contentValue making statement from the ChooseEventActivity.class
-        *
-        int set_count = 5;
-        int sub_ID = 0;
-        int id = 0;
-        int eventID = 2;
 
-        squatValues.put(EventEntry._ID, id);
-        squatValues.put(EventEntry.COLUMN_SUB_ID, sub_ID);
-        squatValues.put(EventEntry.COLUMN_EVENT_ID, eventID);
-        squatValues.put(EventEntry.COLUMN_SET_COUNT, set_count);
-        * */
-
-        //when creating a new event,
-        /*
-        * ContentValues values = (ContentValues) bundle.get("values");
-            //how many sets
-            int set_count = values.getAsInteger(DataContract.EventEntry.COLUMN_SET_COUNT);
-            //同じ日付IDで、何番目のアイテム？
-            int sub_id = values.getAsInteger(DataContract.EventEntry.COLUMN_SUB_ID);
-            //イベントのID
-            int event_id = values.getAsInteger(DataContract.EventEntry.COLUMN_EVENT_ID);
-            */
         if (id == LOADER_CREATE_NEW_EVENT_MODE) {
-            //get all the variables from the contentValues, then display on the fields
+            //handled in onCreate... don't have to do anything here
 
         }
 
@@ -158,25 +162,50 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         return cursorLoader;
     }
 
+    /**
+     *
+     * @param loader    takes the loader (with the set ID) from onCreateLoader
+     * @param cursor    takes the cursor created from onCreateLoader
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
         /*
-        EventEntry.COLUMN_EVENT_ID,
+                    EventEntry.COLUMN_EVENT_ID,
                     EventEntry.COLUMN_SET_COUNT,
                     EventEntry.COLUMN_REP_SEQUENCE,
                     EventEntry.COLUMN_WEIGHT_SEQUENCE
         * */
 
+        Toast.makeText(this, "onLoadFinished is called", Toast.LENGTH_SHORT).show();
+
         if (cursor.moveToFirst()) {
             int setCountIndex = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
             int repSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_REP_SEQUENCE);
             int weightSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_SEQUENCE);
+            int eventID = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
 
             int setCount = cursor.getInt(setCountIndex);
             String repSequence = cursor.getString(repSequenceIndex);
             String weightSequence = cursor.getString(weightSequenceIndex);
+
+            numberPicker_set.setValue(setCount);
+
+            getEventTypeAsString(eventID);
+
+            //TODO: take first item in rep sequence, assign to the textView
+
+//            name_workout.setText();
         }
+        /*
+        *   components that need to be updated
+        *   private NumberPicker numberPicker_set;
+            private NumberPicker numberPicker_rep;
+            private TextView name_workout;
+            private TextView weight_sequence;
+            private Button add_event;
+        * */
+
     }
 
     @Override
@@ -187,5 +216,98 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
 
+    }
+
+    public String getEventTypeAsString(int eventID) {
+
+        String result = "";
+
+        //projection takes on the two columns, because I query the ID and get the string column back
+        String projection[] = new String[]{
+                DataContract.EventTypeEntry._ID,
+                DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+        };
+
+        String selection = DataContract.EventTypeEntry._ID + "=?";
+
+        // in the table, return row where the COLUMN_ID = eventID
+        String selectionArgs[] = new String[] { String.valueOf(eventID) };
+
+        QueryEventName eventTypeQuery = new QueryEventName(getContentResolver(), getApplicationContext());
+        eventTypeQuery.startQuery(
+                DataContract.GlobalConstants.QUERY_EVENT_NAME,
+                null,
+                DataContract.EventTypeEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+
+        return result;
+    }
+}
+
+/**
+ *  Inner class that asynchronically query EventType table to get String value of event type.
+ */
+
+class QueryEventName extends AsyncQueryHandler {
+
+    private Context context;
+
+
+    public QueryEventName(ContentResolver contentResolver, Context context) {
+        super(contentResolver);
+        this.context = context;
+    }
+
+    @Override
+    protected Handler createHandler(Looper looper) {
+        return super.createHandler(looper);
+    }
+
+    /**
+     *
+     * @param id    Identifier of the specific query -- passed to onQueryComplete.
+     * @param cookie    Object that gets passed to onQueryComplete.
+     * @param uri
+     * @param projection
+     * @param selection
+     * @param selectionArgs
+     * @param orderBy
+     */
+    @Override
+    public void startQuery(int id, Object cookie, Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy) {
+        super.startQuery(id, cookie, uri, projection, selection, selectionArgs, orderBy);
+    }
+
+    @Override
+    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+        super.onQueryComplete(token, cookie, cursor);
+
+        int eventNameColumnIndex = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+        String testString = cursor.getString(eventNameColumnIndex);
+        Toast.makeText(context, "Event name queried: " + testString, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onInsertComplete(int token, Object cookie, Uri uri) {
+        super.onInsertComplete(token, cookie, uri);
+    }
+
+    @Override
+    protected void onUpdateComplete(int token, Object cookie, int result) {
+        super.onUpdateComplete(token, cookie, result);
+    }
+
+    @Override
+    protected void onDeleteComplete(int token, Object cookie, int result) {
+        super.onDeleteComplete(token, cookie, result);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+        super.handleMessage(msg);
     }
 }

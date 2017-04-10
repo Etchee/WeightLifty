@@ -30,6 +30,9 @@ public final class DataContract {
         public static final String SUB_ID = "item_sub_id";
         //From ChooseEventActivity, contentValues will be passed.
         public static final String CONTENT_VALUES = "contentValues";
+
+        //in the inner class in EditEventActivity, "QueryEventName", id for making a loader.
+        public static final int QUERY_EVENT_NAME = 0;
     }
 
     public static final class CalendarEntry implements BaseColumns {
