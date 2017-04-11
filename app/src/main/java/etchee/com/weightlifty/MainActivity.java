@@ -339,11 +339,4 @@ public class MainActivity extends AppCompatActivity {
         return numberOfDeletedRows;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        calendar_insertTodaysRow();
-    }
-
-
 }

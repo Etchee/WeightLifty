@@ -177,8 +177,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                     EventEntry.COLUMN_WEIGHT_SEQUENCE
         * */
 
-        Toast.makeText(this, "onLoadFinished is called", Toast.LENGTH_SHORT).show();
-
         if (cursor.moveToFirst()) {
             int setCountIndex = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
             int repSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_REP_SEQUENCE);
@@ -233,7 +231,26 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         // in the table, return row where the COLUMN_ID = eventID
         String selectionArgs[] = new String[] { String.valueOf(eventID) };
 
-        QueryEventName eventTypeQuery = new QueryEventName(getContentResolver(), getApplicationContext());
+        //Async querying of the eventType table
+
+        AsyncQueryHandler eventTypeQuery = new AsyncQueryHandler(getContentResolver()) {
+
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                if (cursor == null) {
+                    throw new IllegalArgumentException("Background Query returned null");
+                }
+
+                int eventNameColumnIndex =
+                        cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+
+                String testString = cursor.getString(eventNameColumnIndex);
+                Toast.makeText(getApplicationContext(),
+                        "Event name queried: " + testString,
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
+
         eventTypeQuery.startQuery(
                 DataContract.GlobalConstants.QUERY_EVENT_NAME,
                 null,
@@ -245,69 +262,5 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         );
 
         return result;
-    }
-}
-
-/**
- *  Inner class that asynchronically query EventType table to get String value of event type.
- */
-
-class QueryEventName extends AsyncQueryHandler {
-
-    private Context context;
-
-
-    public QueryEventName(ContentResolver contentResolver, Context context) {
-        super(contentResolver);
-        this.context = context;
-    }
-
-    @Override
-    protected Handler createHandler(Looper looper) {
-        return super.createHandler(looper);
-    }
-
-    /**
-     *
-     * @param id    Identifier of the specific query -- passed to onQueryComplete.
-     * @param cookie    Object that gets passed to onQueryComplete.
-     * @param uri
-     * @param projection
-     * @param selection
-     * @param selectionArgs
-     * @param orderBy
-     */
-    @Override
-    public void startQuery(int id, Object cookie, Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy) {
-        super.startQuery(id, cookie, uri, projection, selection, selectionArgs, orderBy);
-    }
-
-    @Override
-    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-        super.onQueryComplete(token, cookie, cursor);
-
-        int eventNameColumnIndex = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
-        String testString = cursor.getString(eventNameColumnIndex);
-        Toast.makeText(context, "Event name queried: " + testString, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onInsertComplete(int token, Object cookie, Uri uri) {
-        super.onInsertComplete(token, cookie, uri);
-    }
-
-    @Override
-    protected void onUpdateComplete(int token, Object cookie, int result) {
-        super.onUpdateComplete(token, cookie, result);
-    }
-
-    @Override
-    protected void onDeleteComplete(int token, Object cookie, int result) {
-        super.onDeleteComplete(token, cookie, result);
-    }
-
-    @Override
-    public void handleMessage(Message msg) {
-        super.handleMessage(msg);
     }
 }
