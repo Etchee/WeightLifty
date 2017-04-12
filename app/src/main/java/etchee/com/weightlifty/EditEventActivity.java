@@ -1,7 +1,9 @@
 package etchee.com.weightlifty;
 
+import android.app.Activity;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +17,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -87,12 +90,9 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
 
             ContentValues values = (ContentValues) bundle.get(DataContract.GlobalConstants.CONTENT_VALUES);
-            int sampleValue = values.getAsInteger(EventEntry.COLUMN_EVENT_ID);
+            int sampleValue = values.getAsInteger(DataContract.GlobalConstants.SUB_ID);
 
-            //TODO fix onQueryComplete nullpointer
-            String eventName = getEventTypeAsString(sampleValue);
-
-            name_workout.setText(eventName);
+        getEventTypeAsString(sampleValue);
         }
         // Case 2: modifying an already existing event → bundle with selection.
         else if (bundle.get(DataContract.GlobalConstants.SUB_ID) != null) {
@@ -231,26 +231,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         // in the table, return row where the COLUMN_ID = eventID
         String selectionArgs[] = new String[] { String.valueOf(eventID) };
 
-        //Async querying of the eventType table
-
-        AsyncQueryHandler eventTypeQuery = new AsyncQueryHandler(getContentResolver()) {
-
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                if (cursor == null) {
-                    throw new IllegalArgumentException("Background Query returned null");
-                }
-
-                int eventNameColumnIndex =
-                        cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
-
-                String testString = cursor.getString(eventNameColumnIndex);
-                Toast.makeText(getApplicationContext(),
-                        "Event name queried: " + testString,
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
-
+        EventTypeQuery eventTypeQuery = new EventTypeQuery(getContentResolver(), this);
         eventTypeQuery.startQuery(
                 DataContract.GlobalConstants.QUERY_EVENT_NAME,
                 null,
@@ -261,6 +242,51 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                 null
         );
 
+
         return result;
+    }
+}
+
+class EventTypeQuery extends AsyncQueryHandler {
+
+    private TextView eventNameText;
+
+    public EventTypeQuery(ContentResolver cr, Activity activity) {
+        super(cr);
+
+        eventNameText = (TextView) activity.findViewById(R.id.edit_workout_name);
+    }
+
+    /**
+     *      This method takes event ID and should return the String value after referring to the
+     *      EventType SQL query.
+     *
+     * @param token
+     * @param cookie
+     * @param uri
+     * @param projection
+     * @param selection
+     * @param selectionArgs
+     * @param orderBy
+     */
+
+    @Override
+    public void startQuery(int token, Object cookie, Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy) {
+        super.startQuery(token, cookie, uri, projection, selection, selectionArgs, orderBy);
+    }
+
+    @Override
+    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+        if (cursor == null) throw new IllegalArgumentException("Async EventTypeQuery has returned" +
+                "a null cursor");
+        else {
+            String eventAsString;
+            int eventStringColumnIndex;
+            eventStringColumnIndex = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+            if (cursor.moveToFirst()) {
+                eventAsString = cursor.getString(eventStringColumnIndex);
+                eventNameText.setText(eventAsString);
+            }
+        }
     }
 }

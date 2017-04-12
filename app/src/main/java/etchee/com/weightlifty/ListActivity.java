@@ -63,6 +63,17 @@ public class ListActivity extends AppCompatActivity {
                 Toast.makeText(ListActivity.this, "Item" + String.valueOf(position) + " clicked!",
                         Toast.LENGTH_SHORT).show();
 
+                //When this item is clicked, based on the position passed, query EventTable
+                //to get the Event Name.
+                //Args → Calendar table _ID and subID
+                String projection[] = new String[]{EventEntry.COLUMN_EVENT_ID};
+                String selection = EventEntry.COLUMN_EVENT_ID + "=?";
+                String selectionArgs[] = new String[]{String.valueOf(position)};
+                getContentResolver().query(
+                        EventEntry.CONTENT_URI,
+
+                )
+
                 Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
                 Bundle bundle = new Bundle();
                 //put ID in the bundle
@@ -148,44 +159,5 @@ public class ListActivity extends AppCompatActivity {
         ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
         drawable.getPaint().setColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
 
-    }
-
-
-    /*
-    * TODO: this method should add the number of sub IDs that matches to the number of EventEntry
-    * */
-    private void event_insertDummyValues() {
-
-        /*
-        *   From the helper class
-        *    final String CREATE_EVENT_TABLE =
-                "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
-                + EventEntry._ID + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_SET_COUNT + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_REP_SEQUENCE + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_WEIGHT_SEQUENCE + " TEXT);";
-        * */
-
-        ContentValues dummyValues = new ContentValues();
-        int sub_ID = 0;
-        int id = 0;
-        int eventID = 2;
-
-
-        dummyValues.put(EventEntry._ID, id);
-        dummyValues.put(EventEntry.COLUMN_SUB_ID, sub_ID);
-        dummyValues.put(EventEntry.COLUMN_EVENT_ID, eventID);
-        dummyValues.put(EventEntry.COLUMN_REP_SEQUENCE, "");
-        dummyValues.put(EventEntry.COLUMN_SET_COUNT, 0);
-        dummyValues.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, "");
-
-        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, dummyValues);
-
-        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
-                "failed to insert data. check the MainActivity method and the table.");
-
-        Log.v("DUMMYDATA", "Data inserted in: " + uri);
-        Toast.makeText(this, "Event Data inserted in: " + uri.toString(), Toast.LENGTH_SHORT).show();
     }
 }

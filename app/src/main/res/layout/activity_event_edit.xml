@@ -15,7 +15,7 @@
         android:layout_alignParentStart="true" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/edit_workout_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -42,8 +42,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/delete_workout"
-        android:layout_alignLeft="@+id/editText"
-        android:layout_alignStart="@+id/editText"
+        android:layout_alignLeft="@+id/edit_workout_name"
+        android:layout_alignStart="@+id/edit_workout_name"
         android:paddingTop="10dp" />
 
     <NumberPicker
@@ -71,7 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/rep"
-        android:layout_below="@+id/editText"
+        android:layout_below="@+id/edit_workout_name"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="18dp" />
 
