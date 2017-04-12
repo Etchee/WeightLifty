@@ -50,8 +50,7 @@ public class DataProvider extends ContentProvider {
 
         //EVENT_TYPE: querying the entire table i.e. inserting a new row
         matcher.addURI(CONTENT_AUTHORITY, PATH_EVENT_TYPE, CODE_EVENT_TYPE);
-        //EVENT_TYPE: querying a certain row from the table i.e. fixing typo in event name
-        matcher.addURI(CONTENT_AUTHORITY, PATH_EVENT_TYPE + "/#", CODE_EVENT_TYPE_ID);
+
 
         //EVENT: querying the entire table i.e. inserting a new row
         matcher.addURI(CONTENT_AUTHORITY, PATH_EVENT, CODE_EVENT);
@@ -113,21 +112,6 @@ public class DataProvider extends ContentProvider {
 
             //query the entire event table
             case CODE_EVENT:
-                cursor = database.query(
-                        EventEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        null);
-                break;
-
-            //query specific in event table
-            case CODE_EVENT_ID:
-                selection = EventEntry._ID + "=?";
-                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
-
                 cursor = database.query(
                         EventEntry.TABLE_NAME,
                         projection,
