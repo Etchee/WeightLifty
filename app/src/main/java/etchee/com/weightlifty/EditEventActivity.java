@@ -54,34 +54,30 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     private static final int LOADER_CREATE_NEW_EVENT_MODE = 0;
     private static final int LOADER_MODIFY_EVENT_MODE = 1;
 
-
+    /**
+     *  Two modes for this activity:
+     *  1. From ListActivity, tapping on already existing item.
+     *      → Modify event, bundle w/ selection. Select that in the event table, query, display.
+     *
+     *  2. From ChooseEventActivity, selecting which workout.
+     *      → Create event, bundle w/ contentValues.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_edit);
 
-        //Number pickers settings
         numberPicker_set = (NumberPicker)findViewById(R.id.set_numberPicker);
         numberPicker_set.setMaxValue(SET_MAXVALUE);
         numberPicker_set.setMinValue(SET_MINVALUE);
-
         numberPicker_rep = (NumberPicker)findViewById(R.id.rep_numberPicker);
         numberPicker_rep.setMaxValue(REP_MAXVALUE);
         numberPicker_rep.setMinValue(REP_MINVALUE);
-
-        //other components assignment
         name_workout = (TextView) findViewById(R.id.name_workout);
         weight_sequence = (TextView)findViewById(R.id.input_weight_number);
         add_event = (Button)findViewById(R.id.add_event);
 
-        /**
-         *  When this activity is opened, two modes:
-         *  1. From ListActivity, tapping on already existing item.
-         *      → Modify event, bundle w/ selection. Select that in the event table, query, display.
-         *
-         *  2. From ChooseEventActivity, selecting which workout.
-         *      → Create event, bundle w/ contentValues.
-         */
+
         Bundle bundle = getIntent().getExtras();
 
         // Case 1: creating a new event → bundle with contentValues.

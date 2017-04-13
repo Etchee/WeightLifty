@@ -45,13 +45,13 @@ public final class DataContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CALENDAR;
 
-        public static final String TABLE_NAME = "calendar";
+        public static final String TABLE_NAME = "table_calendar";
         public static final String _ID = BaseColumns._ID;
 
         //and the columns
-        public static final String COLUMN_DATE = "date";
-        public static final String COLUMN_EVENT_IDs = "event_id";
-        public static final String COLUMN_DAY_TAG = "day_note";
+        public static final String COLUMN_DATE = "table_calendar_date";
+        public static final String COLUMN_EVENT_IDs = "table_calendar_event_id";
+        public static final String COLUMN_DAY_TAG = "table_calendar_day_note";
     }
 
     public static final class EventEntry implements BaseColumns {
@@ -60,15 +60,16 @@ public final class DataContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENT).build();
 
-        public static final String TABLE_NAME = "event";
+        public static final String TABLE_NAME = "table_event";
         public static final String _ID = BaseColumns._ID;
 
         //and the columns
-        public static final String COLUMN_SUB_ID = "sub_ID";
-        public static final String COLUMN_EVENT_ID = "event_ID";
-        public static final String COLUMN_SET_COUNT = "set_count";
-        public static final String COLUMN_REP_SEQUENCE = "rep_sequence";
-        public static final String COLUMN_WEIGHT_SEQUENCE = "weight_sequence";
+        public static final String COLUMN_SUB_ID = "table_event_sub_id";
+        public static final String COLUMN_DATE = "table_event_date";
+        public static final String COLUMN_EVENT_ID = "table_event_event_id";
+        public static final String COLUMN_SET_COUNT = "table_event_set_count";
+        public static final String COLUMN_REP_SEQUENCE = "table_event_rep_sequence";
+        public static final String COLUMN_WEIGHT_SEQUENCE = "table_event_weight_sequence";
 
     }
 
@@ -79,10 +80,10 @@ public final class DataContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENT_TYPE).build();
 
-        public static final String TABLE_NAME = "event_type";
+        public static final String TABLE_NAME = "table_eventType";
         public static final String _ID = BaseColumns._ID;
 
         //and the columns
-        public static final String COLUMN_EVENT_NAME = "event_name";
+        public static final String COLUMN_EVENT_NAME = "table_eventType_event_name";
     }
 }

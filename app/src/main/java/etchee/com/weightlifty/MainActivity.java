@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-/*
 
     private void test_toastLastDateInCalendar() {
         int rowsInserted;
@@ -141,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                     "failed. Check the method or the calendar table.");
         }
     }
-*/
 
     private int getDateAsInt() {
         Calendar calendar = Calendar.getInstance();
@@ -269,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
         int repSequence[] = new int[] {7,7,7,7,7};
         int set_count = 5;
+        int date = getDateAsInt();
         int weightSequence[] = new int[]{70,70,70,70,70};
         int sub_ID = 0;
         int id = 0;
@@ -277,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
 
         values.put(EventEntry._ID, id);
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        values.put(EventEntry.COLUMN_DATE, date);
         values.put(EventEntry.COLUMN_EVENT_ID, eventID);
         values.put(EventEntry.COLUMN_REP_SEQUENCE, Arrays.toString(repSequence));
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
@@ -307,13 +307,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int deleteEventTable() {
-        int numberofDeletedRows = getContentResolver().delete(
+        int numberOfDeletedRows = getContentResolver().delete(
                 EventEntry.CONTENT_URI,
                 null,
                 null
         );
-        Toast.makeText(context, String.valueOf(numberofDeletedRows) + " rows deleted.", Toast.LENGTH_SHORT).show();
-        return numberofDeletedRows;
+        Toast.makeText(context, String.valueOf(numberOfDeletedRows) + " rows deleted.", Toast.LENGTH_SHORT).show();
+        return numberOfDeletedRows;
     }
 
     private int deleteAllTableData() {
@@ -334,9 +334,12 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "reset failed", Toast.LENGTH_SHORT).show();
         }
 
-
-
         return numberOfDeletedRows;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        test_toastLastDateInCalendar();
+    }
 }
