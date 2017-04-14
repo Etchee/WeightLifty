@@ -33,6 +33,8 @@ public final class DataContract {
 
         //in the inner class in EditEventActivity, "QueryEventName", id for making a loader.
         public static final int QUERY_EVENT_NAME = 0;
+        public static final int QUERY_EVENT_TYPE = 2;
+        public static final int QUERY_EVENT_ID = 4;
 
         public static final String PASS_EVENT_STRING = "eventStringPassed";
     }

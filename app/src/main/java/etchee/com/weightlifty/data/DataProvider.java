@@ -125,7 +125,7 @@ public class DataProvider extends ContentProvider {
             //query entire event_type table
             case CODE_EVENT_TYPE:
                 cursor = database.query(
-                        EventEntry.TABLE_NAME,
+                        EventTypeEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
