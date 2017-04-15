@@ -53,6 +53,23 @@ public class ListActivity extends AppCompatActivity {
         //create the fabs
         onCreateFabCreator();
 
+        FloatingActionsMenu floatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.button_chest);
+        floatingActionsMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        FloatingActionButton fab_leg = (FloatingActionButton) findViewById(R.id.fab_leg);
+        fab_leg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ChooseEventActivity.class);
+                startActivity(intent);
+            }
+        });
+
         contentResolver = getContentResolver();
 
         //for the empty view
@@ -73,27 +90,11 @@ public class ListActivity extends AppCompatActivity {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(ListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
                 queryEventID(position);
             }
         });
 
-        FloatingActionsMenu floatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.button_chest);
-        floatingActionsMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(ListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
 
-        FloatingActionButton fab_leg = (FloatingActionButton) findViewById(R.id.fab_leg);
-        fab_leg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ChooseEventActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private void queryEventID(int position) {
@@ -101,7 +102,7 @@ public class ListActivity extends AppCompatActivity {
         int date_today = getDateAsInt();
 
         //Define async query handler
-        AsyncQueryHandler queryHandler = new AsyncQueryHandler(getContentResolver()) {
+        AsyncQueryHandler queryHandler = new AsyncQueryHandler(contentResolver) {
 
             @Override
             public void startQuery(int token, Object cookie, Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy) {
@@ -111,20 +112,21 @@ public class ListActivity extends AppCompatActivity {
 
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                int eventID;
 
                 //Token will be passed to prevent confusion on multi querying
                 if (token == DataContract.GlobalConstants.QUERY_EVENT_ID) {
 
-                    if (cursor != null) {
+                    if (cursor.moveToFirst()) {
                         int index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
-                        int eventID[] = new int[1];
                         int count = cursor.getCount();
-                        eventID[0] = cursor.getInt(index);
-                        Toast.makeText(ListActivity.this, "event ID is: " +
-                                String.valueOf(eventID[0]), Toast.LENGTH_SHORT).show();
-                    } if (cursor == null) throw new IllegalArgumentException("Cursor is null");
+                        eventID = Integer.parseInt(cursor.getString(index));
+
+                    } else throw new CursorIndexOutOfBoundsException("Cursor could not move to first");
                 } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
+
                 Log.v("Event ID query", "Status: Completed");
+                Toast.makeText(ListActivity.this, "event ID is: " + String.valueOf(eventID), Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -201,7 +203,7 @@ public class ListActivity extends AppCompatActivity {
         String selectionArgs_eventTypeTable[] = new String[]{String.valueOf(1)};
 
         //Async query for EVENT ID
-        AsyncQueryHandler queryEventID = new AsyncQueryHandler(getContentResolver()) {
+        AsyncQueryHandler queryEventID = new AsyncQueryHandler(contentResolver) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor EventIDcursor) {
                 //Event table　→　put Event ID in eventID[0]
@@ -218,7 +220,7 @@ public class ListActivity extends AppCompatActivity {
         };
 
         //Async query for EVENT TYPE str
-        AsyncQueryHandler queryEventType = new AsyncQueryHandler(getContentResolver()) {
+        AsyncQueryHandler queryEventType = new AsyncQueryHandler(contentResolver) {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor EventTypeCursor) {
                 //EventType table → put event name str in eventString[0]
@@ -274,7 +276,7 @@ public class ListActivity extends AppCompatActivity {
                 EventEntry.COLUMN_SET_COUNT,
         };
 
-        cursor = getContentResolver().query(
+        cursor = contentResolver.query(
                 EventEntry.CONTENT_URI,
                 projection,
                 null,
