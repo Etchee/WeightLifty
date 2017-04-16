@@ -84,7 +84,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         numberPicker_rep = (NumberPicker) findViewById(R.id.rep_numberPicker);
         numberPicker_rep.setMaxValue(REP_MAXVALUE);
         numberPicker_rep.setMinValue(REP_MINVALUE);
-        name_workout = (TextView) findViewById(R.id.name_workout);
+        name_workout = (TextView) findViewById(R.id.edit_workout_name);
         weight_sequence = (TextView) findViewById(R.id.input_weight_number);
         add_event = (Button) findViewById(R.id.add_event);
 
@@ -99,6 +99,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             ContentValues values = (ContentValues) bundle.get(DataContract.GlobalConstants.CONTENT_VALUES);
             int sampleValue = values.getAsInteger(DataContract.GlobalConstants.SUB_ID);
         }
+
         // Case 2: modifying an already existing event → bundle with selection.
         if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
 
@@ -109,6 +110,9 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             //init the loader
             Toast.makeText(this, "Modifying event: " + String.valueOf(receivedEventID), Toast.LENGTH_SHORT).show();
             getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
+
+            //then show the event String
+            queryEventType(getReceivedEventID());
         } else {
             throw new IllegalArgumentException("EditEventActivity did not receive bundle of" +
                     "selection columns nor contentValues to make a new event");
@@ -186,7 +190,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             String weightSequence = cursor.getString(weightSequenceIndex);
 
             numberPicker_set.setValue(setCount);
-            
+
             queryEventType(getReceivedEventID());
 
             //TODO: take first item in rep sequence, assign to the textView
@@ -238,6 +242,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                     throw new IllegalArgumentException("Illegal token received at Event String query.");
 
                 Toast.makeText(EditEventActivity.this, "Type Query finished", Toast.LENGTH_SHORT).show();
+                name_workout.setText(getEventString());
             }
         };
 
