@@ -38,8 +38,6 @@ public class ListActivity extends AppCompatActivity {
     private ContentResolver contentResolver;
 
     private int eventID;
-    private String eventString;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,17 +85,22 @@ public class ListActivity extends AppCompatActivity {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                queryEventID(position);
-                queryEventType(1);
+                launchEditActivityWithEventID(position);
             }
         });
 
 
     }
 
-    private void queryEventIDHandler(int eventID) {
+    private int getEventID() {
+        return eventID;
+    }
+
+    private void setEventID(int eventID) {
         this.eventID = eventID;
     }
+
+
 
 
     /**
@@ -105,7 +108,7 @@ public class ListActivity extends AppCompatActivity {
      *                 This method find the specific row with the sub_id, then get the event_id
      *                 back in that row.
      */
-    private void queryEventID(int position) {
+    private void launchEditActivityWithEventID(int position) {
 
         int date_today = getDateAsInt();
 
@@ -129,8 +132,68 @@ public class ListActivity extends AppCompatActivity {
                 } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
 
                 Log.v("Event ID query", "Status: Completed");
-                queryEventIDHandler(eventID);
-                Toast.makeText(ListActivity.this, "event ID is: " + String.valueOf(eventID), Toast.LENGTH_SHORT).show();
+                setEventID(eventID);
+
+                Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt(DataContract.GlobalConstants.PASS_EVENT_ID, getEventID());
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        };
+
+        //projection
+        String projection[] = new String[]{
+                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_SUB_ID,
+                EventEntry.COLUMN_EVENT_ID
+        };
+
+        //selection
+        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+
+        //selectionArgs
+        String selectionArgs[] = new String[]{
+                String.valueOf(date_today),
+                String.valueOf(position)
+        };
+
+        //Finally, fire the query!
+        queryHandler.startQuery(
+                DataContract.GlobalConstants.QUERY_EVENT_ID,
+                null,
+                EventEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+    }
+
+    private void queryEventIDinEventTable(int position){
+        int date_today = getDateAsInt();
+
+        //Define async query handler
+        AsyncQueryHandler queryHandler = new AsyncQueryHandler(contentResolver) {
+
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                int eventID = -1;
+
+                //Token will be passed to prevent confusion on multi querying
+                if (token == DataContract.GlobalConstants.QUERY_EVENT_ID) {
+                    if (cursor.moveToFirst()) {
+                        int index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
+                        eventID = Integer.parseInt(cursor.getString(index));
+
+                    }
+
+                    else if (!cursor.moveToFirst()) throw new CursorIndexOutOfBoundsException("EventID query: Cursor might be empty");
+
+                } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
+
+                Log.v("Event ID query", "Status: Completed");
+                setEventID(eventID);
             }
         };
 
@@ -164,68 +227,7 @@ public class ListActivity extends AppCompatActivity {
 
 
 
-    /**
-     *
-     * @param eventID: index of the item in ListView. This is equivalent to the item number in the
-     *                sub_id column in Event Table.
-     *
-     *        This method takes the sub_id, and traces to the event name String in the event table.
-     *
-     */
-    private void queryEventType(int eventID) {
 
-        //define onQueryComplete
-        AsyncQueryHandler queryEventType = new AsyncQueryHandler(contentResolver) {
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-
-                String eventString;
-
-                //EventType table → put event name str in eventString[0]
-                if (token == DataContract.GlobalConstants.QUERY_EVENT_TYPE) {
-
-                    if (cursor.moveToFirst()) {
-                        int index = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
-                        eventString = cursor.getString(index);
-
-                    } else throw new CursorIndexOutOfBoundsException("Cursor could not move to first.");
-                }else throw new IllegalArgumentException("Illegal token received at Event String query.");
-
-                Log.v("Event ID query", "Status: Completed");
-                queryEventTypeHandler(ListActivity.this.eventString);
-                Toast.makeText(ListActivity.this, "Event is: " + eventString, Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        //projection
-        String projection[] = new String[]{
-                DataContract.EventTypeEntry._ID,
-                DataContract.EventTypeEntry.COLUMN_EVENT_NAME
-        };
-
-        //select row by eventID
-        String selection = DataContract.EventTypeEntry._ID + "=?";
-
-        //eventID will be thrown in the parameter
-        String selectionArgs[] = new String[]{String.valueOf(eventID)};
-
-
-
-        //Finally, fire the query!
-        queryEventType.startQuery(
-                DataContract.GlobalConstants.QUERY_EVENT_TYPE,
-                null,
-                DataContract.EventTypeEntry.CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                null
-        );
-    }
-
-    private void queryEventTypeHandler(String eventType) {
-        this.eventString = eventType;
-    }
 
     private Cursor createCursor() {
         Cursor cursor;

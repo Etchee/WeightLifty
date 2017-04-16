@@ -26,7 +26,7 @@
         android:layout_marginTop="15dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="@string/sample_workout_name" />
+        android:text="@android:string/untitled" />
 
     <Button
         android:id="@+id/delete_workout"

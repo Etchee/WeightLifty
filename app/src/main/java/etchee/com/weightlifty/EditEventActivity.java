@@ -7,16 +7,19 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
@@ -54,46 +57,57 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     private static final int LOADER_CREATE_NEW_EVENT_MODE = 0;
     private static final int LOADER_MODIFY_EVENT_MODE = 1;
 
+    private String eventType;
+
+    private int receivedEventID = -1;
+
+
+
+    private String eventString;
+
     /**
-     *  Two modes for this activity:
-     *  1. From ListActivity, tapping on already existing item.
-     *      → Modify event, bundle w/ selection. Select that in the event table, query, display.
-     *
-     *  2. From ChooseEventActivity, selecting which workout.
-     *      → Create event, bundle w/ contentValues.
+     * Two modes for this activity:
+     * 1. From ListActivity, tapping on already existing item.
+     * → Modify event, bundle w/ selection. Select that in the event table, query, display.
+     * <p>
+     * 2. From ChooseEventActivity, selecting which workout.
+     * → Create event, bundle w/ contentValues.
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_edit);
 
-        numberPicker_set = (NumberPicker)findViewById(R.id.set_numberPicker);
+        numberPicker_set = (NumberPicker) findViewById(R.id.set_numberPicker);
         numberPicker_set.setMaxValue(SET_MAXVALUE);
         numberPicker_set.setMinValue(SET_MINVALUE);
-        numberPicker_rep = (NumberPicker)findViewById(R.id.rep_numberPicker);
+        numberPicker_rep = (NumberPicker) findViewById(R.id.rep_numberPicker);
         numberPicker_rep.setMaxValue(REP_MAXVALUE);
         numberPicker_rep.setMinValue(REP_MINVALUE);
         name_workout = (TextView) findViewById(R.id.name_workout);
-        weight_sequence = (TextView)findViewById(R.id.input_weight_number);
-        add_event = (Button)findViewById(R.id.add_event);
+        weight_sequence = (TextView) findViewById(R.id.input_weight_number);
+        add_event = (Button) findViewById(R.id.add_event);
 
 
         Bundle bundle = getIntent().getExtras();
 
         // Case 1: creating a new event → bundle with contentValues.
         // use inner class to just get the title of the workout, then display.
-        if (bundle.get(DataContract.GlobalConstants.CONTENT_VALUES)!= null) {
+        if (bundle.get(DataContract.GlobalConstants.CONTENT_VALUES) != null) {
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
 
             ContentValues values = (ContentValues) bundle.get(DataContract.GlobalConstants.CONTENT_VALUES);
             int sampleValue = values.getAsInteger(DataContract.GlobalConstants.SUB_ID);
-
-        getEventTypeAsString(sampleValue);
         }
         // Case 2: modifying an already existing event → bundle with selection.
-        else if (bundle.get(DataContract.GlobalConstants.SUB_ID) != null) {
+        if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
+
+            setReceivedEventID(bundle.getInt(DataContract.GlobalConstants.PASS_EVENT_ID));
+            if (receivedEventID < 0 ) {
+                Log.e("receivedEventID", "Did not get event ID from ListActivity. Check Intent");
+            }
             //init the loader
-            Toast.makeText(this, "Modify event mode", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Modifying event: " + String.valueOf(receivedEventID), Toast.LENGTH_SHORT).show();
             getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
         } else {
             throw new IllegalArgumentException("EditEventActivity did not receive bundle of" +
@@ -103,12 +117,11 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     }
 
     /**
+     * If modifying data, fire up loader for background thread data loading.
      *
-     *     If modifying data, fire up loader for background thread data loading.
-     *
-     * @param id    onCreate sets this to 1
-     * @param bundle  bundle received from the UI thread. Open this magic box to get specific item
-     * @return      passes cursor to onLoadFinished
+     * @param id     onCreate sets this to 1
+     * @param bundle bundle received from the UI thread. Open this magic box to get specific item
+     * @return passes cursor to onLoadFinished
      */
     @Override
     public Loader onCreateLoader(int id, Bundle bundle) {
@@ -116,23 +129,14 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         CursorLoader cursorLoader = null;
 
 
+        //WHEN CREATING A NEW EVENT
         if (id == LOADER_CREATE_NEW_EVENT_MODE) {
             //handled in onCreate... don't have to do anything here
 
         }
 
-        else if (id == LOADER_MODIFY_EVENT_MODE) {
-
-            /*  Example selection selectionArgs
-
-            Cursor cursor = mDb.query(DATABASE_TABLE,
-            new String [] {KEY_DATE, KEY_REPS, KEY_REPS_FEEL, KEY_WEIGHT, KEY_WEIGHT_FEEL}, "KEY_WORKOUT = ? AND KEY_EXERCISE = ?",
-            new String[] { workout, exercise },
-            null,
-            null,
-            KEY_DATE);
-
-            * */
+        //WHEN MODIFYING A EVENT
+        if (id == LOADER_MODIFY_EVENT_MODE) {
 
             //this would be the selection number
             int rowID = bundle.getInt(DataContract.GlobalConstants.SUB_ID);
@@ -159,9 +163,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     }
 
     /**
-     *
-     * @param loader    takes the loader (with the set ID) from onCreateLoader
-     * @param cursor    takes the cursor created from onCreateLoader
+     * @param loader takes the loader (with the set ID) from onCreateLoader
+     * @param cursor takes the cursor created from onCreateLoader
      */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -177,15 +180,14 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             int setCountIndex = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
             int repSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_REP_SEQUENCE);
             int weightSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_SEQUENCE);
-            int eventID = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
 
             int setCount = cursor.getInt(setCountIndex);
             String repSequence = cursor.getString(repSequenceIndex);
             String weightSequence = cursor.getString(weightSequenceIndex);
 
             numberPicker_set.setValue(setCount);
-
-            getEventTypeAsString(eventID);
+            
+            queryEventType(getReceivedEventID());
 
             //TODO: take first item in rep sequence, assign to the textView
 
@@ -212,24 +214,49 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
     }
 
-    public String getEventTypeAsString(int eventID) {
+    /**
+     * @param eventID: index of the item in ListView. This is equivalent to the item number in the
+     *                 sub_id column in Event Table.
+     *                 <p>
+     *                 This method takes the sub_id, and traces to the event name String in the event table.
+     */
+    private void queryEventType(int eventID) {
 
-        String result = "";
+        //define onQueryComplete
+        AsyncQueryHandler queryEventType = new AsyncQueryHandler(getContentResolver()) {
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 
-        //projection takes on the two columns, because I query the ID and get the string column back
+                if (token == DataContract.GlobalConstants.QUERY_EVENT_TYPE) {
+
+                    if (cursor.moveToFirst()) {
+                        int index = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+                        setEventString(cursor.getString(index));
+                    } else
+                        throw new CursorIndexOutOfBoundsException("Cursor could not move to first.");
+                } else
+                    throw new IllegalArgumentException("Illegal token received at Event String query.");
+
+                Toast.makeText(EditEventActivity.this, "Type Query finished", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        //projection
         String projection[] = new String[]{
                 DataContract.EventTypeEntry._ID,
                 DataContract.EventTypeEntry.COLUMN_EVENT_NAME
         };
 
+        //select row by eventID
         String selection = DataContract.EventTypeEntry._ID + "=?";
 
-        // in the table, return row where the COLUMN_ID = eventID
-        String selectionArgs[] = new String[] { String.valueOf(eventID) };
+        //eventID will be thrown in the parameter
+        String selectionArgs[] = new String[]{String.valueOf(eventID)};
 
-        EventTypeQuery eventTypeQuery = new EventTypeQuery(getContentResolver(), this);
-        eventTypeQuery.startQuery(
-                DataContract.GlobalConstants.QUERY_EVENT_NAME,
+
+        //Finally, fire the query!
+        queryEventType.startQuery(
+                DataContract.GlobalConstants.QUERY_EVENT_TYPE,
                 null,
                 DataContract.EventTypeEntry.CONTENT_URI,
                 projection,
@@ -237,52 +264,21 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                 selectionArgs,
                 null
         );
-
-
-        return result;
-    }
-}
-
-class EventTypeQuery extends AsyncQueryHandler {
-
-    private TextView eventNameText;
-
-    public EventTypeQuery(ContentResolver cr, Activity activity) {
-        super(cr);
-
-        eventNameText = (TextView) activity.findViewById(R.id.edit_workout_name);
     }
 
-    /**
-     *      This method takes event ID and should return the String value after referring to the
-     *      EventType SQL query.
-     *
-     * @param token
-     * @param cookie
-     * @param uri
-     * @param projection
-     * @param selection
-     * @param selectionArgs
-     * @param orderBy
-     */
-
-    @Override
-    public void startQuery(int token, Object cookie, Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy) {
-        super.startQuery(token, cookie, uri, projection, selection, selectionArgs, orderBy);
+    private int getReceivedEventID() {
+        return receivedEventID;
     }
 
-    @Override
-    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-        if (cursor == null) throw new IllegalArgumentException("Async EventTypeQuery has returned" +
-                "a null cursor");
-        else {
-            String eventAsString;
-            int eventStringColumnIndex;
-            eventStringColumnIndex = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
-            if (cursor.moveToFirst()) {
-                eventAsString = cursor.getString(eventStringColumnIndex);
-                eventNameText.setText(eventAsString);
-            }
-        }
+    private void setReceivedEventID(int receivedEventID) {
+        this.receivedEventID = receivedEventID;
+    }
+
+    private String getEventString() {
+        return eventString;
+    }
+
+    private void setEventString(String eventString) {
+        this.eventString = eventString;
     }
 }

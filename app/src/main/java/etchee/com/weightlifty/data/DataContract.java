@@ -36,7 +36,7 @@ public final class DataContract {
         public static final int QUERY_EVENT_TYPE = 2;
         public static final int QUERY_EVENT_ID = 4;
 
-        public static final String PASS_EVENT_STRING = "eventStringPassed";
+        public static final String PASS_EVENT_ID = "eventIDpassed";
     }
 
     public static final class CalendarEntry implements BaseColumns {
