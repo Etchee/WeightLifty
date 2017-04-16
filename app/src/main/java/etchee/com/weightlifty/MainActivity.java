@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         int set_count = 5;
         int date = getDateAsInt();
         int weightSequence[] = new int[]{70,70,70,70,70};
-        int sub_ID = 0;
+        int sub_ID = getNextSub_id();
         int id = 0;
         int eventID = 2;
 
@@ -289,6 +289,37 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v("DUMMYDATA", "Data inserted in: " + uri);
         Toast.makeText(this, "Event Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    private int getNextSub_id() {
+        int sub_id;
+        int date = getDateAsInt();
+
+        String projection[] = new String[]{EventEntry.COLUMN_DATE, EventEntry.COLUMN_SUB_ID};
+        String selection = EventEntry.COLUMN_DATE + "=?";
+        String selectionArgs[] = new String[]{String.valueOf(date)};
+
+        Cursor cursor = getContentResolver().query(
+            EventEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+
+        //if cursor comes back, there is already some rows
+        if (cursor.moveToLast()) {
+            int index = cursor.getColumnIndex(EventEntry.COLUMN_SUB_ID);
+            sub_id = cursor.getInt(index) + 1;
+            Log.v("GetNextSubID", "Data exists, incremented");
+        } else {
+            Log.v("GetNextSubID", "Set sub_id as zero");
+            sub_id = 0;
+        }
+
+
+
+        return sub_id;
     }
 
     private void eventType_insertDummyValues() {
