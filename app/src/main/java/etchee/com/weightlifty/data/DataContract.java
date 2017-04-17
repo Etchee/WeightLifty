@@ -36,6 +36,14 @@ public final class DataContract {
         public static final int QUERY_EVENT_TYPE = 2;
         public static final int QUERY_EVENT_ID = 4;
 
+        public static final int QUERY_SETS_NUMBER = 8;
+        public static final int QUERY_REPS_COUNT = 16;
+        public static final int QUERY_WEIGHT_COUNT = 32;
+
+        public static final String PASS_SUB_ID = "subIDpassed";
+
+
+
         public static final String PASS_EVENT_ID = "eventIDpassed";
     }
 
@@ -70,8 +78,8 @@ public final class DataContract {
         public static final String COLUMN_DATE = "table_event_date";
         public static final String COLUMN_EVENT_ID = "table_event_event_id";
         public static final String COLUMN_SET_COUNT = "table_event_set_count";
-        public static final String COLUMN_REP_SEQUENCE = "table_event_rep_sequence";
-        public static final String COLUMN_WEIGHT_SEQUENCE = "table_event_weight_sequence";
+        public static final String COLUMN_REP_COUNT = "table_event_rep_count";
+        public static final String COLUMN_WEIGHT_COUNT = "table_event_weight_count";
 
     }
 

@@ -47,7 +47,7 @@ public class listActivityAdapter extends CursorAdapter {
 
 //        int workoutName_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_SUB_ID);
 
-        int repCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_REP_SEQUENCE);
+        int repCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_REP_COUNT);
         int setCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_SET_COUNT);
 
         String repSequnce = cursor.getString(repCount_columnIndex);

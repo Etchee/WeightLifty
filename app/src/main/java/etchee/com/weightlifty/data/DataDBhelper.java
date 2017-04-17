@@ -57,8 +57,8 @@ public class DataDBhelper extends SQLiteOpenHelper {
                 + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
                 + EventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, "
                 + EventEntry.COLUMN_SET_COUNT + " INTEGER NOT NULL, "
-                + EventEntry.COLUMN_REP_SEQUENCE + " TEXT , "
-                + EventEntry.COLUMN_WEIGHT_SEQUENCE + " TEXT);";
+                + EventEntry.COLUMN_REP_COUNT + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_WEIGHT_COUNT + " INTEGER NOT NULL);";
 
         db.execSQL(CREATE_CALENDAR_TABLE);
         db.execSQL(CREATE_EVENT_TYPE_TABLE);

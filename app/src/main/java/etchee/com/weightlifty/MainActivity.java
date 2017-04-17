@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.data.DataContract.CalendarEntry;
@@ -265,10 +264,10 @@ public class MainActivity extends AppCompatActivity {
 
         ContentValues values = new ContentValues();
 
-        int repSequence[] = new int[] {7,7,7,7,7};
+        int rep_count = 7;
         int set_count = 5;
         int date = getDateAsInt();
-        int weightSequence[] = new int[]{70,70,70,70,70};
+        int weight_count = 70;
         int sub_ID = getNextSub_id();
         int id = 0;
         int eventID = 2;
@@ -278,9 +277,9 @@ public class MainActivity extends AppCompatActivity {
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);
         values.put(EventEntry.COLUMN_EVENT_ID, eventID);
-        values.put(EventEntry.COLUMN_REP_SEQUENCE, Arrays.toString(repSequence));
+        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
-        values.put(EventEntry.COLUMN_WEIGHT_SEQUENCE, Arrays.toString(weightSequence));
+        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
 
         Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
 

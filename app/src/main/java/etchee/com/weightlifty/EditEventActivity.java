@@ -1,34 +1,31 @@
 package etchee.com.weightlifty;
 
-import android.app.Activity;
 import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.net.Uri;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import etchee.com.weightlifty.data.DataContract.EventEntry;
+import java.util.Calendar;
 
 import etchee.com.weightlifty.data.DataContract;
+import etchee.com.weightlifty.data.DataContract.EventEntry;
+
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_SETS_NUMBER;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_WEIGHT_COUNT;
 
 /**
  * Created by rikutoechigoya on 2017/04/07.
@@ -61,6 +58,10 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
     private int receivedEventID = -1;
 
+    private AsyncQueryHandler queryHandler;
+
+    private int sub_ID;
+
 
 
     private String eventString;
@@ -88,8 +89,12 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         weight_sequence = (TextView) findViewById(R.id.input_weight_number);
         add_event = (Button) findViewById(R.id.add_event);
 
+        defineQueryHandler();
+
 
         Bundle bundle = getIntent().getExtras();
+
+        sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID);
 
         // Case 1: creating a new event → bundle with contentValues.
         // use inner class to just get the title of the workout, then display.
@@ -107,18 +112,94 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             if (receivedEventID < 0 ) {
                 Log.e("receivedEventID", "Did not get event ID from ListActivity. Check Intent");
             }
+
             //init the loader
-            Toast.makeText(this, "Modifying event: " + String.valueOf(receivedEventID), Toast.LENGTH_SHORT).show();
             getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
 
             //then show the event String
             queryEventType(getReceivedEventID());
+
+            //set the number of sets
+            queryNumberOfSets(getDateAsInt(), sub_ID);
+
+            //set the number of reps
+            queryNumberOfReps(getDateAsInt(), sub_ID);
+
+            //set the weight figure
+            queryWeightCount(getDateAsInt(), sub_ID);
+
+
         } else {
             throw new IllegalArgumentException("EditEventActivity did not receive bundle of" +
                     "selection columns nor contentValues to make a new event");
         }
 
     }
+
+    private void defineQueryHandler() {
+
+        queryHandler = new AsyncQueryHandler(getContentResolver()) {
+
+            @Override
+            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+
+                switch (token) {
+
+                    case QUERY_EVENT_TYPE:
+                        if (cursor.moveToFirst()) {
+                            int index = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+                            setEventString(cursor.getString(index));
+                            cursor.close();
+                        } else throw new CursorIndexOutOfBoundsException("Event string query: " +
+                                "cursor returned null.");
+
+                        name_workout.setText(getEventString());
+                        Log.v("Event name query", "Successful! Event name: " + getEventString());
+
+                        break;
+
+                    case QUERY_SETS_NUMBER:
+                        int count = cursor.getCount();
+                        if (cursor.moveToFirst()) {
+                            Log.v("DATABASE UTILS", DatabaseUtils.dumpCursorToString(cursor));
+                            int index = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
+                            int set_count = cursor.getInt(index);
+                            numberPicker_set.setValue(set_count);
+                        } else throw new CursorIndexOutOfBoundsException("Set Number query: " +
+                                "cursor returned null");
+                        break;
+
+                    case QUERY_REPS_COUNT:
+                        count = cursor.getCount();
+                        if (cursor.moveToFirst()) {
+                            Log.v("DATABASE UTILS", DatabaseUtils.dumpCursorToString(cursor));
+                            int index = cursor.getColumnIndex(EventEntry.COLUMN_REP_COUNT);
+                            int rep_number = cursor.getInt(index);
+                            numberPicker_rep.setValue(rep_number);
+                        }
+
+                        break;
+
+                    case QUERY_WEIGHT_COUNT:
+                        count = cursor.getCount();
+                        if (cursor.moveToFirst()) {
+                            Log.v("DATABASE UTILS", DatabaseUtils.dumpCursorToString(cursor));
+                            int index = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_COUNT);
+                            int weight_count = cursor.getInt(index);
+                            weight_sequence.setText(String.valueOf(weight_count));
+                        }
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("QueryHandler received wrong " +
+                                    "token to process. Debug to check token.");
+                }
+            }
+
+        };
+    }
+
+
 
     /**
      * If modifying data, fire up loader for background thread data loading.
@@ -147,8 +228,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             String projection[] = new String[]{
                     EventEntry.COLUMN_EVENT_ID,
                     EventEntry.COLUMN_SET_COUNT,
-                    EventEntry.COLUMN_REP_SEQUENCE,
-                    EventEntry.COLUMN_WEIGHT_SEQUENCE
+                    EventEntry.COLUMN_REP_COUNT,
+                    EventEntry.COLUMN_WEIGHT_COUNT
             };
             //sort order is "column_name ASC" or "column_name DESC"
             String sortorder = DataContract.CalendarEntry.COLUMN_EVENT_IDs + ORDER_DECENDING;
@@ -176,14 +257,14 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         /*
                     EventEntry.COLUMN_EVENT_ID,
                     EventEntry.COLUMN_SET_COUNT,
-                    EventEntry.COLUMN_REP_SEQUENCE,
-                    EventEntry.COLUMN_WEIGHT_SEQUENCE
+                    EventEntry.COLUMN_REP_COUNT,
+                    EventEntry.COLUMN_WEIGHT_COUNT
         * */
 
         if (cursor.moveToFirst()) {
             int setCountIndex = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
-            int repSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_REP_SEQUENCE);
-            int weightSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_SEQUENCE);
+            int repSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_REP_COUNT);
+            int weightSequenceIndex = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_COUNT);
 
             int setCount = cursor.getInt(setCountIndex);
             String repSequence = cursor.getString(repSequenceIndex);
@@ -226,26 +307,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
      */
     private void queryEventType(int eventID) {
 
-        //define onQueryComplete
-        AsyncQueryHandler queryEventType = new AsyncQueryHandler(getContentResolver()) {
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-
-                if (token == DataContract.GlobalConstants.QUERY_EVENT_TYPE) {
-
-                    if (cursor.moveToFirst()) {
-                        int index = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
-                        setEventString(cursor.getString(index));
-                    } else
-                        throw new CursorIndexOutOfBoundsException("Cursor could not move to first.");
-                } else
-                    throw new IllegalArgumentException("Illegal token received at Event String query.");
-
-                Toast.makeText(EditEventActivity.this, "Type Query finished", Toast.LENGTH_SHORT).show();
-                name_workout.setText(getEventString());
-            }
-        };
-
         //projection
         String projection[] = new String[]{
                 DataContract.EventTypeEntry._ID,
@@ -260,10 +321,97 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
 
         //Finally, fire the query!
-        queryEventType.startQuery(
-                DataContract.GlobalConstants.QUERY_EVENT_TYPE,
+        queryHandler.startQuery(
+                QUERY_EVENT_TYPE,
                 null,
                 DataContract.EventTypeEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+    }
+
+
+    private void queryNumberOfSets(int date, int subID) {
+        //projection
+        String projection[] = new String[]{
+                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_SUB_ID,
+                EventEntry.COLUMN_SET_COUNT
+        };
+
+        //select row by eventID
+        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+
+        //eventID will be thrown in the parameter
+        String selectionArgs[] = new String[]{
+                String.valueOf(date),
+                String.valueOf(subID)
+        };
+
+
+        //Finally, fire the query!
+        queryHandler.startQuery(
+                QUERY_SETS_NUMBER,
+                null,
+                EventEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+    }
+
+    private void queryNumberOfReps(int date, int subID) {
+        //projection
+        String projection[] = new String[]{
+                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_SUB_ID,
+                EventEntry.COLUMN_REP_COUNT
+        };
+
+        //selection
+        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+
+        //selectionArgs
+        String selectionArgs[] = new String[]{
+                String.valueOf(date),
+                String.valueOf(subID)
+        };
+
+        queryHandler.startQuery(
+                QUERY_REPS_COUNT,
+                null,
+                EventEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+    }
+
+    private void queryWeightCount(int date, int subID) {
+        //projection
+        String projection[] = new String[]{
+                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_SUB_ID,
+                EventEntry.COLUMN_WEIGHT_COUNT
+        };
+
+        //selection
+        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+
+        //selectionArgs
+        String selectionArgs[] = new String[]{
+                String.valueOf(date),
+                String.valueOf(subID)
+        };
+
+        queryHandler.startQuery(
+                QUERY_WEIGHT_COUNT,
+                null,
+                EventEntry.CONTENT_URI,
                 projection,
                 selection,
                 selectionArgs,
@@ -285,5 +433,18 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
     private void setEventString(String eventString) {
         this.eventString = eventString;
+    }
+
+    private int getDateAsInt() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
+        Log.v("Concatenated", concatenated);
+
+        return Integer.parseInt(concatenated);
     }
 }

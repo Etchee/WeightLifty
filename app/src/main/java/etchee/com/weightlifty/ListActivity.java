@@ -108,7 +108,7 @@ public class ListActivity extends AppCompatActivity {
      *                 This method find the specific row with the sub_id, then get the event_id
      *                 back in that row.
      */
-    private void launchEditActivityWithEventID(int position) {
+    private void launchEditActivityWithEventID(final int position) {
 
         int date_today = getDateAsInt();
 
@@ -137,6 +137,7 @@ public class ListActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putInt(DataContract.GlobalConstants.PASS_EVENT_ID, getEventID());
+                bundle.putInt(DataContract.GlobalConstants.PASS_SUB_ID, position);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -234,8 +235,8 @@ public class ListActivity extends AppCompatActivity {
 
         String projection[] = {
                 EventEntry._ID,
-                EventEntry.COLUMN_WEIGHT_SEQUENCE,
-                EventEntry.COLUMN_REP_SEQUENCE,
+                EventEntry.COLUMN_WEIGHT_COUNT,
+                EventEntry.COLUMN_REP_COUNT,
                 EventEntry.COLUMN_SUB_ID,
                 EventEntry.COLUMN_SET_COUNT,
         };

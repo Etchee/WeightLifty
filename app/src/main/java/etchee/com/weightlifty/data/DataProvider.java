@@ -7,14 +7,9 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.provider.CalendarContract;
-import android.provider.Settings;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.sql.Date;
-import java.util.Arrays;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.data.DataContract.*;
@@ -222,7 +217,7 @@ public class DataProvider extends ContentProvider {
 
         long id = database.insert(EventEntry.TABLE_NAME, null, contentValues);
 
-        String testString = contentValues.getAsString(EventEntry.COLUMN_REP_SEQUENCE);
+        String testString = contentValues.getAsString(EventEntry.COLUMN_REP_COUNT);
         if (testString == null) throw new IllegalArgumentException("Content provider's insert " +
                 "method for Event Table has received" +
                 "null for the date value. Check what is passed into the insert method");
@@ -505,9 +500,9 @@ public class DataProvider extends ContentProvider {
                     "(Update method, event table) received null value for contentValues");
         }
 
-        if (contentValues.containsKey(EventEntry.COLUMN_WEIGHT_SEQUENCE)) {
-            String sample_weight_sequence = contentValues.getAsString(EventEntry.COLUMN_REP_SEQUENCE);
-            if (sample_weight_sequence == null) throw new IllegalArgumentException("ContentProvider" +
+        if (contentValues.containsKey(EventEntry.COLUMN_WEIGHT_COUNT)) {
+            int sample_weight_count = contentValues.getAsInteger(EventEntry.COLUMN_REP_COUNT);
+            if (sample_weight_count < 0) throw new IllegalArgumentException("ContentProvider" +
                     "(Update method, event table) has received null value for contentValues");
         }
 
