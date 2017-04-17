@@ -286,8 +286,7 @@ public class MainActivity extends AppCompatActivity {
         if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
 
-        Log.v("DUMMYDATA", "Data inserted in: " + uri);
-        Toast.makeText(this, "Event Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
+        Log.v("DUMMYDATA", "Event Data inserted in: " + uri);
     }
 
     private int getNextSub_id() {

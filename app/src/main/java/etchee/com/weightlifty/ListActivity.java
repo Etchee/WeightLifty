@@ -20,10 +20,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+
+import org.w3c.dom.Text;
 
 import java.util.Calendar;
 
@@ -38,6 +41,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private ListView listview;
     private listActivityAdapter mAdapter;
+    
+    private TextView textView;
 
     //To make sure that there is only one instance because OpenHelper will serialize threads anyways
     private ContentResolver contentResolver;
@@ -51,6 +56,9 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list);
+        
+        textView = (TextView)findViewById(R.id.temp_search_hint_text);
+        
 
         //create the fabs
         onCreateFabCreator();
@@ -102,9 +110,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 launchEditActivityWithEventID(position);
             }
         });
-
-
-
     }
 
 
@@ -262,12 +267,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onResume() {
         super.onResume();
-        contentResolver.notifyChange(
-                EventEntry.CONTENT_URI,
-                null
-        );
-
-        mAdapter.notifyDataSetChanged();
     }
 
 

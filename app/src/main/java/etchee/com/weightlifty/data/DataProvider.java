@@ -149,6 +149,7 @@ public class DataProvider extends ContentProvider {
                     "unsupported URI: " + uri);
         }
 
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
@@ -223,6 +224,8 @@ public class DataProvider extends ContentProvider {
                 "null for the date value. Check what is passed into the insert method");
 
         Log.v("Content provider", "ID: " + String.valueOf(id));
+
+        getContext().getContentResolver().notifyChange(uri, null);
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -308,6 +311,7 @@ public class DataProvider extends ContentProvider {
         if (numOfRowsDeleted < 0) throw new IllegalArgumentException("Content Provider (delete" +
                 "method) gave an error. Number of deleted row was 0 or less.");
 
+        getContext().getContentResolver().notifyChange(uri, null);
         return numOfRowsDeleted;
     }
 
@@ -508,6 +512,8 @@ public class DataProvider extends ContentProvider {
 
         numOfRowsUpdated = database.update(EventEntry.TABLE_NAME, contentValues, selection,
                 selectionArgs);
+
+        getContext().getContentResolver().notifyChange(uri, null);
 
         return numOfRowsUpdated;
     }

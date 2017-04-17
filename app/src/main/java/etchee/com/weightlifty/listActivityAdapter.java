@@ -60,5 +60,4 @@ public class listActivityAdapter extends CursorAdapter {
         repCount.setText(rep_count);
         setCount.setText(set_count);
     }
-
 }
