@@ -100,6 +100,14 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
         sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID);
 
+        delete_event.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int numberOfDeletedRows = deleteButtonAction(getDateAsInt(), sub_ID);
+                finish();
+            }
+        });
+
         // Case 1: creating a new event → bundle with contentValues.
         // use inner class to just get the title of the workout, then display.
         if (bundle.get(DataContract.GlobalConstants.CONTENT_VALUES) != null) {
@@ -429,6 +437,31 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                 selectionArgs,
                 null
         );
+    }
+
+    private int deleteButtonAction(int date, int sub_ID) {
+
+        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+
+        String selectionArgs[] = new String[]{
+                String.valueOf(date),
+                String.valueOf(sub_ID)
+        };
+
+        int numOfDeletedRows = getContentResolver().delete(
+                EventEntry.CONTENT_URI,
+                selection,
+                selectionArgs
+        );
+
+        if (numOfDeletedRows < 0) throw new IllegalArgumentException("Delete method returned " +
+                "negative number for the number of rows deleted. Check EditEventActivity's" +
+                "deleteButtonAction method.");
+
+
+
+        return numOfDeletedRows;
+
     }
 
     private int getReceivedEventID() {
