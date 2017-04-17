@@ -12,8 +12,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     private TextView name_workout;
     private TextView weight_sequence;
     private Button add_event;
+    private Button delete_event;
 
     private static final int SET_MAXVALUE = 30;
     private static final int SET_MINVALUE = 1;
@@ -88,6 +91,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         name_workout = (TextView) findViewById(R.id.edit_workout_name);
         weight_sequence = (TextView) findViewById(R.id.input_weight_number);
         add_event = (Button) findViewById(R.id.add_event);
+        delete_event = (Button) findViewById(R.id.delete_workout);
 
         defineQueryHandler();
 
@@ -107,6 +111,14 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
         // Case 2: modifying an already existing event → bundle with selection.
         if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
+
+            //no option to add event in this case
+            add_event.setVisibility(View.GONE);
+
+            //For a neater look, center the delete button
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) delete_event.getLayoutParams();
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            delete_event.setLayoutParams(layoutParams);
 
             setReceivedEventID(bundle.getInt(DataContract.GlobalConstants.PASS_EVENT_ID));
             if (receivedEventID < 0 ) {
