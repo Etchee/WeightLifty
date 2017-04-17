@@ -42,6 +42,8 @@ public final class DataContract {
 
         public static final String PASS_SUB_ID = "subIDpassed";
 
+        public static final String PASS_CREATE_LOADER_DATE = "passdate";
+
 
 
         public static final String PASS_EVENT_ID = "eventIDpassed";

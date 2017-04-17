@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.DatabaseUtils;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -61,11 +62,9 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
     private int receivedEventID = -1;
 
-    private AsyncQueryHandler queryHandler;
+    private AsyncQueryHandler queryHandler; // for querying data
 
     private int sub_ID;
-
-
 
     private String eventString;
 
@@ -187,6 +186,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                             numberPicker_set.setValue(set_count);
                         } else throw new CursorIndexOutOfBoundsException("Set Number query: " +
                                 "cursor returned null");
+                        cursor.close();
                         break;
 
                     case QUERY_REPS_COUNT:
@@ -197,7 +197,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                             int rep_number = cursor.getInt(index);
                             numberPicker_rep.setValue(rep_number);
                         }
-
+                        cursor.close();
                         break;
 
                     case QUERY_WEIGHT_COUNT:
@@ -208,6 +208,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                             int weight_count = cursor.getInt(index);
                             weight_sequence.setText(String.valueOf(weight_count));
                         }
+
+                        cursor.close();
                         break;
 
                     default:
@@ -231,15 +233,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     @Override
     public Loader onCreateLoader(int id, Bundle bundle) {
 
-        CursorLoader cursorLoader = null;
-
-
-        //WHEN CREATING A NEW EVENT
-        if (id == LOADER_CREATE_NEW_EVENT_MODE) {
-            //handled in onCreate... don't have to do anything here
-
-        }
-
         //WHEN MODIFYING A EVENT
         if (id == LOADER_MODIFY_EVENT_MODE) {
 
@@ -254,8 +247,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             //sort order is "column_name ASC" or "column_name DESC"
             String sortorder = DataContract.CalendarEntry.COLUMN_EVENT_IDs + ORDER_DECENDING;
 
-
-            cursorLoader = new CursorLoader(
+            return new CursorLoader(
                     getApplicationContext(),
                     DataContract.EventEntry.CONTENT_URI,
                     projection,
@@ -264,7 +256,13 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                     null
             );
         }
-        return cursorLoader;
+
+        else{
+            throw new IllegalArgumentException("Loader creation received invalid token(id)." +
+                    "Check onCreateLoader method");
+        }
+
+
     }
 
     /**
@@ -273,13 +271,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
      */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
-        /*
-                    EventEntry.COLUMN_EVENT_ID,
-                    EventEntry.COLUMN_SET_COUNT,
-                    EventEntry.COLUMN_REP_COUNT,
-                    EventEntry.COLUMN_WEIGHT_COUNT
-        * */
 
         if (cursor.moveToFirst()) {
             int setCountIndex = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
@@ -293,19 +284,9 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             numberPicker_set.setValue(setCount);
 
             queryEventType(getReceivedEventID());
-
-            //TODO: take first item in rep sequence, assign to the textView
-
-//            name_workout.setText();
         }
-        /*
-        *   components that need to be updated
-        *   private NumberPicker numberPicker_set;
-            private NumberPicker numberPicker_rep;
-            private TextView name_workout;
-            private TextView weight_sequence;
-            private Button add_event;
-        * */
+
+        getLoaderManager().destroyLoader(LOADER_MODIFY_EVENT_MODE);
 
     }
 

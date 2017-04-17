@@ -19,14 +19,16 @@ public class listActivityAdapter extends CursorAdapter {
     private TextView workout_name, repCount, setCount;
 
     public listActivityAdapter(Context context, Cursor c, int flags) {
+
         super(context, c, flags);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-
         return LayoutInflater.from(context).inflate(R.layout.item_single_listview, viewGroup, false);
     }
+
+
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
@@ -50,12 +52,13 @@ public class listActivityAdapter extends CursorAdapter {
         int repCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_REP_COUNT);
         int setCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_SET_COUNT);
 
-        String repSequnce = cursor.getString(repCount_columnIndex);
-        String set = cursor.getString(setCount_columnIndex);
+        String rep_count = cursor.getString(repCount_columnIndex);
+        String set_count = cursor.getString(setCount_columnIndex);
 //        String workoutName = cursor.getString(workoutName_columnIndex);
 
 //        workout_name.setText(workoutName);
-        repCount.setText(repSequnce);
-        setCount.setText(set);
+        repCount.setText(rep_count);
+        setCount.setText(set_count);
     }
+
 }

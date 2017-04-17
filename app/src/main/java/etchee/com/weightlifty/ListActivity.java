@@ -1,8 +1,12 @@
 package etchee.com.weightlifty;
 
+import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.drawable.ShapeDrawable;
@@ -11,6 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,7 +34,7 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
  * Created by rikutoechigoya on 2017/03/30.
  */
 
-public class ListActivity extends AppCompatActivity {
+public class ListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ListView listview;
     private listActivityAdapter mAdapter;
@@ -38,6 +43,8 @@ public class ListActivity extends AppCompatActivity {
     private ContentResolver contentResolver;
 
     private int eventID;
+
+    private final int CREATE_LOADER_ID = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,6 +85,13 @@ public class ListActivity extends AppCompatActivity {
         mAdapter = new listActivityAdapter(getApplicationContext(), cursor, 0);
         listview.setAdapter(mAdapter);
 
+        //Init the loader
+
+        //only display today's data for now
+        Bundle bundle = new Bundle();
+        bundle.putInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, getDateAsInt());
+        getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
+
         /**
          *  When an item on the listView is clicked, get the (INT) item id, put on the bundle and deliver
          *      to EditActivity.
@@ -90,7 +104,9 @@ public class ListActivity extends AppCompatActivity {
         });
 
 
+
     }
+
 
     private int getEventID() {
         return eventID;
@@ -99,9 +115,6 @@ public class ListActivity extends AppCompatActivity {
     private void setEventID(int eventID) {
         this.eventID = eventID;
     }
-
-
-
 
     /**
      * @param position equals to that of the sub_id in the event table.
@@ -170,63 +183,6 @@ public class ListActivity extends AppCompatActivity {
                 null
         );
     }
-
-    private void queryEventIDinEventTable(int position){
-        int date_today = getDateAsInt();
-
-        //Define async query handler
-        AsyncQueryHandler queryHandler = new AsyncQueryHandler(contentResolver) {
-
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                int eventID = -1;
-
-                //Token will be passed to prevent confusion on multi querying
-                if (token == DataContract.GlobalConstants.QUERY_EVENT_ID) {
-                    if (cursor.moveToFirst()) {
-                        int index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
-                        eventID = Integer.parseInt(cursor.getString(index));
-
-                    }
-
-                    else if (!cursor.moveToFirst()) throw new CursorIndexOutOfBoundsException("EventID query: Cursor might be empty");
-
-                } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
-
-                Log.v("Event ID query", "Status: Completed");
-                setEventID(eventID);
-            }
-        };
-
-        //projection
-        String projection[] = new String[]{
-                EventEntry.COLUMN_DATE,
-                EventEntry.COLUMN_SUB_ID,
-                EventEntry.COLUMN_EVENT_ID
-        };
-
-        //selection
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
-
-        //selectionArgs
-        String selectionArgs[] = new String[]{
-                String.valueOf(date_today),
-                String.valueOf(position)
-        };
-
-        //Finally, fire the query!
-        queryHandler.startQuery(
-                DataContract.GlobalConstants.QUERY_EVENT_ID,
-                null,
-                EventEntry.CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                null
-        );
-    }
-
-
 
 
 
@@ -301,5 +257,74 @@ public class ListActivity extends AppCompatActivity {
         Log.v("Concatenated", concatenated);
 
         return Integer.parseInt(concatenated);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        contentResolver.notifyChange(
+                EventEntry.CONTENT_URI,
+                null
+        );
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+
+    /**
+     *
+     * @param id Just select any desired ID. Here I define in the global constant
+     * @param bundle  pass any object in bundle, no need to pass anything in here.
+     * @return  defined cursor
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+        /**
+         *  ListView will contain specified date's events.
+         *  Required components
+         *
+         *  1. date to specify date
+         *  2. event ID to get the workout name
+         *  3. set_count
+         *  4. rep_count
+         *
+         */
+
+        int date;
+
+        date = bundle.getInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE);
+
+        String projection[] = new String[]{
+                EventEntry._ID,
+                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_EVENT_ID,
+                EventEntry.COLUMN_WEIGHT_COUNT,
+                EventEntry.COLUMN_SET_COUNT,
+                EventEntry.COLUMN_REP_COUNT
+        };
+
+        String selection = EventEntry.COLUMN_DATE + "=?";
+        String selectionArgs[] = new String[]{String.valueOf(date)};
+
+        return new CursorLoader(
+                this,
+                EventEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }
