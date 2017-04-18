@@ -1,7 +1,9 @@
 package etchee.com.weightlifty;
 
+import android.app.Activity;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.DatabaseUtils;
@@ -20,15 +22,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 
+import static android.R.attr.id;
+import static android.R.id.list;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_SETS_NUMBER;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_WEIGHT_COUNT;
+import static java.lang.Integer.parseInt;
 
 /**
  * Created by rikutoechigoya on 2017/04/07.
@@ -102,7 +108,20 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         delete_event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int numberOfDeletedRows = deleteButtonAction(getDateAsInt(), sub_ID);
+                DeleteActionHelper deleteEvent = new DeleteActionHelper(
+                        getApplicationContext(),
+                        EditEventActivity.this
+                );
+
+                String array[] = new String[]{
+                        String.valueOf(getDateAsInt()),
+                        String.valueOf(sub_ID)
+                };
+                ArrayList<String> list = new ArrayList<>(2);
+                list.add(0, String.valueOf(getDateAsInt()));
+                list.add(1, String.valueOf(sub_ID));
+
+                deleteEvent.execute(list);
                 finish();
             }
         });
@@ -420,31 +439,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         );
     }
 
-    private int deleteButtonAction(int date, int sub_ID) {
-
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
-
-        String selectionArgs[] = new String[]{
-                String.valueOf(date),
-                String.valueOf(sub_ID)
-        };
-
-        int numOfDeletedRows = getContentResolver().delete(
-                EventEntry.CONTENT_URI,
-                selection,
-                selectionArgs
-        );
-
-        if (numOfDeletedRows < 0) throw new IllegalArgumentException("Delete method returned " +
-                "negative number for the number of rows deleted. Check EditEventActivity's" +
-                "deleteButtonAction method.");
-
-
-
-        return numOfDeletedRows;
-
-    }
-
     private int getReceivedEventID() {
         return receivedEventID;
     }
@@ -471,6 +465,56 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
         Log.v("Concatenated", concatenated);
 
-        return Integer.parseInt(concatenated);
+        return parseInt(concatenated);
+    }
+}
+
+/**
+ *  Inner class to handle heavy row delete action.
+ *  ArrayList will contain two Integers: date, sub_id.
+ */
+class DeleteActionHelper extends AsyncTask<ArrayList, Void, Integer> {
+
+    private Context context;
+    private Activity activity;
+
+    public DeleteActionHelper(Context context, Activity activity) {
+        super();
+        this.context = context;
+        this.activity = activity;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        Toast.makeText(context, "AsyncTask fired!", Toast.LENGTH_SHORT).show();
+        activity.finish();
+    }
+
+    @Override
+    protected Integer doInBackground(ArrayList... arrayList) {
+        Object date = arrayList[0].get(0);
+        Object sub_id = arrayList[0].get(1);
+
+        int dateAsInt = Integer.parseInt(date.toString());
+        int SubIdAsInt = Integer.parseInt(sub_id.toString());
+
+        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+        String selectionArgs[] = new String[]{
+                String.valueOf(dateAsInt),
+                String.valueOf(SubIdAsInt)
+        };
+
+        int numberOfDeletedRows = context.getContentResolver().delete(
+                EventEntry.CONTENT_URI,
+                selection,
+                selectionArgs
+        );
+
+        return numberOfDeletedRows;
+    };
+
+    @Override
+    protected void onPostExecute(Integer numOfDeletedRows) {
+        Toast.makeText(context, String.valueOf(numOfDeletedRows) + " deleted.", Toast.LENGTH_SHORT).show();
     }
 }

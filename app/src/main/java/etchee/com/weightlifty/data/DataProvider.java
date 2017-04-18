@@ -281,11 +281,14 @@ public class DataProvider extends ContentProvider {
             //query the entire event table
             case CODE_EVENT:
                 numOfRowsDeleted = database.delete(EventEntry.TABLE_NAME, selection, selectionArgs);
+                updateIDNumbers();
                 break;
 
             //query specific in event table
             case CODE_EVENT_ID:
                 selection = EventEntry._ID + "=?";
+                int id = (int)ContentUris.parseId(uri);
+                Log.v("ContentPRov", "Id is received as :" + String.valueOf(id));
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
 
                 numOfRowsDeleted = database.delete(EventEntry.TABLE_NAME, selection, selectionArgs);
@@ -313,6 +316,10 @@ public class DataProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
         return numOfRowsDeleted;
+    }
+
+    private void updateIDNumbers() {
+        //query ID numbers to check where it's skippingｘ
     }
 
     private int deleteEventIdInCalendarTable() {
@@ -428,6 +435,47 @@ public class DataProvider extends ContentProvider {
 
         return numOfRowsUpdated;
     }
+
+    /**
+     *      This method sorts sub_ID in EventEntry correctly.
+     *       Deleting a row causes sub_id to "skip" which leads to crash when passing position in
+     *       ListView. So call this whenever a row is added.
+     * @param date check which date in the EventEntry to "fix" the IDs.
+     */
+    private void updateEventIDs(int date) {
+        /**
+         *  Steps
+         *  1. Look in the EventEntry
+         *  2. Acquire all rows in the specified date in a cursor
+         *  3. Check which row has "skip" ID
+         *  4. From there to the end of cursor, update ID with correct number.
+         */
+
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+
+        //Step 1 Look in the Event Entry
+        String projection[] = new String[]{
+                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_SUB_ID
+        };
+
+        String selection = EventEntry.COLUMN_DATE + "=?";
+        String selectionArgs[] = new String[]{String.valueOf(date)};
+
+        Cursor cursor = database.query(
+                EventEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+
+    }
+
 
 
     /**
