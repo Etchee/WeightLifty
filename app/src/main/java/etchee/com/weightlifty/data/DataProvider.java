@@ -538,16 +538,8 @@ public class DataProvider extends ContentProvider {
         if (contentValues.size() == 0) throw new IllegalArgumentException("Content Provider " +
                 "(Update method, event table) received null value for contentValues");
 
-        //sanity check: if any value comes empty with a key, then there's something wrong
-
-        if (contentValues.containsKey(EventEntry.COLUMN_SUB_ID)) {
-            String sample_ID = contentValues.getAsString(EventEntry.COLUMN_SUB_ID);
-            if (sample_ID == null) throw new IllegalArgumentException("ContentProvider " +
-                    "(Update method, event table) received null value for contentValues");
-        }
-
         if (contentValues.containsKey(EventEntry.COLUMN_WEIGHT_COUNT)) {
-            int sample_weight_count = contentValues.getAsInteger(EventEntry.COLUMN_REP_COUNT);
+            int sample_weight_count = contentValues.getAsInteger(EventEntry.COLUMN_WEIGHT_COUNT);
             if (sample_weight_count < 0) throw new IllegalArgumentException("ContentProvider" +
                     "(Update method, event table) has received null value for contentValues");
         }

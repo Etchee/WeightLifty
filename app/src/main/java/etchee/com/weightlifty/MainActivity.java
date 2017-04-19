@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,6 +24,7 @@ import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataDBhelper;
 
+import static android.R.attr.end;
 import static android.R.attr.id;
 
 public class MainActivity extends AppCompatActivity {
@@ -341,15 +343,16 @@ class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
 
     private Context context;
     private int subId;
+    private int startID, endID;
 
     public subIDfixHelper(Context context) {
         this.context = context;
     }
 
     @Override
-    protected Integer doInBackground(Integer... params) {
+    protected Integer doInBackground(Integer... dateSelection) {
         //get the date
-        int date = params[0];
+        int date = dateSelection[0];
 
         //set up the query to get the number of rows. Any column is okay
 
@@ -361,8 +364,8 @@ class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
         String selection = EventEntry.COLUMN_DATE + "=?";
         String selectionArgs[] = new String[]{ String.valueOf(date) };
         Cursor cursor = null;
-
-        int columnIndex_ID, numOfEventsInDate;
+        int numOfRowsToUpdate;
+        int columnIndex_ID;
         try {
             cursor = context.getContentResolver().query(
                     EventEntry.CONTENT_URI,
@@ -371,8 +374,15 @@ class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
                     selectionArgs,
                     null
             );
+            numOfRowsToUpdate = cursor.getCount();
+            columnIndex_ID = cursor.getColumnIndex(EventEntry._ID);
+            if (cursor.moveToFirst()) {
+                startID = cursor.getInt(columnIndex_ID);
+            }
 
-            numOfEventsInDate = cursor.getCount();
+            if (cursor.moveToLast()) {
+                endID = cursor.getInt(columnIndex_ID);
+            }
 
         } finally {
             cursor.close();
@@ -380,16 +390,38 @@ class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
 
         //necessary items for update method
         ContentValues values = new ContentValues();
-        String key = EventEntry.COLUMN_SUB_ID;
-        String selection_update = EventEntry.COLUMN_DATE + "=?";
-        String selectionArgs_update[] = new String[]{String.valueOf(date)};
+        String selection_update = EventEntry._ID + "=?";
+        //Sum of rows updated
+        int iteratedRowCount = 0;
+        //current row updated? Or not
+        int currentRowUpdate;
 
+        // For "the number of items" times,
+        while (startID <= endID){
+            values.put(EventEntry.COLUMN_SUB_ID, iteratedRowCount);
+            currentRowUpdate = context.getContentResolver().update(
+                    EventEntry.CONTENT_URI,
+                    values,
+                    selection_update,
+                    new String[]{String.valueOf(startID)}
+            );
+            //current row (_ID) is there,
+            if (currentRowUpdate > 0) {
+                iteratedRowCount++;
+            }
+            //current row (_ID) ISN'T there, BUT THE SUB_ID AT NEXT _ID NEEDS TO BE iteratedRowCount++!!!
+            if (currentRowUpdate == 0) {
 
-        return numOfEventsInDate;
+            }
+            startID++;
+            values.clear();
+        }
+        //because while loop
+        return iteratedRowCount;
     }
 
     @Override
-    protected void onPostExecute(Integer integer) {
-        Toast.makeText(context, "Number of Events: " + String.valueOf(integer), Toast.LENGTH_SHORT).show();
+    protected void onPostExecute(Integer updatedRowCount) {
+        Toast.makeText(context, "Number of rows: " + String.valueOf(updatedRowCount), Toast.LENGTH_SHORT).show();
     }
 }
