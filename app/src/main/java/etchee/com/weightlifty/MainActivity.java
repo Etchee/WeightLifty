@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.PagerSnapHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +22,8 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataDBhelper;
+
+import static android.R.attr.id;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -148,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
-        Log.v("Concatenated", concatenated);
 
         return Integer.parseInt(concatenated);
     }
@@ -160,22 +163,26 @@ public class MainActivity extends AppCompatActivity {
      *      If not, insert today's row
      */
     private void calendar_insertTodaysRow() {
-
+        Cursor cursor = null;
         // query the calendar table to check the last row
-        Cursor cursor;
-        int dateFromLastRow = 0;
-        String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
+        int dateFromLastRow;
+        try {
+            dateFromLastRow = 0;
+            String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
 
-        cursor = getContentResolver().query(
-                CalendarEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null
-                );
-        if (cursor.moveToLast()) {
-            int dateColumnIndex = cursor.getColumnIndex(CalendarEntry.COLUMN_DATE);
-            dateFromLastRow = cursor.getInt(dateColumnIndex);
+            cursor = getContentResolver().query(
+                    CalendarEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null
+                    );
+            if (cursor.moveToLast()) {
+                int dateColumnIndex = cursor.getColumnIndex(CalendarEntry.COLUMN_DATE);
+                dateFromLastRow = cursor.getInt(dateColumnIndex);
+            }
+        } finally {
+            cursor.close();
         }
 
         //check if the date matches to that of today
@@ -199,66 +206,6 @@ public class MainActivity extends AppCompatActivity {
         } else Toast.makeText(context, "Calendar: today's record is there!", Toast.LENGTH_SHORT).show();
 
     }
-/*
-
-    //insert fake values to all the tables to test if the tables are properly working
-    private void calendar_insertDummyValues() {
-
-        //get the date data from the last row in the calendar table
-        Cursor cursor;
-
-        //for now, I'm looking at the date column only.
-        String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
-
-        cursor = getContentResolver().query(
-                CalendarEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null,
-                null
-        );
-
-        // get the data from the last row
-        if (cursor.moveToLast()) {
-            cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
-        }
-
-        //error handling
-        if (cursor == null) {
-            throw new IllegalArgumentException("test_toastLastDateInCalendar() function has " +
-                    "failed. Check the method or the calendar table.");
-        }
-
-        int eventIDs[] = new int[]{2,5,3,14,2};
-        String eventIDsString = Arrays.toString(eventIDs);
-
-        int date;
-        ContentValues dummyValues = new ContentValues();
-        Uri uri = null;
-
-        for (int i = 1; i < 31; i++) {
-            String dateAsStr = "20174" + String.valueOf(i);
-            date = Integer.parseInt(dateAsStr);
-
-            dummyValues.put(CalendarEntry.COLUMN_DATE, date);
-            dummyValues.put(CalendarEntry.COLUMN_EVENT_IDs, eventIDsString);
-            dummyValues.put(CalendarEntry.COLUMN_DAY_TAG, "");
-
-            uri = getContentResolver().insert(DataContract.CalendarEntry.CONTENT_URI, dummyValues);
-
-            dummyValues.clear();
-            dateAsStr = "";
-        }
-
-        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
-                "failed to insert data. check the MainActivity method and the table.");
-
-        Log.v("DUMMYDATA", "Data inserted in: " + uri);
-        Toast.makeText(this, eventIDsString, Toast.LENGTH_SHORT).show();
-    }
-*/
-
 
     private void event_insertDummyValues() {
 
@@ -269,11 +216,8 @@ public class MainActivity extends AppCompatActivity {
         int date = getDateAsInt();
         int weight_count = 70;
         int sub_ID = getNextSub_id();
-        int id = 0;
         int eventID = 2;
 
-
-        values.put(EventEntry._ID, id);
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);
         values.put(EventEntry.COLUMN_EVENT_ID, eventID);
@@ -286,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
         if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
 
-        Log.v("DUMMYDATA", "Event Data inserted in: " + uri);
     }
 
     private int getNextSub_id() {
@@ -296,25 +239,28 @@ public class MainActivity extends AppCompatActivity {
         String projection[] = new String[]{EventEntry.COLUMN_DATE, EventEntry.COLUMN_SUB_ID};
         String selection = EventEntry.COLUMN_DATE + "=?";
         String selectionArgs[] = new String[]{String.valueOf(date)};
+        Cursor cursor = null;
 
-        Cursor cursor = getContentResolver().query(
-            EventEntry.CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                null
-        );
+        try {
+            cursor = getContentResolver().query(
+                EventEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null
+            );
 
-        //if cursor comes back, there is already some rows
-        if (cursor.moveToLast()) {
-            int index = cursor.getColumnIndex(EventEntry.COLUMN_SUB_ID);
-            sub_id = cursor.getInt(index) + 1;
-            Log.v("GetNextSubID", "Data exists, incremented");
-        } else {
-            Log.v("GetNextSubID", "Set sub_id as zero");
-            sub_id = 0;
+            //if cursor comes back, there is already some rows
+            if (cursor.moveToLast()) {
+                int index = cursor.getColumnIndex(EventEntry.COLUMN_SUB_ID);
+                sub_id = cursor.getInt(index) + 1;
+
+            } else {
+                sub_id = 0;
+            }
+        } finally {
+            cursor.close();
         }
-
 
 
         return sub_id;
@@ -331,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
         if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
 
-        Log.v("DUMMYDATA", "Data inserted in: " + uri);
+
         Toast.makeText(this, "EventType Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
     }
 
@@ -366,9 +312,105 @@ public class MainActivity extends AppCompatActivity {
         return numberOfDeletedRows;
     }
 
+    /**
+     *  Function to fix jumping sub_id caused by deleting a row.
+     * @param date Specify date of data that I want to fix sub_id of
+     */
+    private void updateSubIDs(int date) {
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-//        test_toastLastDateInCalendar();
+        new subIDfixHelper(context).execute(getDateAsInt());
+    }
+}
+
+
+/**
+ *  Background operation to fix wrong sub_id order upon deleting rows.
+ *
+ *  Get the first and last _ID, from rows of the specified date.
+ *
+ *  Last-first + 1 = actual number of events.
+ *
+ *  for(i = 0; i < actual number of events; i++) update sub_id
+ */
+class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
+
+    private Context context;
+    private int subId;
+
+    public subIDfixHelper(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    protected Integer doInBackground(Integer... params) {
+        //get the date
+        int date = params[0];
+
+        //set up the query to get the number of rows. Any column is okay
+
+        String projection[] = new String[]{
+                EventEntry._ID,
+                EventEntry.COLUMN_DATE
+        };
+
+        String selection = EventEntry.COLUMN_DATE + "=?";
+        String selectionArgs[] = new String[]{ String.valueOf(date) };
+        Cursor cursor = null;
+
+        int columnIndex_ID, firstID, lastID, numOfEventsInDate;
+        try {
+            cursor = context.getContentResolver().query(
+                    EventEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null
+            );
+
+            lastID = 0;
+            firstID = 0;
+
+            columnIndex_ID = cursor.getColumnIndex(EventEntry._ID);
+
+            int count = cursor.getCount();
+
+            // Get the first row ID
+            if (cursor.moveToFirst()) {
+                firstID = cursor.getInt(columnIndex_ID);
+            }
+            //Get the second row ID
+            if (cursor.moveToLast()) {
+                lastID = cursor.getInt(columnIndex_ID);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        //num of of iterations that need to happen to update the sub_ID
+        // handle 0
+        if (lastID - firstID == 0) numOfEventsInDate = 0;
+        else if (lastID - firstID > 0) numOfEventsInDate = lastID - firstID + 1;
+        else numOfEventsInDate = -1;
+
+        int numOfRows = cursor.getCount();
+
+        //necessary items for update method
+        ContentValues values = new ContentValues();
+        String key = EventEntry.COLUMN_SUB_ID;
+        String selection_update = EventEntry.COLUMN_DATE + "=?";
+        String selectionArgs_update[] = new String[]{String.valueOf(date)};
+
+
+        return numOfEventsInDate;
+    }
+
+    @Override
+    protected void onPostExecute(Integer integer) {
+        Toast.makeText(context, "Number of Events: " + String.valueOf(integer), Toast.LENGTH_SHORT).show();
     }
 }

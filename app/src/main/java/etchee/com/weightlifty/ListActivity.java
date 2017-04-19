@@ -149,7 +149,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
 
-                Log.v("Event ID query", "Status: Completed");
                 setEventID(eventID);
 
                 Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
@@ -259,7 +258,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
-        Log.v("Concatenated", concatenated);
 
         return Integer.parseInt(concatenated);
     }

@@ -74,6 +74,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
     private String eventString;
 
+    private DeleteActionHelper deleteHelper;
+
     /**
      * Two modes for this activity:
      * 1. From ListActivity, tapping on already existing item.
@@ -108,7 +110,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         delete_event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DeleteActionHelper deleteEvent = new DeleteActionHelper(
+                deleteHelper = new DeleteActionHelper(
                         getApplicationContext(),
                         EditEventActivity.this
                 );
@@ -121,7 +123,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                 list.add(0, String.valueOf(getDateAsInt()));
                 list.add(1, String.valueOf(sub_ID));
 
-                deleteEvent.execute(list);
+                deleteHelper.execute(list);
                 finish();
             }
         });
@@ -148,7 +150,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
             setReceivedEventID(bundle.getInt(DataContract.GlobalConstants.PASS_EVENT_ID));
             if (receivedEventID < 0 ) {
-                Log.e("receivedEventID", "Did not get event ID from ListActivity. Check Intent");
+                throw new IllegalArgumentException("Null contentValues");
             }
 
             //init the loader
@@ -192,14 +194,12 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                                 "cursor returned null.");
 
                         name_workout.setText(getEventString());
-                        Log.v("Event name query", "Successful! Event name: " + getEventString());
 
                         break;
 
                     case QUERY_SETS_NUMBER:
                         int count = cursor.getCount();
                         if (cursor.moveToFirst()) {
-                            Log.v("DATABASE UTILS", DatabaseUtils.dumpCursorToString(cursor));
                             int index = cursor.getColumnIndex(EventEntry.COLUMN_SET_COUNT);
                             int set_count = cursor.getInt(index);
                             numberPicker_set.setValue(set_count);
@@ -211,7 +211,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                     case QUERY_REPS_COUNT:
                         count = cursor.getCount();
                         if (cursor.moveToFirst()) {
-                            Log.v("DATABASE UTILS", DatabaseUtils.dumpCursorToString(cursor));
                             int index = cursor.getColumnIndex(EventEntry.COLUMN_REP_COUNT);
                             int rep_number = cursor.getInt(index);
                             numberPicker_rep.setValue(rep_number);
@@ -222,7 +221,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                     case QUERY_WEIGHT_COUNT:
                         count = cursor.getCount();
                         if (cursor.moveToFirst()) {
-                            Log.v("DATABASE UTILS", DatabaseUtils.dumpCursorToString(cursor));
                             int index = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_COUNT);
                             int weight_count = cursor.getInt(index);
                             weight_sequence.setText(String.valueOf(weight_count));
@@ -463,7 +461,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
-        Log.v("Concatenated", concatenated);
 
         return parseInt(concatenated);
     }
@@ -486,7 +483,6 @@ class DeleteActionHelper extends AsyncTask<ArrayList, Void, Integer> {
 
     @Override
     protected void onPreExecute() {
-        Toast.makeText(context, "AsyncTask fired!", Toast.LENGTH_SHORT).show();
         activity.finish();
     }
 

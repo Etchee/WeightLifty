@@ -223,8 +223,6 @@ public class DataProvider extends ContentProvider {
                 "method for Event Table has received" +
                 "null for the date value. Check what is passed into the insert method");
 
-        Log.v("Content provider", "ID: " + String.valueOf(id));
-
         getContext().getContentResolver().notifyChange(uri, null);
         return ContentUris.withAppendedId(uri, id);
     }
@@ -251,7 +249,6 @@ public class DataProvider extends ContentProvider {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
-        Log.v("Concatenated", concatenated);
 
         return Integer.parseInt(concatenated);
     }
@@ -288,7 +285,6 @@ public class DataProvider extends ContentProvider {
             case CODE_EVENT_ID:
                 selection = EventEntry._ID + "=?";
                 int id = (int)ContentUris.parseId(uri);
-                Log.v("ContentPRov", "Id is received as :" + String.valueOf(id));
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
 
                 numOfRowsDeleted = database.delete(EventEntry.TABLE_NAME, selection, selectionArgs);
@@ -508,8 +504,6 @@ public class DataProvider extends ContentProvider {
         // これが　→ [5,5,5,5]みたいになってるので
         String eventsArray[] = events.split(",");
 
-        Log.v("Event checker", eventsArray[2].toString());
-
         return eventsArray;
     }
 
@@ -538,7 +532,7 @@ public class DataProvider extends ContentProvider {
     private int updateEvent (Uri uri, ContentValues contentValues, String selection,
                              String[] selectionArgs) {
         int numOfRowsUpdated;
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
 
         //sanity checks
         if (contentValues.size() == 0) throw new IllegalArgumentException("Content Provider " +
