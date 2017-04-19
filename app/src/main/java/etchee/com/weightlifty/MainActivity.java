@@ -362,7 +362,7 @@ class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
         String selectionArgs[] = new String[]{ String.valueOf(date) };
         Cursor cursor = null;
 
-        int columnIndex_ID, firstID, lastID, numOfEventsInDate;
+        int columnIndex_ID, numOfEventsInDate;
         try {
             cursor = context.getContentResolver().query(
                     EventEntry.CONTENT_URI,
@@ -372,32 +372,11 @@ class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
                     null
             );
 
-            lastID = 0;
-            firstID = 0;
+            numOfEventsInDate = cursor.getCount();
 
-            columnIndex_ID = cursor.getColumnIndex(EventEntry._ID);
-
-            int count = cursor.getCount();
-
-            // Get the first row ID
-            if (cursor.moveToFirst()) {
-                firstID = cursor.getInt(columnIndex_ID);
-            }
-            //Get the second row ID
-            if (cursor.moveToLast()) {
-                lastID = cursor.getInt(columnIndex_ID);
-            }
         } finally {
             cursor.close();
         }
-
-        //num of of iterations that need to happen to update the sub_ID
-        // handle 0
-        if (lastID - firstID == 0) numOfEventsInDate = 0;
-        else if (lastID - firstID > 0) numOfEventsInDate = lastID - firstID + 1;
-        else numOfEventsInDate = -1;
-
-        int numOfRows = cursor.getCount();
 
         //necessary items for update method
         ContentValues values = new ContentValues();
