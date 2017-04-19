@@ -155,6 +155,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 Bundle bundle = new Bundle();
                 bundle.putInt(DataContract.GlobalConstants.PASS_EVENT_ID, getEventID());
                 bundle.putInt(DataContract.GlobalConstants.PASS_SUB_ID, position);
+                bundle.putInt(DataContract.GlobalConstants.PASS_SELECTED_DATE, getDateAsInt());
                 intent.putExtras(bundle);
                 startActivity(intent);
             }

@@ -41,6 +41,7 @@ public final class DataContract {
         public static final int QUERY_WEIGHT_COUNT = 32;
 
         public static final String PASS_SUB_ID = "subIDpassed";
+        public static final String PASS_SELECTED_DATE = "Date";
 
         public static final String PASS_CREATE_LOADER_DATE = "passdate";
 

@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.database.DatabaseUtils;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,13 +13,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,8 +27,6 @@ import java.util.Calendar;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 
-import static android.R.attr.id;
-import static android.R.id.list;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_SETS_NUMBER;
@@ -49,8 +46,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     private NumberPicker numberPicker_set;
     private NumberPicker numberPicker_rep;
     private TextView name_workout;
-    private TextView weight_sequence;
-    private Button add_event;
+    private TextView weight_count;
+    private Button event_button;
     private Button delete_event;
 
     private static final int SET_MAXVALUE = 30;
@@ -96,8 +93,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         numberPicker_rep.setMaxValue(REP_MAXVALUE);
         numberPicker_rep.setMinValue(REP_MINVALUE);
         name_workout = (TextView) findViewById(R.id.edit_workout_name);
-        weight_sequence = (TextView) findViewById(R.id.input_weight_number);
-        add_event = (Button) findViewById(R.id.add_event);
+        weight_count = (TextView) findViewById(R.id.input_weight_number);
+        event_button = (Button) findViewById(R.id.add_event);
         delete_event = (Button) findViewById(R.id.delete_workout);
 
         defineQueryHandler();
@@ -140,13 +137,23 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         // Case 2: modifying an already existing event → bundle with selection.
         if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
 
-            //no option to add event in this case
-            add_event.setVisibility(View.GONE);
+            //currently in ListActivity, this date is just set as today's date. Just pass another date
+            //in future updates.
+            final int selectedDate = bundle.getInt(DataContract.GlobalConstants.PASS_SELECTED_DATE);
 
-            //For a neater look, center the delete button
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) delete_event.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-            delete_event.setLayoutParams(layoutParams);
+            //Not create event but modify event
+            event_button.setText(R.string.modify_event);
+            event_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new ModifyEventHelper(
+                            getApplicationContext(),
+                            EditEventActivity.this,
+                            selectedDate,
+                            sub_ID
+                            ).execute(getUserInputs());
+                }
+            });
 
             setReceivedEventID(bundle.getInt(DataContract.GlobalConstants.PASS_EVENT_ID));
             if (receivedEventID < 0 ) {
@@ -223,7 +230,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                         if (cursor.moveToFirst()) {
                             int index = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_COUNT);
                             int weight_count = cursor.getInt(index);
-                            weight_sequence.setText(String.valueOf(weight_count));
+                            EditEventActivity.this.weight_count.setText(String.valueOf(weight_count));
                         }
 
                         cursor.close();
@@ -236,6 +243,21 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             }
 
         };
+    }
+
+    private ContentValues getUserInputs() {
+        ContentValues values = new ContentValues();
+
+        int set_count = numberPicker_set.getValue();
+        int rep_count = numberPicker_rep.getValue();
+        int weight_count = Integer.parseInt(this.weight_count.getText().toString());
+
+        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
+        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
+        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+        values.put(EventEntry.COLUMN_EVENT_ID, receivedEventID);
+
+        return values;
     }
 
 
@@ -512,5 +534,54 @@ class DeleteActionHelper extends AsyncTask<ArrayList, Void, Integer> {
     @Override
     protected void onPostExecute(Integer numOfDeletedRows) {
         Toast.makeText(context, String.valueOf(numOfDeletedRows) + " deleted.", Toast.LENGTH_SHORT).show();
+    }
+}
+
+/**
+ *  Class to handle heavy row update action when modifying an event.
+ */
+class ModifyEventHelper extends AsyncTask<ContentValues, Void, Integer> {
+
+    private Context context;
+    private Activity activity;
+
+    private int set_count, rep_count, weight_count;
+    private String workout_name;
+
+    private int date, sub_id;
+
+    public ModifyEventHelper(Context context, Activity activity, int date, int sub_id) {
+        super();
+        this.context = context;
+        this.activity = activity;
+        this.date = date;
+        this.sub_id = sub_id;
+    }
+
+    @Override
+    protected Integer doInBackground(ContentValues... values) {
+        int numberOfRowsUpdated;
+
+        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+        String selectionArgs[] = new String[] {
+                String.valueOf(date),
+                String.valueOf(sub_id)
+        };
+
+        numberOfRowsUpdated = context.getContentResolver().update(
+                EventEntry.CONTENT_URI,
+                values[0],
+                selection,
+                selectionArgs
+        );
+
+        return numberOfRowsUpdated;
+    }
+
+    @Override
+    protected void onPostExecute(Integer integer) {
+        if (integer > 0) Toast.makeText(context, "Event Updated!", Toast.LENGTH_SHORT).show();
+        else Toast.makeText(context, "Event update failed.", Toast.LENGTH_SHORT).show();
+        activity.finish();
     }
 }

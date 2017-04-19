@@ -421,7 +421,7 @@ class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
     }
 
     @Override
-    protected void onPostExecute(Integer updatedRowCount) {
-        Toast.makeText(context, "Number of rows: " + String.valueOf(updatedRowCount), Toast.LENGTH_SHORT).show();
+    protected void onPostExecute(Integer integer) {
+        Toast.makeText(context, "SUB_ID sorted", Toast.LENGTH_SHORT).show();
     }
 }
