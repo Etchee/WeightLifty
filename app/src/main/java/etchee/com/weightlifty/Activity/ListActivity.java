@@ -54,9 +54,9 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list);
-        
+
+        contentResolver = getContentResolver();
         textView = (TextView)findViewById(R.id.temp_search_hint_text);
-        
 
         //create the fabs
         onCreateFabCreator();
@@ -78,7 +78,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
-        contentResolver = getContentResolver();
 
         //for the empty view
         View emptyView = findViewById(R.id.view_empty);
@@ -205,6 +204,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 EventEntry.COLUMN_REP_COUNT,
                 EventEntry.COLUMN_SUB_ID,
                 EventEntry.COLUMN_SET_COUNT,
+                EventEntry.COLUMN_EVENT_ID
         };
 
         cursor = contentResolver.query(

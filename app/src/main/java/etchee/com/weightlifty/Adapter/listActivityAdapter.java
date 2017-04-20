@@ -2,26 +2,33 @@ package etchee.com.weightlifty.Adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
+import etchee.com.weightlifty.data.EventNameQueryHelper;
+import etchee.com.weightlifty.data.QueryResponceHandler;
 
 /**
  * Created by rikutoechigoya on 2017/03/27.
  */
 
-public class listActivityAdapter extends CursorAdapter {
+public class listActivityAdapter extends CursorAdapter implements QueryResponceHandler{
 
-    private TextView workout_name, repCount, setCount;
+    private TextView field_workout_name, field_repCount, field_setCount;
+    private String eventString;
+    private EventNameQueryHelper eventNameQueryHelper;
 
     public listActivityAdapter(Context context, Cursor c, int flags) {
-
         super(context, c, flags);
+        eventNameQueryHelper = new EventNameQueryHelper(context);
     }
 
     @Override
@@ -33,32 +40,57 @@ public class listActivityAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        workout_name = (TextView)view.findViewById(R.id.name_workout);
-        repCount = (TextView)view.findViewById(R.id.item_count_rep);
-        setCount = (TextView)view.findViewById(R.id.item_count_set);
+        field_workout_name = (TextView)view.findViewById(R.id.name_workout);
+        field_repCount = (TextView)view.findViewById(R.id.item_count_rep);
+        field_setCount = (TextView)view.findViewById(R.id.item_count_set);
 
-        //TODO: Do the steps below to get workout name shown in the listView
-        //To get the workout name --
-        //first, get the event number the cursor is pointing to.
-        //　→
-        // 1. get the current _ID from the EventTable. (i.g. _ID = 0)
-        // 2. at 0th row in the Calendar table, get the event column.
-        // 3. parse the field into an array → ([0, 3, 5, 9])
-        // 4. get the sub_ID from the ORIGINAL cursor, then get array[sub_ID]. This will be the index
-        // for the event Type table.
-        // 5. getContentResolver.query(EventType, where _ID = index). = answer String. SetText.
-
-//        int workoutName_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_SUB_ID);
-
+        int index;
         int repCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_REP_COUNT);
         int setCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_SET_COUNT);
+        int eventID = cursor.getInt(cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_ID));
 
         String rep_count = cursor.getString(repCount_columnIndex);
         String set_count = cursor.getString(setCount_columnIndex);
-//        String workoutName = cursor.getString(workoutName_columnIndex);
 
-//        workout_name.setText(workoutName);
-        repCount.setText(rep_count);
-        setCount.setText(set_count);
+        String projection[] = new String[]{
+                DataContract.EventTypeEntry._ID,
+                DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+        };
+
+        String selection = DataContract.EventTypeEntry._ID + "=?";
+        String selectionArgs[] = new String[]{ String.valueOf(eventID) };
+
+        Cursor eventStringCursor = context.getContentResolver().query(
+                DataContract.EventTypeEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+
+
+        try {
+            if (eventStringCursor.moveToFirst()) {
+                index = eventStringCursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+                Log.v("CURSOR", DatabaseUtils.dumpCursorToString(eventStringCursor));
+                eventString = eventStringCursor.getString(index);
+            } else Toast.makeText(context, "EventString query failed", Toast.LENGTH_SHORT).show();
+        } finally {
+                eventStringCursor.close();
+        }
+
+
+        field_workout_name.setText(eventString);
+        field_repCount.setText(rep_count);
+        field_setCount.setText(set_count);
+    }
+
+    /**
+     *  This method gets the string from the AsyncTask, through interface class
+     * @param eventString from onPostExecute method of the AsyncTask
+     */
+    @Override
+    public void EventNameHolder(String eventString) {
+        this.eventString = eventString;
     }
 }
