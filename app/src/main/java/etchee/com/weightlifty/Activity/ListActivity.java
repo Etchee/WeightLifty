@@ -119,7 +119,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         int date = getDateAsInt();
         int weight_count = 70;
         int sub_ID = getNextSub_id();
-        int eventID = new Random().nextInt(5);
+        int eventID = 5;
 
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);

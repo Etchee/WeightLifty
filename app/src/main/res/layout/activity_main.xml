@@ -28,24 +28,5 @@
         android:contentDescription=""
         app:srcCompat="@drawable/welcome_title" />
 
-    <Button
-        android:id="@+id/plan_workout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/begin_workout_button"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="48dp"
-        android:text="@string/plan_workout" />
-
-
-    <Button
-        android:id="@+id/button_insert_event"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/insert_dummy_event"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-
 
 </RelativeLayout>

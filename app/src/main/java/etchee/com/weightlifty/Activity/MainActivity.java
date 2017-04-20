@@ -44,23 +44,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        Button plan_workout = (Button)findViewById(R.id.plan_workout);
-        plan_workout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        final Button insert_dummy_event = (Button)findViewById(R.id.button_insert_event);
-        insert_dummy_event.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                event_insertDummyValues();
-            }
-        });
     }
 
 
