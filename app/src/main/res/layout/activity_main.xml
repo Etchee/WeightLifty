@@ -11,11 +11,9 @@
         android:id="@+id/begin_workout_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/imageView"
-        android:layout_alignLeft="@+id/imageView"
-        android:layout_alignRight="@+id/imageView"
-        android:layout_alignStart="@+id/imageView"
-        android:layout_below="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:paddingRight="10dp"
         android:paddingBottom="20dp"
         android:paddingTop="20dp"
         android:text="@string/begin_workout" />
@@ -40,76 +38,14 @@
         android:text="@string/plan_workout" />
 
 
-    <!--Horizontally scroll down below to make use of the dev options-->
-    <ScrollView
-        android:id="@+id/dev_scrollview"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/button_insert_event"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/insert_dummy_event"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/plan_workout"
-        android:layout_marginTop="20dp"
-        android:background="@color/white_pressed">
-
-        <GridLayout
-            android:id="@+id/dev_gridview"
-            style="@style/Animation.AppCompat.DropDownUp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="1"
-            android:fadingEdge="horizontal"
-            android:scrollbars="vertical"
-            android:useDefaultMargins="true">
-
-            <Button
-                android:id="@+id/view_tables_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/view_tables" />
-
-            <Button
-                android:id="@+id/button_calendar_delete_dummy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/delete_dummy_data" />
-
-            <Button
-                android:id="@+id/button_remove_events"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/delete_all_events"
-                />
-
-
-            <Button
-                android:id="@+id/button_insert_eventtype"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-
-                android:text="@string/insert_dummy_eventtype_data" />
-
-            <Button
-                android:id="@+id/button_insert_event"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/insert_dummy_event" />
-
-            <Button
-                android:id="@+id/insert_calendar_today"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/insert_today_calendar" />
-
-        </GridLayout>
-
-    </ScrollView>
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

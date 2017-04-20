@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Activity.MainActivity"
+    >
+    <item
+        android:title="@string/insert_event_values"
+        android:id="@+id/menu_insert_event"
+        app:showAsAction="never" />
+    <item android:title="@string/insert_type_event"
+        android:id="@+id/menu_insert_event_type"
+        app:showAsAction="never" />
+    <item android:title="@string/delete_all_events"
+        android:id="@+id/menu_delete_all_events"
+        app:showAsAction="never" />
+    <item android:title="@string/view_tables"
+        android:id="@+id/menu_view_tables"
+        app:showAsAction="never" />
+
+</menu>

@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -31,15 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
 
-        //Button to view SQLite tables
-        Button viewTableButton = (Button)findViewById(R.id.view_tables_button);
-        viewTableButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
-                startActivity(intent);
-            }
-        });
+
 
         //"Begin Workout" button to launch listActivity
         Button begin_workout = (Button)findViewById(R.id.begin_workout_button);
@@ -60,45 +54,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //delete button for all data in calednar table
-        Button delete_dummy_button = (Button)findViewById(R.id.button_calendar_delete_dummy);
-        delete_dummy_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int numberOfDeletedRows = deleteAllTableData();
-            }
-        });
-
-        //Button to insert dummy eventType data
-        final Button insertDummy_eventType = (Button)findViewById(R.id.button_insert_eventtype);
-        insertDummy_eventType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                eventType_insertDummyValues();
-            }
-        });
-
         final Button insert_dummy_event = (Button)findViewById(R.id.button_insert_event);
         insert_dummy_event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 event_insertDummyValues();
-            }
-        });
-
-        Button insert_today_data = (Button)findViewById(R.id.insert_calendar_today);
-        insert_today_data.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                calendar_insertTodaysRow();
-            }
-        });
-
-        final Button delete_event_data = (Button)findViewById(R.id.button_remove_events);
-        delete_event_data.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                deleteEventTable();
             }
         });
     }
@@ -277,6 +237,39 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return numberOfDeletedRows;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.menu_delete_all_events:
+                int numOfDeletedRows = deleteEventTable();
+                Toast.makeText(context, String.valueOf(numOfDeletedRows) + " deleted.",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.menu_insert_event:
+                event_insertDummyValues();
+                break;
+            case R.id.menu_insert_event_type:
+                eventType_insertDummyValues();
+                break;
+
+            case R.id.menu_view_tables:
+                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
+                startActivity(intent);
+                break;
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 

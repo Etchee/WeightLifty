@@ -24,4 +24,6 @@
     <string name="delete_all_events">Delete All Events</string>
     <string name="add_event">Add Event</string>
     <string name="modify_event">Modify Event</string>
+    <string name="insert_event_values">Insert Event Values</string>
+    <string name="insert_type_event">Insert Event Type</string>
 </resources>
