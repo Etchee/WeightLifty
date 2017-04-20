@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,9 +17,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".data.DBviewer" />
-        <activity android:name=".ListActivity" />
-        <activity android:name=".EditEventActivity"/>
-        <activity android:name=".ChooseEventActivity"/>
+        <activity android:name=".Activity.ListActivity" />
+        <activity android:name=".Activity.EditEventActivity"/>
+        <activity android:name=".Activity.ChooseEventActivity"/>
 
         <provider
             android:authorities="etchee.com.weightlifty"

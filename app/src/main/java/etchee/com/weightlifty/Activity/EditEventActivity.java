@@ -1,12 +1,9 @@
-package etchee.com.weightlifty;
+package etchee.com.weightlifty.Activity;
 
-import android.app.Activity;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -19,13 +16,14 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
+import etchee.com.weightlifty.data.DeleteActionHelper;
+import etchee.com.weightlifty.data.ModifyEventHelper;
 
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
@@ -488,100 +486,3 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     }
 }
 
-/**
- *  Inner class to handle heavy row delete action.
- *  ArrayList will contain two Integers: date, sub_id.
- */
-class DeleteActionHelper extends AsyncTask<ArrayList, Void, Integer> {
-
-    private Context context;
-    private Activity activity;
-
-    public DeleteActionHelper(Context context, Activity activity) {
-        super();
-        this.context = context;
-        this.activity = activity;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        activity.finish();
-    }
-
-    @Override
-    protected Integer doInBackground(ArrayList... arrayList) {
-        Object date = arrayList[0].get(0);
-        Object sub_id = arrayList[0].get(1);
-
-        int dateAsInt = Integer.parseInt(date.toString());
-        int SubIdAsInt = Integer.parseInt(sub_id.toString());
-
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
-        String selectionArgs[] = new String[]{
-                String.valueOf(dateAsInt),
-                String.valueOf(SubIdAsInt)
-        };
-
-        int numberOfDeletedRows = context.getContentResolver().delete(
-                EventEntry.CONTENT_URI,
-                selection,
-                selectionArgs
-        );
-
-        return numberOfDeletedRows;
-    };
-
-    @Override
-    protected void onPostExecute(Integer numOfDeletedRows) {
-        Toast.makeText(context, String.valueOf(numOfDeletedRows) + " deleted.", Toast.LENGTH_SHORT).show();
-    }
-}
-
-/**
- *  Class to handle heavy row update action when modifying an event.
- */
-class ModifyEventHelper extends AsyncTask<ContentValues, Void, Integer> {
-
-    private Context context;
-    private Activity activity;
-
-    private int set_count, rep_count, weight_count;
-    private String workout_name;
-
-    private int date, sub_id;
-
-    public ModifyEventHelper(Context context, Activity activity, int date, int sub_id) {
-        super();
-        this.context = context;
-        this.activity = activity;
-        this.date = date;
-        this.sub_id = sub_id;
-    }
-
-    @Override
-    protected Integer doInBackground(ContentValues... values) {
-        int numberOfRowsUpdated;
-
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
-        String selectionArgs[] = new String[] {
-                String.valueOf(date),
-                String.valueOf(sub_id)
-        };
-
-        numberOfRowsUpdated = context.getContentResolver().update(
-                EventEntry.CONTENT_URI,
-                values[0],
-                selection,
-                selectionArgs
-        );
-
-        return numberOfRowsUpdated;
-    }
-
-    @Override
-    protected void onPostExecute(Integer integer) {
-        if (integer > 0) Toast.makeText(context, "Event Updated!", Toast.LENGTH_SHORT).show();
-        else Toast.makeText(context, "Event update failed.", Toast.LENGTH_SHORT).show();
-        activity.finish();
-    }
-}

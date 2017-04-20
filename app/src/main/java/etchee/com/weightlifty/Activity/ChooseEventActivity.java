@@ -1,21 +1,17 @@
-package etchee.com.weightlifty;
+package etchee.com.weightlifty.Activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
+import etchee.com.weightlifty.Activity.EditEventActivity;
+import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
-import etchee.com.weightlifty.data.DataContract.CalendarEntry;
-
-import java.util.Arrays;
 
 /**
  * Created by rikutoechigoya on 2017/04/09.

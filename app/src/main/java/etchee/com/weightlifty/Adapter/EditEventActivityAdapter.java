@@ -1,4 +1,4 @@
-package etchee.com.weightlifty;
+package etchee.com.weightlifty.Adapter;
 
 import android.content.Context;
 import android.database.Cursor;

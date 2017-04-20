@@ -1,4 +1,4 @@
-package etchee.com.weightlifty;
+package etchee.com.weightlifty.Adapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 
 /**

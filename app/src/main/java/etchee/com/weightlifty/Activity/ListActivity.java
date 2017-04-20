@@ -1,9 +1,8 @@
-package etchee.com.weightlifty;
+package etchee.com.weightlifty.Activity;
 
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -15,8 +14,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -26,12 +23,13 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
-import org.w3c.dom.Text;
-
 import java.util.Calendar;
 
+import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
+import etchee.com.weightlifty.data.subIDfixHelper;
+import etchee.com.weightlifty.Adapter.listActivityAdapter;
 
 /**
  * Created by rikutoechigoya on 2017/03/30.
@@ -112,6 +110,13 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         });
     }
 
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+
+        new subIDfixHelper(getApplicationContext()).execute(getDateAsInt());
+    }
 
     private int getEventID() {
         return eventID;
@@ -326,3 +331,4 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.swapCursor(null);
     }
 }
+
