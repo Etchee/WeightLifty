@@ -129,7 +129,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
 
             ContentValues values = (ContentValues) bundle.get(DataContract.GlobalConstants.CONTENT_VALUES);
-            int sampleValue = values.getAsInteger(DataContract.GlobalConstants.SUB_ID);
+            int sampleValue = values.getAsInteger(EventEntry.COLUMN_SUB_ID);
         }
 
         // Case 2: modifying an already existing event → bundle with selection.

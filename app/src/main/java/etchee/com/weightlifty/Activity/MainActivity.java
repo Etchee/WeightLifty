@@ -103,41 +103,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void test_toastLastDateInCalendar() {
-        int rowsInserted;
-        Cursor cursor;
 
-        SQLiteDatabase readDb = new DataDBhelper(context).getReadableDatabase();
-
-        //for now, I'm looking at the date column only.
-        String projection[] = new String[]{CalendarEntry.COLUMN_DATE};
-
-        cursor = getContentResolver().query(
-                CalendarEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null,
-                null
-                );
-
-        // get the data from the last row
-        if (cursor.moveToLast()) {
-            int lastdate = cursor.getInt(cursor.getColumnIndex(CalendarEntry.COLUMN_DATE));
-
-            if (lastdate == 2017430) {
-                Toast.makeText(context, "Valid calendar data!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(context, "Invalid today calendar date", Toast.LENGTH_SHORT).show();
-            }
-            
-        }
-
-        //error handling
-        if (cursor == null) {
-            throw new IllegalArgumentException("test_toastLastDateInCalendar() function has " +
-                    "failed. Check the method or the calendar table.");
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        calendar_insertTodaysRow();
     }
 
     private int getDateAsInt() {
@@ -198,10 +168,11 @@ public class MainActivity extends AppCompatActivity {
             //error handling block
             if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
                     "failed to insert data. check the MainActivity method and the table.");
-            else Toast.makeText(context, "Row inserted. Date: " + String.valueOf(dateOfToday), Toast.LENGTH_SHORT).show();
-        } else Toast.makeText(context, "Calendar: today's record is there!", Toast.LENGTH_SHORT).show();
+        }
 
     }
+
+
 
     private void event_insertDummyValues() {
 

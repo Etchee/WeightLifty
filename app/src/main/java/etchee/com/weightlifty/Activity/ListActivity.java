@@ -3,33 +3,31 @@ package etchee.com.weightlifty.Activity;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.github.clans.fab.FloatingActionButton;
 
 import java.util.Calendar;
+import java.util.Random;
 
+import etchee.com.weightlifty.Adapter.listActivityAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.subIDfixHelper;
-import etchee.com.weightlifty.Adapter.listActivityAdapter;
 
 /**
  * Created by rikutoechigoya on 2017/03/30.
@@ -39,14 +37,12 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private ListView listview;
     private listActivityAdapter mAdapter;
-    
     private TextView textView;
+    private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize threads anyways
     private ContentResolver contentResolver;
-
     private int eventID;
-
     private final int CREATE_LOADER_ID = 1;
 
     @Override
@@ -58,26 +54,15 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         contentResolver = getContentResolver();
         textView = (TextView)findViewById(R.id.temp_search_hint_text);
 
-        //create the fabs
-        onCreateFabCreator();
+        //fab setup
+        fab = (FloatingActionButton) findViewById(R.id.list_fab);
 
-        FloatingActionsMenu floatingActionsMenu = (FloatingActionsMenu) findViewById(R.id.button_chest);
-        floatingActionsMenu.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(ListActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                event_insertDummyValues();
             }
         });
-
-        FloatingActionButton fab_leg = (FloatingActionButton) findViewById(R.id.fab_leg);
-        fab_leg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ChooseEventActivity.class);
-                startActivity(intent);
-            }
-        });
-
 
         //for the empty view
         View emptyView = findViewById(R.id.view_empty);
@@ -125,6 +110,65 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         this.eventID = eventID;
     }
 
+    private void event_insertDummyValues() {
+
+        ContentValues values = new ContentValues();
+
+        int rep_count = 7;
+        int set_count = 5;
+        int date = getDateAsInt();
+        int weight_count = 70;
+        int sub_ID = getNextSub_id();
+        int eventID = new Random().nextInt(5);
+
+        values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        values.put(EventEntry.COLUMN_DATE, date);
+        values.put(EventEntry.COLUMN_EVENT_ID, eventID);
+        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
+        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
+        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+
+        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
+
+        if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
+                "failed to insert data. check the MainActivity method and the table.");
+
+    }
+
+    private int getNextSub_id() {
+        int sub_id;
+        int date = getDateAsInt();
+
+        String projection[] = new String[]{EventEntry.COLUMN_DATE, EventEntry.COLUMN_SUB_ID};
+        String selection = EventEntry.COLUMN_DATE + "=?";
+        String selectionArgs[] = new String[]{String.valueOf(date)};
+        Cursor cursor = null;
+
+        try {
+            cursor = getContentResolver().query(
+                    EventEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null
+            );
+
+            //if cursor comes back, there is already some rows
+            if (cursor.moveToLast()) {
+                int index = cursor.getColumnIndex(EventEntry.COLUMN_SUB_ID);
+                sub_id = cursor.getInt(index) + 1;
+
+            } else {
+                sub_id = 0;
+            }
+        } finally {
+            cursor.close();
+        }
+
+
+        return sub_id;
+    }
+
     /**
      * @param position equals to that of the sub_id in the event table.
      *                 This method find the specific row with the sub_id, then get the event_id
@@ -141,17 +185,25 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
                 int eventID = -1;
 
-                //Token will be passed to prevent confusion on multi querying
-                if (token == DataContract.GlobalConstants.QUERY_EVENT_ID) {
-                    if (cursor.moveToFirst()) {
-                        int index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
-                        eventID = Integer.parseInt(cursor.getString(index));
+                try {
+                    //Token will be passed to prevent confusion on multi querying
+                    if (token == DataContract.GlobalConstants.QUERY_EVENT_ID) {
+                        if (cursor.moveToFirst()) {
+                            int index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
+                            eventID = Integer.parseInt(cursor.getString(index));
 
-                    }
+                        }
 
-                    else if (!cursor.moveToFirst()) throw new CursorIndexOutOfBoundsException("EventID query: Cursor might be empty");
+                        else if (!cursor.moveToFirst()) throw new CursorIndexOutOfBoundsException("EventID query: Cursor might be empty");
 
-                } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
+                    } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
+                } catch (CursorIndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }finally {
+                    cursor.close();
+                }
 
                 setEventID(eventID);
 
@@ -214,46 +266,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 null,
                 null );
         return cursor;
-    }
-
-    private void onCreateFabCreator() {
-
-        //Action button A  (Top)
-        final FloatingActionButton actionA = (FloatingActionButton) findViewById(R.id.fab_leg);
-        actionA.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        //Action button B (
-        // iddle)
-        final View actionB = findViewById(R.id.action_b);
-        actionB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        //Action button C (Bottom)
-        FloatingActionButton actionC = new FloatingActionButton(getBaseContext());
-        actionC.setTitle("Chest");
-        actionC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        final FloatingActionsMenu menuMultipleActions =
-                (FloatingActionsMenu)findViewById(R.id.button_chest);
-        menuMultipleActions.addButton(actionC);
-
-        ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
-        drawable.getPaint().setColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-
     }
 
     private int getDateAsInt() {

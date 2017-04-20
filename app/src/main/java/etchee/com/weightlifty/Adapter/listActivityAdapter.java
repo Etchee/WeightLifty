@@ -33,6 +33,7 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+
         return LayoutInflater.from(context).inflate(R.layout.item_single_listview, viewGroup, false);
     }
 
@@ -72,9 +73,8 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
         try {
             if (eventStringCursor.moveToFirst()) {
                 index = eventStringCursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
-                Log.v("CURSOR", DatabaseUtils.dumpCursorToString(eventStringCursor));
                 eventString = eventStringCursor.getString(index);
-            } else Toast.makeText(context, "EventString query failed", Toast.LENGTH_SHORT).show();
+            } else Log.e("ListAdapter", "Event String query failed");
         } finally {
                 eventStringCursor.close();
         }

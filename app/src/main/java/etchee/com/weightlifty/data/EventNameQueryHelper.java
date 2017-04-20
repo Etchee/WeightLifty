@@ -55,7 +55,6 @@ public class EventNameQueryHelper extends AsyncTask<Integer, Void, String> {
                 cursor.close();
         }
 
-
         return eventString;
     }
 
