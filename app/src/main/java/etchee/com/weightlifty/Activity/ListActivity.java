@@ -9,14 +9,23 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
@@ -25,6 +34,7 @@ import java.util.Random;
 
 import etchee.com.weightlifty.Adapter.listActivityAdapter;
 import etchee.com.weightlifty.R;
+import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.subIDfixHelper;
@@ -40,7 +50,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     private TextView textView;
     private FloatingActionButton fab;
 
-    //To make sure that there is only one instance because OpenHelper will serialize threads anyways
+    //To make sure that there is only one instance because OpenHelper will serialize requests anyways
     private ContentResolver contentResolver;
     private int eventID;
     private final int CREATE_LOADER_ID = 1;
@@ -341,6 +351,80 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        //set delete menu text to red color
+        MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events);
+        SpannableString string = new SpannableString(delete_all_events.getTitle());
+        string.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(ListActivity.this, R.color.colorPrimary)),
+                0,
+                string.length(),
+                Spanned.SPAN_PRIORITY);
+
+        delete_all_events.setTitle(string);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_list, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.menu_delete_all_events:
+                int numOfDeletedRows = deleteEventTable();
+                Toast.makeText(ListActivity.this, String.valueOf(numOfDeletedRows) + " deleted.",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.menu_insert_event:
+                event_insertDummyValues();
+                break;
+            case R.id.menu_insert_event_type:
+                eventType_insertDummyValues();
+                break;
+
+            case R.id.menu_view_tables:
+                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
+                startActivity(intent);
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private int deleteEventTable() {
+        int numberOfDeletedRows = getContentResolver().delete(
+                EventEntry.CONTENT_URI,
+                null,
+                null
+        );
+        return numberOfDeletedRows;
+    }
+
+    private void eventType_insertDummyValues() {
+
+        ContentValues dummyValues = new ContentValues();
+
+        dummyValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, "Test Event");
+
+        Uri uri = getContentResolver().insert(DataContract.EventTypeEntry.CONTENT_URI, dummyValues);
+
+        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
+                "failed to insert data. check the MainActivity method and the table.");
+
+
+        Toast.makeText(this, "EventType inserted", Toast.LENGTH_SHORT).show();
     }
 }
 

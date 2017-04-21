@@ -6,8 +6,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -220,6 +224,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return numberOfDeletedRows;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        //set delete menu text to red color
+        MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events);
+        SpannableString string = new SpannableString(delete_all_events.getTitle());
+        string.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary)),
+                0,
+                string.length(),
+                Spanned.SPAN_PRIORITY);
+
+        delete_all_events.setTitle(string);
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

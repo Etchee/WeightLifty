@@ -14,7 +14,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <EditText
+    <TextView
         android:id="@+id/edit_workout_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,7 +26,10 @@
         android:layout_marginTop="15dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="@android:string/untitled" />
+        android:text="@android:string/untitled"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/delete_workout"
@@ -58,13 +61,14 @@
         android:id="@+id/hint_text_set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/set"
-        android:layout_marginRight="18dp"
-        android:layout_marginEnd="18dp"
         android:layout_alignBaseline="@+id/hint_text_rep"
         android:layout_alignBottom="@+id/hint_text_rep"
+        android:layout_alignEnd="@+id/set_numberPicker"
         android:layout_alignRight="@+id/set_numberPicker"
-        android:layout_alignEnd="@+id/set_numberPicker" />
+        android:layout_marginEnd="18dp"
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/set" />
 
     <TextView
         android:id="@+id/hint_text_rep"
@@ -73,7 +77,7 @@
         android:text="@string/rep"
         android:layout_below="@+id/edit_workout_name"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="18dp" />
+        android:layout_marginTop="10dp" />
 
     <EditText
         android:id="@+id/input_weight_number"

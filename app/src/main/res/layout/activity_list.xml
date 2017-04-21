@@ -24,14 +24,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="17dp"
+        android:layout_marginRight="17dp"
         android:adjustViewBounds="true"
+        android:background="@color/colorPrimary"
+        android:cropToPadding="true"
         android:elevation="@dimen/fab_size_normal"
         android:src="@drawable/fab_add"
-        fab:fab_colorNormal="@color/blue_semi_transparent"
-        fab:fab_colorPressed="@color/blue_semi_transparent"
+        fab:fab_colorNormal="@color/colorPrimary"
+        fab:fab_colorPressed="@color/colorPrimary"
         fab:fab_colorRipple="@color/black_semi_transparent" />
 
 </RelativeLayout>
