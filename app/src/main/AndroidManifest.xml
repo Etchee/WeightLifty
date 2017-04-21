@@ -17,13 +17,29 @@
             </intent-filter>
         </activity>
         <activity android:name=".data.DBviewer" />
-        <activity android:name=".Activity.ListActivity" />
-        <activity android:name=".Activity.EditEventActivity"/>
-        <activity android:name=".Activity.ChooseEventActivity"/>
+
+        <activity android:name=".Activity.ListActivity">
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                />
+
+        </activity>
+
+        <activity android:name=".Activity.SearchResultsActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+        </activity>
+
+        <activity android:name=".Activity.EditEventActivity" />
+        <activity android:name=".Activity.ChooseEventActivity" />
 
         <provider
-            android:authorities="etchee.com.weightlifty"
             android:name=".data.DataProvider"
+            android:authorities="etchee.com.weightlifty"
             android:exported="false" />
     </application>
 
