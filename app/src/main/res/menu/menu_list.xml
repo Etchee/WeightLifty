@@ -5,7 +5,7 @@
 
     <item android:id="@+id/search"
         android:title="@string/search_events"
-        android:icon="@drawable/ic_search_black_24dp"
+        android:icon="@drawable/ic_add_list"
         app:showAsAction="ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
 

@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -25,7 +24,7 @@ import static etchee.com.weightlifty.data.DataContract.PATH_EVENT_TYPE;
 
 public class DataProvider extends ContentProvider {
 
-    private DataDBhelper dbHelper;
+    private DataDbHelper dbHelper;
 
     //adding codes to different type of URIs that this provider can handle.
     private static final int CODE_CALENDAR = 100;
@@ -56,7 +55,7 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        dbHelper = new DataDBhelper(getContext());
+        dbHelper = new DataDbHelper(getContext());
         getDateAsInt();
         return true;
     }

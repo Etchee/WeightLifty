@@ -20,14 +20,14 @@ import static android.R.attr.version;
  * Created by rikutoechigoya on 2017/03/24.
  */
 
-public class DataDBhelper extends SQLiteOpenHelper {
+public class DataDbHelper extends SQLiteOpenHelper {
 
-    public static final String LOG_TAG = DataDBhelper.class.getSimpleName();
+    public static final String LOG_TAG = DataDbHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME = "log.db";
     private static final int DATABASE_VERSION = 1;
 
-    public DataDBhelper(Context context) {
+    public DataDbHelper(Context context) {
 
         super(context, DATABASE_NAME, null, version);
     }

@@ -54,7 +54,7 @@ public class DBviewer extends Activity implements OnItemClickListener {
 
     //in the below line Change the text 'yourCustomSqlHelper' with your custom sqlitehelper class name.
     //Do not change the variable name dbm
-    DataDBhelper dbm;
+    DataDbHelper dbm;
     TableLayout tableLayout;
     TableRow.LayoutParams tableRowParams;
     HorizontalScrollView hsv;
@@ -73,7 +73,7 @@ public class DBviewer extends Activity implements OnItemClickListener {
 
 
         //in the below line Change the text 'yourCustomSqlHelper' with your custom sqlitehelper class name
-        dbm = new DataDBhelper(DBviewer.this);
+        dbm = new DataDbHelper(DBviewer.this);
 
         mainscrollview = new ScrollView(DBviewer.this);
 

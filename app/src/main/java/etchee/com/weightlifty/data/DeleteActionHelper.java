@@ -50,7 +50,7 @@ public class DeleteActionHelper extends AsyncTask<ArrayList, Void, Integer> {
         );
 
         return numberOfDeletedRows;
-    };
+    }
 
     @Override
     protected void onPostExecute(Integer numOfDeletedRows) {

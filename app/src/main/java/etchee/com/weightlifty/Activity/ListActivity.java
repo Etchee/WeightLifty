@@ -54,6 +54,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     private TextView textView;
     private FloatingActionButton fab;
 
+    private SearchView searchView;
+
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
     private ContentResolver contentResolver;
     private int eventID;
@@ -379,11 +381,13 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_list, menu);
 
-        // Associate searchable configuration with the SearchView
+        /** configure the search view **/
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem mSearchMenuItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
+        searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+
 
         return super.onCreateOptionsMenu(menu);
     }

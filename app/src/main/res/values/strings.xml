@@ -28,4 +28,5 @@
     <string name="insert_type_event">Insert Event Type</string>
     <string name="search_events">Search Events</string>
     <string name="hint_search_events">Search Events...</string>
+    <string name="hint_text_example">Hint Text</string>
 </resources>
