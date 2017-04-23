@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.SearchView;
 import android.widget.ListView;
 
 import etchee.com.weightlifty.Adapter.SearchResultsAdapter;
@@ -17,21 +18,27 @@ import etchee.com.weightlifty.data.InstantEventTypeQuery;
  * Created by rikutoechigoya on 2017/04/21.
  */
 
-public class SearchResultsActivity extends ListActivity {
+public class SearchResultsActivity extends Activity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private String query;
     private InstantEventTypeQuery db;
     private Context context;
     private ListView listview;
     private SearchResultsAdapter adapter;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //component setting
         context = SearchResultsActivity.this;
+        searchView = (SearchView) findViewById(R.id.search);
         listview = (ListView)findViewById(R.id.view_search_list);
+
+        //ListView setting
         adapter = new SearchResultsAdapter(context, handleIntent() , 0);
-        listview.setAdapter();
+        listview.setAdapter(adapter);
 
         db = new InstantEventTypeQuery(context);
 
@@ -53,5 +60,32 @@ public class SearchResultsActivity extends ListActivity {
         }
 
         return cursor;
+    }
+
+    private void showResults(String query) {
+
+    }
+
+
+    @Override
+    public boolean onClose() {
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 }
