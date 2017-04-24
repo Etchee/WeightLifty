@@ -12,7 +12,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import etchee.com.weightlifty.Adapter.SearchResultsAdapter;
 import etchee.com.weightlifty.R;
@@ -74,8 +78,81 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
         return cursor;
     }
 
+    /**
+     *  This method takes the resulting cursor from the "search method" and then inflate the
+     *  result in listView.a
+     * @param query
+     */
     private void showResults(String query) {
+        Cursor cursor = searchCustomer((query != null ? query.toString() : "@@@@"));
 
+        if (cursor == null) {
+            //
+        } else {
+            // Specify the columns we want to display in the result
+            String[] from = new String[]{
+                    KEY_CUSTOMER,
+                    KEY_NAME,
+                    KEY_ADDRESS,
+                    KEY_CITY,
+                    KEY_STATE,
+                    KEY_ZIP};
+
+            // Specify the Corresponding layout elements where we want the columns to go
+            int[] to = new int[]{R.id.scustomer,
+                    R.id.sname,
+                    R.id.saddress,
+                    R.id.scity,
+                    R.id.sstate,
+                    R.id.szipCode};
+
+            // Create a simple cursor adapter for the definitions and apply them to the ListView
+            android.widget.SimpleCursorAdapter customers = new android.widget.SimpleCursorAdapter(this, R.layout.customerresult, cursor, from, to);
+            mListView.setAdapter(customers);
+
+            // Define the on-click listener for the list items
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // Get the cursor, positioned to the corresponding row in the result set
+                    Cursor cursor = (Cursor) mListView.getItemAtPosition(position);
+
+                    // Get the state's capital from this row in the database.
+                    String customer = cursor.getString(cursor.getColumnIndexOrThrow("customer"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    String address = cursor.getString(cursor.getColumnIndexOrThrow("address"));
+                    String city = cursor.getString(cursor.getColumnIndexOrThrow("city"));
+                    String state = cursor.getString(cursor.getColumnIndexOrThrow("state"));
+                    String zipCode = cursor.getString(cursor.getColumnIndexOrThrow("zipCode"));
+
+                    //Check if the Layout already exists
+                    LinearLayout customerLayout = (LinearLayout) findViewById(R.id.customerLayout);
+                    if (customerLayout == null) {
+                        //Inflate the Customer Information View
+                        LinearLayout leftLayout = (LinearLayout) findViewById(R.id.rightLayout);
+                        View customerInfo = getLayoutInflater().inflate(R.layout.selected_customer_detail, leftLayout, false);
+                        leftLayout.addView(customerInfo);
+                    }
+
+                    //Get References to the TextViews
+                    customerText = (TextView) findViewById(R.id.customer);
+                    nameText = (TextView) findViewById(R.id.name);
+                    addressText = (TextView) findViewById(R.id.address);
+                    cityText = (TextView) findViewById(R.id.city);
+                    stateText = (TextView) findViewById(R.id.state);
+                    zipCodeText = (TextView) findViewById(R.id.zipCode);
+
+                    // Update the parent class's TextView
+                    customerText.setText(customer);
+                    nameText.setText(name);
+                    addressText.setText(address);
+                    cityText.setText(city);
+                    stateText.setText(state);
+                    zipCodeText.setText(zipCode);
+
+                    searchView.setQuery("", true);
+                }
+            });
+        }
     }
 
     public SearchResultsActivity openDbInstance() throws SQLException {
@@ -91,7 +168,7 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
      * @return cursor to iterate thru to show results in ListView
      * @throws SQLException if search fails.
      */
-    public Cursor searchCustomer(String inputText) throws SQLException {
+    public Cursor search(String inputText) throws SQLException {
         Log.w(TAG, inputText);
         String query = "SELECT docid as _id," +
                 DataContract.EventTypeEntry.COLUMN_EVENT_NAME + "," +
