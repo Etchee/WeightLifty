@@ -2,6 +2,7 @@ package etchee.com.weightlifty.Activity;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,17 +15,14 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import etchee.com.weightlifty.Adapter.SearchResultsAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
-import etchee.com.weightlifty.data.InstantEventTypeQuery;
 
 import static android.content.ContentValues.TAG;
-import static etchee.com.weightlifty.data.DataContract.FTS_Table.DATABASE_NAME;
 import static etchee.com.weightlifty.data.DataContract.FTS_Table.DATABASE_VERSION;
 import static etchee.com.weightlifty.data.DataContract.FTS_Table.FTS_VIRTUAL_TABLE;
 
@@ -35,47 +33,31 @@ import static etchee.com.weightlifty.data.DataContract.FTS_Table.FTS_VIRTUAL_TAB
 public class SearchResultsActivity extends Activity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private String query;
-    private InstantEventTypeQuery db;
     private Context context;
     private ListView listview;
     private SearchResultsAdapter adapter;
     private SearchView searchView;
     private FTSDatabaseOpenHelper mDbHelper;
     private SQLiteDatabase mDb;
+    private TextView search_textView_workoutName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //component setting
+        listview = (ListView) findViewById(R.id.view_search_list);
         context = SearchResultsActivity.this;
+
+        //search view setup
+        searchView.setIconifiedByDefault(true);
+        searchView.setOnQueryTextListener(this);
         searchView = (SearchView) findViewById(R.id.search);
-        listview = (ListView)findViewById(R.id.view_search_list);
+        searchView.setOnCloseListener(this);
+        search_textView_workoutName = (TextView) findViewById(R.id.searchview_event_name);
 
-        //ListView setting
-        adapter = new SearchResultsAdapter(context, handleIntent() , 0);
-        listview.setAdapter(adapter);
+        openDbInstance();
 
-        db = new InstantEventTypeQuery(context);
-
-        /** Query string is bundled in the intent **/
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            query = intent.getStringExtra(SearchManager.QUERY);
-        }
-    }
-
-    private Cursor handleIntent(Intent intent) {
-
-        Cursor cursor = null;
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            cursor = db.getWordMatches(query, null);
-            //process Cursor and display results
-        }
-
-        return cursor;
     }
 
     /**
@@ -84,71 +66,40 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
      * @param query
      */
     private void showResults(String query) {
-        Cursor cursor = searchCustomer((query != null ? query.toString() : "@@@@"));
+        Cursor cursor = search((query != null ? query.toString() : "@@@@"));
 
         if (cursor == null) {
             //
         } else {
             // Specify the columns we want to display in the result
             String[] from = new String[]{
-                    KEY_CUSTOMER,
-                    KEY_NAME,
-                    KEY_ADDRESS,
-                    KEY_CITY,
-                    KEY_STATE,
-                    KEY_ZIP};
+                    DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+            };
 
             // Specify the Corresponding layout elements where we want the columns to go
-            int[] to = new int[]{R.id.scustomer,
-                    R.id.sname,
-                    R.id.saddress,
-                    R.id.scity,
-                    R.id.sstate,
-                    R.id.szipCode};
+            int[] to = new int[]{
+                    R.id.searchview_event_name
+            };
 
             // Create a simple cursor adapter for the definitions and apply them to the ListView
-            android.widget.SimpleCursorAdapter customers = new android.widget.SimpleCursorAdapter(this, R.layout.customerresult, cursor, from, to);
-            mListView.setAdapter(customers);
+            android.widget.SimpleCursorAdapter customers = new android.widget.SimpleCursorAdapter(
+                    this, R.layout.item_single_searchview, cursor, from, to, 0);
+            listview.setAdapter(customers);
 
             // Define the on-click listener for the list items
-            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     // Get the cursor, positioned to the corresponding row in the result set
-                    Cursor cursor = (Cursor) mListView.getItemAtPosition(position);
+                    Cursor cursor = (Cursor) listview.getItemAtPosition(position);
 
                     // Get the state's capital from this row in the database.
-                    String customer = cursor.getString(cursor.getColumnIndexOrThrow("customer"));
-                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                    String address = cursor.getString(cursor.getColumnIndexOrThrow("address"));
-                    String city = cursor.getString(cursor.getColumnIndexOrThrow("city"));
-                    String state = cursor.getString(cursor.getColumnIndexOrThrow("state"));
-                    String zipCode = cursor.getString(cursor.getColumnIndexOrThrow("zipCode"));
+                    String workoutName = cursor.getString(cursor.getColumnIndexOrThrow(
+                            DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+                    ));
 
-                    //Check if the Layout already exists
-                    LinearLayout customerLayout = (LinearLayout) findViewById(R.id.customerLayout);
-                    if (customerLayout == null) {
-                        //Inflate the Customer Information View
-                        LinearLayout leftLayout = (LinearLayout) findViewById(R.id.rightLayout);
-                        View customerInfo = getLayoutInflater().inflate(R.layout.selected_customer_detail, leftLayout, false);
-                        leftLayout.addView(customerInfo);
-                    }
-
-                    //Get References to the TextViews
-                    customerText = (TextView) findViewById(R.id.customer);
-                    nameText = (TextView) findViewById(R.id.name);
-                    addressText = (TextView) findViewById(R.id.address);
-                    cityText = (TextView) findViewById(R.id.city);
-                    stateText = (TextView) findViewById(R.id.state);
-                    zipCodeText = (TextView) findViewById(R.id.zipCode);
 
                     // Update the parent class's TextView
-                    customerText.setText(customer);
-                    nameText.setText(name);
-                    addressText.setText(address);
-                    cityText.setText(city);
-                    stateText.setText(state);
-                    zipCodeText.setText(zipCode);
-
+                    search_textView_workoutName.setText(workoutName);
                     searchView.setQuery("", true);
                 }
             });
@@ -159,6 +110,17 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
         mDbHelper = new FTSDatabaseOpenHelper(this);
         mDb = mDbHelper.getReadableDatabase();
         return this;
+    }
+
+    /**
+     * Method to put customer values into the SQL
+     */
+    public long insertCustomer(String workoutName) {
+
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, workoutName);
+
+        return mDb.insert(FTS_VIRTUAL_TABLE, null, initialValues);
     }
 
     /**
@@ -181,6 +143,15 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
             mCursor.moveToFirst();
         }
         return mCursor;
+
+    }
+
+    public boolean deleteAllEntries() {
+
+        int numberOfRowsDeleted;
+        numberOfRowsDeleted = mDb.delete(FTS_VIRTUAL_TABLE, null, null);
+        Log.w(TAG, Integer.toString(numberOfRowsDeleted));
+        return numberOfRowsDeleted > 0;
 
     }
 
