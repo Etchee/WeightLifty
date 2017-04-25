@@ -51,9 +51,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private ListView listview;
     private listActivityAdapter mAdapter;
-    private TextView textView;
     private FloatingActionButton fab;
-
     private SearchView searchView;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -68,7 +66,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_list);
 
         contentResolver = getContentResolver();
-        textView = (TextView)findViewById(R.id.temp_search_hint_text);
 
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.list_fab);
@@ -392,6 +389,15 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onCreateOptionsMenu(menu);
     }
 
+
+
+    //if searchView is expanded, then collapse
+    @Override
+    public void onBackPressed() {
+        if (!searchView.isIconified()) {
+            searchView.setIconified(true);
+        } else super.onBackPressed();
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 

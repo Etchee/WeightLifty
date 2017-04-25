@@ -1,10 +1,8 @@
 package etchee.com.weightlifty.Activity;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,13 +22,14 @@ import etchee.com.weightlifty.data.DataContract;
 
 import static android.content.ContentValues.TAG;
 import static etchee.com.weightlifty.data.DataContract.FTS_Table.DATABASE_VERSION;
+import static etchee.com.weightlifty.data.DataContract.FTS_Table.FTS_TABLE_CREATE;
 import static etchee.com.weightlifty.data.DataContract.FTS_Table.FTS_VIRTUAL_TABLE;
 
 /**
  * Created by rikutoechigoya on 2017/04/21.
  */
 
-public class SearchResultsActivity extends Activity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+public class SearchViewActivity extends Activity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private String query;
     private Context context;
@@ -44,15 +43,16 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
 
         //component setting
         listview = (ListView) findViewById(R.id.view_search_list);
-        context = SearchResultsActivity.this;
+        context = SearchViewActivity.this;
 
         //search view setup
+        searchView = (SearchView) findViewById(R.id.search);
         searchView.setIconifiedByDefault(true);
         searchView.setOnQueryTextListener(this);
-        searchView = (SearchView) findViewById(R.id.search);
         searchView.setOnCloseListener(this);
         search_textView_workoutName = (TextView) findViewById(R.id.searchview_event_name);
 
@@ -107,7 +107,7 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
         }
     }
 
-    public SearchResultsActivity openDbInstance() throws SQLException {
+    public SearchViewActivity openDbInstance() throws SQLException {
         mDbHelper = new FTSDatabaseOpenHelper(this);
         mDb = mDbHelper.getReadableDatabase();
         return this;
@@ -188,30 +188,21 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
     }
 
 
-
     /**
      *  DbHelper class specific for FTS virtual copy of the EventType table.
      */
     private static class FTSDatabaseOpenHelper extends SQLiteOpenHelper {
 
-        private final Context mHelperContext;
-        private SQLiteDatabase db;
-
-        private static final String FTS_TABLE_CREATE =
-                "CREATE VIRTUAL TABLE " + FTS_VIRTUAL_TABLE +
-                        " USING fts3 (" +
-                        DataContract.EventTypeEntry._ID + ", " +
-                        DataContract.EventTypeEntry.COLUMN_EVENT_NAME + ")";
+        private Context context;
 
         FTSDatabaseOpenHelper(Context context) {
             super(context, DataContract.EventTypeEntry.TABLE_NAME, null, DATABASE_VERSION);
-            mHelperContext = context;
+            this.context = context;
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            this.db = db;
-            this.db.execSQL(FTS_TABLE_CREATE);
+            db.execSQL(FTS_TABLE_CREATE);
             copyDataFromEventTypeTable();
         }
 
