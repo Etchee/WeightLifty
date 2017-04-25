@@ -69,22 +69,23 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
         Cursor cursor = search((query != null ? query.toString() : "@@@@"));
 
         if (cursor == null) {
-            //
+            Log.e(TAG, "InstaSearch cursor returned null");
         } else {
             // Specify the columns we want to display in the result
-            String[] from = new String[]{
+            String[] projection = new String[]{
                     DataContract.EventTypeEntry.COLUMN_EVENT_NAME
             };
 
             // Specify the Corresponding layout elements where we want the columns to go
-            int[] to = new int[]{
-                    R.id.searchview_event_name
+            int[] searchView_element = new int[]{
+                    R.id.searchview_event_name  //the array will match because this method is about
+                    //what the cursor will return.
             };
 
             // Create a simple cursor adapter for the definitions and apply them to the ListView
-            android.widget.SimpleCursorAdapter customers = new android.widget.SimpleCursorAdapter(
-                    this, R.layout.item_single_searchview, cursor, from, to, 0);
-            listview.setAdapter(customers);
+            android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(
+                    this, R.layout.item_single_searchview, cursor, projection, searchView_element, 0);
+            listview.setAdapter(adapter);
 
             // Define the on-click listener for the list items
             listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -155,27 +156,35 @@ public class SearchResultsActivity extends Activity implements SearchView.OnQuer
 
     }
 
+    public void close() {
+        if (mDbHelper != null) {
+            mDbHelper.close();
+        }
+    }
+
 
     @Override
     public boolean onClose() {
-
+        showResults("");
         return false;
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        showResults(query + "*");
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        showResults(newText + "*");
         return false;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        close();
     }
 
 
