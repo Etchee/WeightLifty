@@ -24,6 +24,17 @@ public final class DataContract {
 
     }
 
+    public static final class FTS_Table {
+
+        public static final String TAG = DataContract.EventTypeEntry.TABLE_NAME;
+        public static final String event_id = "ID";
+        public static final String event_string = "eventString";
+
+        public static final String DATABASE_NAME = "FTS_TABLE";
+        public static final String FTS_VIRTUAL_TABLE = "FTS";
+        public static final int DATABASE_VERSION = 1;
+    }
+
     public static final class GlobalConstants {
 
         //When an item in listActivity is clicked, pass the item ID
