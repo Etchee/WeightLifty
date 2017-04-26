@@ -47,7 +47,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
         //because I might use Java Rx to search for desired key later on.
         final String CREATE_EVENT_TYPE_TABLE =
                 "CREATE TABLE IF NOT EXISTS " + DataContract.EventTypeEntry.TABLE_NAME + " ("
-                + EventTypeEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + EventTypeEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + EventTypeEntry.COLUMN_EVENT_NAME + " TEXT NOT NULL);";
 
         final String CREATE_EVENT_TABLE =

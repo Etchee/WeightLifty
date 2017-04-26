@@ -26,7 +26,7 @@
 
         </activity>
 
-        <activity android:name=".Activity.SearchViewActivity">
+        <activity android:name=".Search.SearchViewActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

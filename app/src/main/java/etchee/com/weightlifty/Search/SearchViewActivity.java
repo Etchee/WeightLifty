@@ -1,4 +1,4 @@
-package etchee.com.weightlifty.Activity;
+package etchee.com.weightlifty.Search;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -16,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import etchee.com.weightlifty.Adapter.SearchResultsAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 

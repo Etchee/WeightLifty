@@ -25,6 +25,7 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
     private TextView field_workout_name, field_repCount, field_setCount;
     private String eventString;
     private EventNameQueryHelper eventNameQueryHelper;
+    private static final String TAG = "ListActivityAdapter";
 
     public listActivityAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -74,7 +75,10 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
             if (eventStringCursor.moveToFirst()) {
                 index = eventStringCursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
                 eventString = eventStringCursor.getString(index);
-            } else Log.e("ListAdapter", "Event String query failed");
+            } else {
+                Log.e(TAG, "Event String query failed");
+                Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+            }
         } finally {
                 eventStringCursor.close();
         }
