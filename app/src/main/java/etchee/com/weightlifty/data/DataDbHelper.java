@@ -61,7 +61,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 + EventEntry.COLUMN_WEIGHT_COUNT + " INTEGER);";
 
         db.execSQL(CREATE_CALENDAR_TABLE);
-        db.execSQL(CREATE_EVENT_TYPE_TABLE);
+//        db.execSQL(CREATE_EVENT_TYPE_TABLE);
         db.execSQL(CREATE_EVENT_TABLE);
     }
 

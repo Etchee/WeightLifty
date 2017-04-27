@@ -18,25 +18,32 @@ public final class DataContract {
     public static final String PATH_CALENDAR = "calendar";
     public static final String PATH_EVENT_TYPE = "event_type";
     public static final String PATH_EVENT = "event";
+    public static final String PATH_FTS = "EventType_FTS";
 
     //private, contract cannot be instantiated
     private DataContract() {
 
     }
 
-    public static final class FTS_Table {
+    public static final class EventType_FTSEntry {
 
         public static final String TAG = DataContract.EventTypeEntry.TABLE_NAME;
         public static final String event_id = "ID";
         public static final String event_string = "eventString";
 
-        public static final String DATABASE_NAME = "FTS_TABLE";
-        public static final String FTS_VIRTUAL_TABLE = "FTS";
+        public static final String TABLE_NAME = "table_eventType_FTS";
+
+        public static final String FTS_DATABASE_NAME = "FTS_TABLE";
         public static final int DATABASE_VERSION = 1;
 
-        public static final String FTS_TABLE_CREATE = "CREATE VIRTUAL TABLE " + FTS_VIRTUAL_TABLE +
-                        " USING fts3 (" + EventTypeEntry._ID + ", " +
-                        EventTypeEntry.COLUMN_EVENT_NAME + ")";
+        public static final String COLUMN_EVENT_NAME = "name_event";
+        public static final String COLUMN_EVENT_TYPE = "type_event";
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FTS).build();
+
+        public static final String FTS_TABLE_CREATE = "CREATE VIRTUAL TABLE " + FTS_DATABASE_NAME +
+                        " USING fts3 (" + EventTypeEntry.COLUMN_EVENT_NAME +
+                        EventTypeEntry.COLUMN_EVENT_TYPE + ")";
     }
 
     public static final class GlobalConstants {
@@ -113,5 +120,6 @@ public final class DataContract {
 
         //and the columns
         public static final String COLUMN_EVENT_NAME = "table_eventType_event_name";
+        public static final String COLUMN_EVENT_TYPE = "table_eventType_event_type";
     }
 }

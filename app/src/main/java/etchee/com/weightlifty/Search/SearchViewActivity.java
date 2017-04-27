@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SearchView;
@@ -20,9 +19,7 @@ import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 
 import static android.content.ContentValues.TAG;
-import static etchee.com.weightlifty.data.DataContract.FTS_Table.DATABASE_VERSION;
-import static etchee.com.weightlifty.data.DataContract.FTS_Table.FTS_TABLE_CREATE;
-import static etchee.com.weightlifty.data.DataContract.FTS_Table.FTS_VIRTUAL_TABLE;
+import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.FTS_DATABASE_NAME;
 
 /**
  * Created by rikutoechigoya on 2017/04/21.
@@ -120,7 +117,7 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         ContentValues initialValues = new ContentValues();
         initialValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, workoutName);
 
-        return mDb.insert(FTS_VIRTUAL_TABLE, null, initialValues);
+        return mDb.insert(FTS_DATABASE_NAME, null, initialValues);
     }
 
     /**
@@ -134,7 +131,7 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         Log.w(TAG, inputText);
         String query = "SELECT docid as _id," +
                 DataContract.EventTypeEntry.COLUMN_EVENT_NAME + "," +
-                " from " + FTS_VIRTUAL_TABLE +
+                " from " + FTS_DATABASE_NAME +
                 " where " + DataContract.EventTypeEntry.COLUMN_EVENT_NAME + " MATCH '" + inputText + "';";
 
         Cursor mCursor = mDb.rawQuery(query, null);
@@ -149,7 +146,7 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
     public boolean deleteAllEntries() {
 
         int numberOfRowsDeleted;
-        numberOfRowsDeleted = mDb.delete(FTS_VIRTUAL_TABLE, null, null);
+        numberOfRowsDeleted = mDb.delete(FTS_DATABASE_NAME, null, null);
         Log.w(TAG, Integer.toString(numberOfRowsDeleted));
         return numberOfRowsDeleted > 0;
 
@@ -185,39 +182,4 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         super.onDestroy();
         close();
     }
-
-
-    /**
-     *  DbHelper class specific for FTS virtual copy of the EventType table.
-     */
-    private static class FTSDatabaseOpenHelper extends SQLiteOpenHelper {
-
-        private Context context;
-
-        FTSDatabaseOpenHelper(Context context) {
-            super(context, DataContract.EventTypeEntry.TABLE_NAME, null, DATABASE_VERSION);
-            this.context = context;
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(FTS_TABLE_CREATE);
-            copyDataFromEventTypeTable();
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-                    + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS " + FTS_VIRTUAL_TABLE);
-            onCreate(db);
-        }
-
-
-        //TODO Create a method here to copy eventType table into FTS3
-        private void copyDataFromEventTypeTable() {
-
-        }
-    }
-
 }

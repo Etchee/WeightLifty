@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,14 +23,19 @@ import android.widget.Toast;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.R;
+import etchee.com.weightlifty.Search.FTSDatabaseOpenHelper;
 import etchee.com.weightlifty.data.DataContract.CalendarEntry;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 
+import static etchee.com.weightlifty.R.string.begin_workout;
+
 public class MainActivity extends AppCompatActivity {
 
     Context context;
+    private SQLiteOpenHelper ftsHelper;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
 
-
+        ftsHelper = new FTSDatabaseOpenHelper(context);
 
         //"Begin Workout" button to launch listActivity
         Button begin_workout = (Button)findViewById(R.id.begin_workout_button);
@@ -53,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         calendar_insertTodaysRow();
+    }
+
+    private void setUpEventTypeTable() {
+
+
     }
 
     private int getDateAsInt() {
@@ -183,14 +196,12 @@ public class MainActivity extends AppCompatActivity {
         ContentValues dummyValues = new ContentValues();
 
         dummyValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, "Test Event");
-
         Uri uri = getContentResolver().insert(DataContract.EventTypeEntry.CONTENT_URI, dummyValues);
-
         if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
 
 
-        Toast.makeText(this, "EventType Data inserted: " + uri.toString(), Toast.LENGTH_SHORT).show();
+        Log.v(TAG, "EventType inserted at: " + uri.toString());
     }
 
     private int deleteEventTable() {

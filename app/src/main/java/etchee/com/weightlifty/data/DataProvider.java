@@ -17,6 +17,7 @@ import static etchee.com.weightlifty.data.DataContract.CONTENT_AUTHORITY;
 import static etchee.com.weightlifty.data.DataContract.PATH_CALENDAR;
 import static etchee.com.weightlifty.data.DataContract.PATH_EVENT;
 import static etchee.com.weightlifty.data.DataContract.PATH_EVENT_TYPE;
+import static etchee.com.weightlifty.data.DataContract.PATH_FTS;
 
 /**
  * Created by rikutoechigoya on 2017/03/24.
@@ -33,6 +34,7 @@ public class DataProvider extends ContentProvider {
     private static final int CODE_EVENT_TYPE_ID = 201;
     private static final int CODE_EVENT = 300;
     private static final int CODE_EVENT_ID = 301;
+    private static final int CODE_EVENT_TYPE_FTS = 400;
 
     //sURIMatcher declaration. Call a static reference here
     private static final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -44,6 +46,8 @@ public class DataProvider extends ContentProvider {
 
         //EVENT_TYPE: querying the entire table i.e. inserting a new row
         matcher.addURI(CONTENT_AUTHORITY, PATH_EVENT_TYPE, CODE_EVENT_TYPE);
+
+        matcher.addURI(CONTENT_AUTHORITY, PATH_FTS, CODE_EVENT_TYPE_FTS);
 
 
         //EVENT: querying the entire table i.e. inserting a new row
@@ -143,6 +147,12 @@ public class DataProvider extends ContentProvider {
                         null);
                 break;
 
+            case CODE_EVENT_TYPE_FTS:
+
+                //TODO: put query logic here
+
+                break;
+
             //if URI matches to none of the above, return an exception
             default: throw new IllegalArgumentException("Query method cannot handle " +
                     "unsupported URI: " + uri);
@@ -176,6 +186,10 @@ public class DataProvider extends ContentProvider {
                 uri_new = insertInEventTypeTable(uri, contentValues);
                 break;
 
+            case CODE_EVENT_TYPE_FTS:
+                uri_new = insertInEventTypeFTSTable(uri, contentValues);
+                break;
+
             //if URI matches to none of the above, return an exception
             default: throw new IllegalArgumentException("Query method cannot handle " +
                     "unsupported URI: " + uri);
@@ -186,6 +200,27 @@ public class DataProvider extends ContentProvider {
                 "returning a null URI.");
 
         return uri_new;
+    }
+
+    private Uri insertInEventTypeFTSTable (Uri uri, ContentValues contentValues) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        //id is the ID of the newly inserted row. Returns -1 in case of an error with insertion.
+        long id = database.insert(EventType_FTSEntry.TABLE_NAME, null, contentValues);
+
+        String testString = contentValues.getAsString(EventType_FTSEntry.COLUMN_EVENT_NAME);
+        if (testString == null) {
+            throw new IllegalArgumentException("Content provider's insert method of " +
+                    "the calendar table has received" +
+                    "null for the date value. Check what is passed into the insert method.");
+        }
+
+        if (id < 0) {
+            throw new IllegalArgumentException("Content provider's insertion has failed.");
+        }
+
+        //append the id of the newly inserted row, append at the end of the CONTENT_AUTHORITY,
+        return ContentUris.withAppendedId(uri, id);
     }
 
 
@@ -301,6 +336,10 @@ public class DataProvider extends ContentProvider {
                 numOfRowsDeleted = database.delete(EventTypeEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
+            case CODE_EVENT_TYPE_FTS:
+                numOfRowsDeleted = database.delete(EventType_FTSEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
             //if URI matches to none of the above, return an exception
             default: throw new IllegalArgumentException("Query method cannot handle " +
                     "unsupported URI: " + uri);
@@ -364,6 +403,10 @@ public class DataProvider extends ContentProvider {
             case CODE_EVENT_ID:
                 selection = EventTypeEntry._ID + "=?";
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                rowsUpdated = updateEvent(uri, contentValues, selection, selectionArgs);
+                break;
+
+            case CODE_EVENT_TYPE_FTS:
                 rowsUpdated = updateEvent(uri, contentValues, selection, selectionArgs);
                 break;
 
