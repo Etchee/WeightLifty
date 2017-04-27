@@ -25,26 +25,6 @@ public final class DataContract {
 
     }
 
-    public static final class EventType_FTSEntry {
-
-        public static final String TAG = DataContract.EventTypeEntry.TABLE_NAME;
-        public static final String event_id = "ID";
-        public static final String event_string = "eventString";
-
-        public static final String TABLE_NAME = "table_eventType_FTS";
-
-        public static final String FTS_DATABASE_NAME = "FTS_TABLE";
-        public static final int DATABASE_VERSION = 1;
-
-        public static final String COLUMN_EVENT_NAME = "name_event";
-        public static final String COLUMN_EVENT_TYPE = "type_event";
-
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FTS).build();
-
-        public static final String FTS_TABLE_CREATE = "CREATE VIRTUAL TABLE " + FTS_DATABASE_NAME +
-                        " USING fts3 (" + EventTypeEntry.COLUMN_EVENT_NAME +
-                        EventTypeEntry.COLUMN_EVENT_TYPE + ")";
-    }
 
     public static final class GlobalConstants {
 
@@ -68,8 +48,18 @@ public final class DataContract {
         public static final String PASS_CREATE_LOADER_DATE = "passdate";
 
 
-
         public static final String PASS_EVENT_ID = "eventIDpassed";
+    }
+
+    public static final class EventType_FTSEntry {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_FTS).build();
+        public static final String TABLE_NAME = "table_eventType_FTS";
+        public static final String COLUMN_EVENT_NAME = "name_event";
+        public static final String COLUMN_EVENT_TYPE = "type_event";
+
+
     }
 
     public static final class CalendarEntry implements BaseColumns {

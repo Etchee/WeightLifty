@@ -19,7 +19,7 @@ import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 
 import static android.content.ContentValues.TAG;
-import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.FTS_DATABASE_NAME;
+import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.TABLE_NAME;
 
 /**
  * Created by rikutoechigoya on 2017/04/21.
@@ -32,7 +32,6 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
     private ListView listview;
     private SearchResultsAdapter adapter;
     private SearchView searchView;
-    private FTSDatabaseOpenHelper mDbHelper;
     private SQLiteDatabase mDb;
     private TextView search_textView_workoutName;
 
@@ -51,8 +50,6 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         searchView.setOnQueryTextListener(this);
         searchView.setOnCloseListener(this);
         search_textView_workoutName = (TextView) findViewById(R.id.searchview_event_name);
-
-        openDbInstance();
 
     }
 
@@ -103,12 +100,6 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         }
     }
 
-    public SearchViewActivity openDbInstance() throws SQLException {
-        mDbHelper = new FTSDatabaseOpenHelper(this);
-        mDb = mDbHelper.getReadableDatabase();
-        return this;
-    }
-
     /**
      * Method to put customer values into the SQL
      */
@@ -117,7 +108,7 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         ContentValues initialValues = new ContentValues();
         initialValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, workoutName);
 
-        return mDb.insert(FTS_DATABASE_NAME, null, initialValues);
+        return mDb.insert(TABLE_NAME, null, initialValues);
     }
 
     /**
@@ -131,7 +122,7 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         Log.w(TAG, inputText);
         String query = "SELECT docid as _id," +
                 DataContract.EventTypeEntry.COLUMN_EVENT_NAME + "," +
-                " from " + FTS_DATABASE_NAME +
+                " from " + TABLE_NAME +
                 " where " + DataContract.EventTypeEntry.COLUMN_EVENT_NAME + " MATCH '" + inputText + "';";
 
         Cursor mCursor = mDb.rawQuery(query, null);
@@ -146,16 +137,10 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
     public boolean deleteAllEntries() {
 
         int numberOfRowsDeleted;
-        numberOfRowsDeleted = mDb.delete(FTS_DATABASE_NAME, null, null);
+        numberOfRowsDeleted = mDb.delete(TABLE_NAME, null, null);
         Log.w(TAG, Integer.toString(numberOfRowsDeleted));
         return numberOfRowsDeleted > 0;
 
-    }
-
-    public void close() {
-        if (mDbHelper != null) {
-            mDbHelper.close();
-        }
     }
 
 
@@ -175,11 +160,5 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
     public boolean onQueryTextChange(String newText) {
         showResults(newText + "*");
         return false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        close();
     }
 }

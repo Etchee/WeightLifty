@@ -15,6 +15,7 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DataContract.EventTypeEntry;
 
 import static android.R.attr.version;
+import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.TABLE_NAME;
 
 /**
  * Created by rikutoechigoya on 2017/03/24.
@@ -22,14 +23,14 @@ import static android.R.attr.version;
 
 public class DataDbHelper extends SQLiteOpenHelper {
 
-    public static final String LOG_TAG = DataDbHelper.class.getSimpleName();
+    public static final String TAG = DataDbHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME = "log.db";
     private static final int DATABASE_VERSION = 1;
 
     public DataDbHelper(Context context) {
 
-        super(context, DATABASE_NAME, null, version);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -60,16 +61,22 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 + EventEntry.COLUMN_REP_COUNT + " INTEGER, "
                 + EventEntry.COLUMN_WEIGHT_COUNT + " INTEGER);";
 
+        final String CREATE_EVENT_TYPE_FTS_TABLE = "CREATE VIRTUAL TABLE IF NOT EXISTS "
+                + DataContract.EventType_FTSEntry.TABLE_NAME +
+                " USING fts3 ("
+                + DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + " TEXT NOT NULL, "
+                + DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE + " TEXT NOT NULL);";
+
+        db.execSQL(CREATE_EVENT_TYPE_FTS_TABLE);
         db.execSQL(CREATE_CALENDAR_TABLE);
-//        db.execSQL(CREATE_EVENT_TYPE_TABLE);
         db.execSQL(CREATE_EVENT_TABLE);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
     }
-
 
     /*
     *   For the helper class to read and write database from device.

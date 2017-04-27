@@ -62,7 +62,7 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
         String selectionArgs[] = new String[]{ String.valueOf(eventID) };
 
         Cursor eventStringCursor = context.getContentResolver().query(
-                DataContract.EventTypeEntry.CONTENT_URI,
+                DataContract.EventType_FTSEntry.CONTENT_URI,
                 projection,
                 selection,
                 selectionArgs,

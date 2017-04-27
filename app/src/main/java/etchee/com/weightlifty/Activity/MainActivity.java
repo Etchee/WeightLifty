@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,21 +21,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.R;
-import etchee.com.weightlifty.Search.FTSDatabaseOpenHelper;
 import etchee.com.weightlifty.data.DataContract.CalendarEntry;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
+import etchee.com.weightlifty.data.DataDbHelper;
 
+import static android.R.attr.id;
 import static etchee.com.weightlifty.R.string.begin_workout;
 
 public class MainActivity extends AppCompatActivity {
 
     Context context;
-    private SQLiteOpenHelper ftsHelper;
+    private SQLiteOpenHelper dbHelper;
     private static final String TAG = "MainActivity";
 
     @Override
@@ -42,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
-
-        ftsHelper = new FTSDatabaseOpenHelper(context);
+        dbHelper = new DataDbHelper(context);
 
         //"Begin Workout" button to launch listActivity
         Button begin_workout = (Button)findViewById(R.id.begin_workout_button);
@@ -193,10 +195,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void eventType_insertDummyValues() {
 
-        ContentValues dummyValues = new ContentValues();
+        ContentValues values = new ContentValues();
 
-        dummyValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, "Test Event");
-        Uri uri = getContentResolver().insert(DataContract.EventTypeEntry.CONTENT_URI, dummyValues);
+        values.put(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME, "Test Event");
+        values.put(DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE, "Test Category");
+        Uri uri = getContentResolver().insert(DataContract.EventType_FTSEntry.CONTENT_URI, values);
         if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
 
@@ -273,6 +276,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu_insert_event_type:
                 eventType_insertDummyValues();
+                /**
+                 * V/MainActivity: Columns in FTS are: [table_eventType_event_name, table_eventType_event_type]
+                 */
+//                SQLiteDatabase db = dbHelper.getWritableDatabase();
+//                Cursor cursor = db.query(
+//                        DataContract.EventType_FTSEntry.TABLE_NAME,
+//                        null, null, null, null, null, null
+//                );
+//
+//                String columns[] = cursor.getColumnNames();
+//                Log.v(TAG, "Columns in FTS are: " +  Arrays.toString(columns));
                 break;
 
             case R.id.menu_view_tables:

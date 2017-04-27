@@ -149,8 +149,6 @@ public class DataProvider extends ContentProvider {
 
             case CODE_EVENT_TYPE_FTS:
 
-                //TODO: put query logic here
-
                 break;
 
             //if URI matches to none of the above, return an exception
@@ -160,6 +158,7 @@ public class DataProvider extends ContentProvider {
 
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
+
     }
 
     //TODO Each time app is up, Insert rows of days up to the current date.
@@ -202,13 +201,13 @@ public class DataProvider extends ContentProvider {
         return uri_new;
     }
 
-    private Uri insertInEventTypeFTSTable (Uri uri, ContentValues contentValues) {
+    private Uri insertInEventTypeFTSTable (Uri uri, ContentValues values) {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
         //id is the ID of the newly inserted row. Returns -1 in case of an error with insertion.
-        long id = database.insert(EventType_FTSEntry.TABLE_NAME, null, contentValues);
+        long id = database.insert(EventType_FTSEntry.TABLE_NAME, null, values);
 
-        String testString = contentValues.getAsString(EventType_FTSEntry.COLUMN_EVENT_NAME);
+        String testString = values.getAsString(EventType_FTSEntry.COLUMN_EVENT_NAME);
         if (testString == null) {
             throw new IllegalArgumentException("Content provider's insert method of " +
                     "the calendar table has received" +
@@ -264,7 +263,7 @@ public class DataProvider extends ContentProvider {
     private Uri insertInEventTypeTable(Uri uri, ContentValues contentValues) {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
-        long id = database.insert(EventTypeEntry.TABLE_NAME, null, contentValues);
+        long id = database.insert(EventType_FTSEntry.TABLE_NAME, null, contentValues);
 
         String testString = contentValues.getAsString(EventTypeEntry.COLUMN_EVENT_NAME);
         if (testString == null) throw new IllegalArgumentException("Content provider's insert" +
