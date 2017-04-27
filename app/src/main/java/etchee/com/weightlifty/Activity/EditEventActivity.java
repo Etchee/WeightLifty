@@ -22,8 +22,8 @@ import java.util.Calendar;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
-import etchee.com.weightlifty.data.DeleteActionHelper;
-import etchee.com.weightlifty.data.ModifyEventHelper;
+import etchee.com.weightlifty.DataMethods.DeleteActionHelper;
+import etchee.com.weightlifty.DataMethods.ModifyEventHelper;
 
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;

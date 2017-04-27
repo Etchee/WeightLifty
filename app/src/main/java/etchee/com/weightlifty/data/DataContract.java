@@ -33,6 +33,7 @@ public final class DataContract {
         public static final String DATABASE_NAME = "FTS_TABLE";
         public static final String FTS_VIRTUAL_TABLE = "FTS";
         public static final int DATABASE_VERSION = 1;
+
         public static final String FTS_TABLE_CREATE = "CREATE VIRTUAL TABLE " + FTS_VIRTUAL_TABLE +
                         " USING fts3 (" + EventTypeEntry._ID + ", " +
                         EventTypeEntry.COLUMN_EVENT_NAME + ")";

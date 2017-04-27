@@ -9,12 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
-import etchee.com.weightlifty.data.EventNameQueryHelper;
-import etchee.com.weightlifty.data.QueryResponceHandler;
+import etchee.com.weightlifty.DataMethods.EventNameQueryHelper;
+import etchee.com.weightlifty.DataMethods.QueryResponceHandler;
 
 /**
  * Created by rikutoechigoya on 2017/03/27.
