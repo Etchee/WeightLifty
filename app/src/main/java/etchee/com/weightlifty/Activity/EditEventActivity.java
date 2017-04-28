@@ -192,7 +192,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
                     case QUERY_EVENT_TYPE:
                         if (cursor.moveToFirst()) {
-                            int index = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+                            int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
                             setEventString(cursor.getString(index));
                             cursor.close();
                         } else throw new CursorIndexOutOfBoundsException("Event string query: " +
@@ -347,12 +347,13 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
         //projection
         String projection[] = new String[]{
-                DataContract.EventTypeEntry._ID,
-                DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+                DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME
         };
 
         //select row by eventID
-        String selection = DataContract.EventTypeEntry._ID + "=?";
+        String selection = DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?";
 
         //eventID will be thrown in the parameter
         String selectionArgs[] = new String[]{String.valueOf(eventID)};
@@ -362,7 +363,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         queryHandler.startQuery(
                 QUERY_EVENT_TYPE,
                 null,
-                DataContract.EventTypeEntry.CONTENT_URI,
+                DataContract.EventType_FTSEntry.CONTENT_URI,
                 projection,
                 selection,
                 selectionArgs,
