@@ -29,6 +29,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.Calendar;
 
@@ -48,7 +49,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     private ListView listview;
     private listActivityAdapter mAdapter;
     private FloatingActionButton fab;
-    private SearchView searchView;
+    private MaterialSearchView searchView;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
     private ContentResolver contentResolver;
@@ -62,6 +63,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_list);
 
         contentResolver = getContentResolver();
+
+        searchView = (MaterialSearchView) findViewById(R.id.search_view);
 
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.list_fab);
@@ -99,6 +102,34 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 launchEditActivityWithEventID(position);
+            }
+        });
+
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Do some magic
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+                searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
+                searchView.setCursorDrawable(R.drawable.ic_searchview_cursor);
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
             }
         });
     }
@@ -370,29 +401,26 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onPrepareOptionsMenu(menu);
     }
 
+    //if searchView is expanded, then collapse
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_list, menu);
-
-        /** configure the search view **/
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        MenuItem mSearchMenuItem = menu.findItem(R.id.search);
-        searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-
-
-        return super.onCreateOptionsMenu(menu);
+    public void onBackPressed() {
+        if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+        } else {
+            super.onBackPressed();
+        }
     }
 
 
 
-    //if searchView is expanded, then collapse
     @Override
-    public void onBackPressed() {
-        if (!searchView.isIconified()) {
-            searchView.setIconified(true);
-        } else super.onBackPressed();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_list, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        searchView.setMenuItem(item);
+
+        return true;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -406,9 +434,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 break;
             case R.id.menu_insert_event:
                 event_insertDummyValues();
-                break;
-            case R.id.menu_insert_event_type:
-                eventType_insertDummyValues();
                 break;
 
             case R.id.menu_view_tables:

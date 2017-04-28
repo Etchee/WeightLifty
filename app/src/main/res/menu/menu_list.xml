@@ -3,20 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <item android:id="@+id/search"
-        android:title="@string/search_events"
-        android:icon="@drawable/ic_add_list"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView"/>
+    <!--<item android:id="@+id/search"-->
+        <!--android:title="@string/search_events"-->
+        <!--android:icon="@drawable/ic_add_list"-->
+        <!--app:showAsAction="ifRoom"-->
+        <!--app:actionViewClass="android.support.v7.widget.SearchView"/>-->
 
     <item
         android:title="@string/insert_event_values"
         android:id="@+id/menu_insert_event"
         app:showAsAction="never"
         />
-    <item android:title="@string/insert_type_event"
-        android:id="@+id/menu_insert_event_type"
-        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_action_action_search"
+        android:orderInCategory="100"
+        android:title="@string/abc_search_hint"
+        app:showAsAction="always" />
 
     <item android:title="@string/view_tables"
         android:id="@+id/menu_view_tables"

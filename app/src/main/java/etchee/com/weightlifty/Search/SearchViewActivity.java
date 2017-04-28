@@ -45,11 +45,11 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
         context = SearchViewActivity.this;
 
         //search view setup
-        searchView = (SearchView) findViewById(R.id.search);
-        searchView.setIconifiedByDefault(true);
-        searchView.setOnQueryTextListener(this);
-        searchView.setOnCloseListener(this);
-        search_textView_workoutName = (TextView) findViewById(R.id.searchview_event_name);
+//        searchView = (SearchView) findViewById(R.id.search);
+//        searchView.setIconifiedByDefault(true);
+//        searchView.setOnQueryTextListener(this);
+//        searchView.setOnCloseListener(this);
+//        search_textView_workoutName = (TextView) findViewById(R.id.searchview_event_name);
 
     }
 
@@ -101,17 +101,6 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
     }
 
     /**
-     * Method to put customer values into the SQL
-     */
-    public long insertCustomer(String workoutName) {
-
-        ContentValues initialValues = new ContentValues();
-        initialValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, workoutName);
-
-        return mDb.insert(TABLE_NAME, null, initialValues);
-    }
-
-    /**
      * Takes userInput, search thru the db and then returns cursor to iterate in the adapter.
      *
      * @param inputText User input text sent from the UI
@@ -119,18 +108,37 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
      * @throws SQLException if search fails.
      */
     public Cursor search(String inputText) throws SQLException {
-        Log.w(TAG, inputText);
-        String query = "SELECT docid as _id," +
-                DataContract.EventTypeEntry.COLUMN_EVENT_NAME + "," +
-                " from " + TABLE_NAME +
-                " where " + DataContract.EventTypeEntry.COLUMN_EVENT_NAME + " MATCH '" + inputText + "';";
+        Log.w(TAG, "Input text: " + inputText);
 
-        Cursor mCursor = mDb.rawQuery(query, null);
+        /** taken from FTS3_example project **/
+//        String query = "SELECT docid as _id," +
+//                DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + "," +
+//                " from " + TABLE_NAME +
+//                " where " + DataContract.EventTypeEntry.COLUMN_EVENT_NAME + " MATCH '" + inputText + "';";
 
-        if (mCursor != null) {
-            mCursor.moveToFirst();
+//        Cursor mCursor = mDb.rawQuery(query, null);
+
+        String projection[] = new String[]{
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE
+        };
+
+        String selection = DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + "=?";
+
+        String selectionArgs[] = new String[]{ inputText };
+
+        Cursor cursor = context.getContentResolver().query(
+                DataContract.EventType_FTSEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+
+        if (cursor != null) {
+            cursor.moveToFirst();
         }
-        return mCursor;
+        return cursor;
 
     }
 
