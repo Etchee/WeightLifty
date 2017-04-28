@@ -163,7 +163,7 @@ public class DataProvider extends ContentProvider {
                     "unsupported URI: " + uri);
         }
 
-//        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
 
     }

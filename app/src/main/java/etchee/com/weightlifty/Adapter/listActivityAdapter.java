@@ -65,8 +65,8 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
         Cursor eventStringCursor = context.getContentResolver().query(
                 DataContract.EventType_FTSEntry.CONTENT_URI,
                 projection,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null
         );
 
