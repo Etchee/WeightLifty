@@ -54,29 +54,31 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
         String set_count = cursor.getString(setCount_columnIndex);
 
         String projection[] = new String[]{
-                DataContract.EventTypeEntry._ID,
-                DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+                DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME
         };
 
-        String selection = DataContract.EventTypeEntry._ID + "=?";
+        String selection = DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?";
         String selectionArgs[] = new String[]{ String.valueOf(eventID) };
 
         Cursor eventStringCursor = context.getContentResolver().query(
                 DataContract.EventType_FTSEntry.CONTENT_URI,
                 projection,
-                selection,
-                selectionArgs,
+                null,
+                null,
                 null
         );
 
 
         try {
             if (eventStringCursor.moveToFirst()) {
-                index = eventStringCursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+                index = eventStringCursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
                 eventString = eventStringCursor.getString(index);
+                Log.v(TAG, "Cursor contents: " + DatabaseUtils.dumpCursorToString(eventStringCursor));
             } else {
                 Log.e(TAG, "Event String query failed");
-                Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+                Log.v(TAG, DatabaseUtils.dumpCursorToString(eventStringCursor));
             }
         } finally {
                 eventStringCursor.close();

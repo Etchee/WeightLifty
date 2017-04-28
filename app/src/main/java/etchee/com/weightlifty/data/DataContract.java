@@ -58,8 +58,7 @@ public final class DataContract {
         public static final String TABLE_NAME = "table_eventType_FTS";
         public static final String COLUMN_EVENT_NAME = "name_event";
         public static final String COLUMN_EVENT_TYPE = "type_event";
-
-
+        public static final String COLUMN_ROW_ID = "docid";
     }
 
     public static final class CalendarEntry implements BaseColumns {

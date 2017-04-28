@@ -47,6 +47,7 @@ public class DataProvider extends ContentProvider {
         //EVENT_TYPE: querying the entire table i.e. inserting a new row
         matcher.addURI(CONTENT_AUTHORITY, PATH_EVENT_TYPE, CODE_EVENT_TYPE);
 
+        //EVENT_TYPE: FTS TABLE
         matcher.addURI(CONTENT_AUTHORITY, PATH_FTS, CODE_EVENT_TYPE_FTS);
 
 
@@ -148,7 +149,13 @@ public class DataProvider extends ContentProvider {
                 break;
 
             case CODE_EVENT_TYPE_FTS:
-
+                cursor = database.query(
+                    EventType_FTSEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null, null, null
+                );
                 break;
 
             //if URI matches to none of the above, return an exception
@@ -156,7 +163,7 @@ public class DataProvider extends ContentProvider {
                     "unsupported URI: " + uri);
         }
 
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+//        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
 
     }

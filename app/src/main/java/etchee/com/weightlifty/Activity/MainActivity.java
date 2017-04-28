@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteTableLockedException;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
@@ -65,9 +66,22 @@ public class MainActivity extends AppCompatActivity {
         calendar_insertTodaysRow();
     }
 
-    private void setUpEventTypeTable() {
-
-
+    private void testEventNameQuery() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String projection[] = new String[]{
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE,
+                DataContract.EventType_FTSEntry.COLUMN_ROW_ID
+        };
+        String selection = DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?";
+        String []selectionArgs = new String[]{String.valueOf(3)};
+        db.query(
+                DataContract.EventType_FTSEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null, null, null
+        );
     }
 
     private int getDateAsInt() {
