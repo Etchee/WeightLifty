@@ -151,7 +151,7 @@ public class DataProvider extends ContentProvider {
             case CODE_EVENT_TYPE_FTS:
                 cursor = database.query(
                     EventType_FTSEntry.TABLE_NAME,
-                        projection,
+                        null,
                         selection,
                         selectionArgs,
                         null, null, null
