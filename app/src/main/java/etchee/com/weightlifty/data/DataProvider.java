@@ -168,8 +168,6 @@ public class DataProvider extends ContentProvider {
 
     }
 
-    //TODO Each time app is up, Insert rows of days up to the current date.
-
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {

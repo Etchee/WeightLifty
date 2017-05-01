@@ -44,7 +44,7 @@ import etchee.com.weightlifty.DataMethods.subIDfixHelper;
  * Created by rikutoechigoya on 2017/03/30.
  */
 
-public class ListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private ListView listview;
     private listActivityAdapter mAdapter;
@@ -467,6 +467,35 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
         Toast.makeText(this, "EventType inserted", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     *  Search bar listener implementation
+     * @return
+     */
+    @Override
+    public boolean onClose() {
+        return false;
+    }
+
+    /**
+     *  Here send an intent to SearchViewActivity
+     * @param query
+     * @return
+     */
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    /**
+     *  Fire query via content provider to the SearchView Activity
+     * @param newText
+     * @return
+     */
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }
 
