@@ -1,8 +1,10 @@
 package etchee.com.weightlifty.Search;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,7 +27,7 @@ import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.TABLE_
  * Created by rikutoechigoya on 2017/04/21.
  */
 
-public class SearchViewActivity extends Activity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+public class SearchViewActivity extends ListActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private String query;
     private Context context;
@@ -151,6 +153,10 @@ public class SearchViewActivity extends Activity implements SearchView.OnQueryTe
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
 
     @Override
     public boolean onClose() {
