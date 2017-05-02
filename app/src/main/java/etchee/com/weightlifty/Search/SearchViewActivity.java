@@ -121,6 +121,7 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
 //        Cursor mCursor = mDb.rawQuery(query, null);
 
         String projection[] = new String[]{
+                DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
                 DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME,
                 DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE
         };
