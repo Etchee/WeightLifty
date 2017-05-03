@@ -49,7 +49,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     private ListView listview;
     private listActivityAdapter mAdapter;
     private FloatingActionButton fab;
-    private MaterialSearchView searchView;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
     private ContentResolver contentResolver;
@@ -63,8 +62,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_list);
 
         contentResolver = getContentResolver();
-
-        searchView = (MaterialSearchView) findViewById(R.id.search_view);
 
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.list_fab);
@@ -102,34 +99,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 launchEditActivityWithEventID(position);
-            }
-        });
-
-        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                //Do some magic
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                //Do some magic
-                return false;
-            }
-        });
-
-        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
-            @Override
-            public void onSearchViewShown() {
-                //Do some magic
-                searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
-                searchView.setCursorDrawable(R.drawable.ic_searchview_cursor);
-            }
-
-            @Override
-            public void onSearchViewClosed() {
-                //Do some magic
             }
         });
     }
@@ -404,11 +373,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     //if searchView is expanded, then collapse
     @Override
     public void onBackPressed() {
-        if (searchView.isSearchOpen()) {
-            searchView.closeSearch();
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
 
@@ -416,10 +381,11 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_list, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
-        MenuItem item = menu.findItem(R.id.action_search);
-        searchView.setMenuItem(item);
-
+        //Get searchableInfo Object created from the searchable.xml config file
+        searchManager.getSearchableInfo(getComponentName());
         return true;
     }
     @Override

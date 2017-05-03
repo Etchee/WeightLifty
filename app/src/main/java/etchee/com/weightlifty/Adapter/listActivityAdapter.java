@@ -75,10 +75,8 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
             if (eventStringCursor.moveToFirst()) {
                 index = eventStringCursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
                 eventString = eventStringCursor.getString(index);
-                Log.v(TAG, "Cursor contents: " + DatabaseUtils.dumpCursorToString(eventStringCursor));
             } else {
                 Log.e(TAG, "Event String query failed");
-                Log.v(TAG, DatabaseUtils.dumpCursorToString(eventStringCursor));
             }
         } finally {
                 eventStringCursor.close();

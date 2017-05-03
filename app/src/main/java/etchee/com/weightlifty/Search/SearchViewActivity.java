@@ -2,10 +2,12 @@ package etchee.com.weightlifty.Search;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -36,6 +38,7 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
     private SearchView searchView;
     private SQLiteDatabase mDb;
     private TextView search_textView_workoutName;
+    private final String TAG = this.getClass().getSimpleName();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,13 +49,7 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
         listview = (ListView) findViewById(R.id.view_search_list);
         context = SearchViewActivity.this;
 
-        //search view setup
-//        searchView = (SearchView) findViewById(R.id.search);
-//        searchView.setIconifiedByDefault(true);
-//        searchView.setOnQueryTextListener(this);
-//        searchView.setOnCloseListener(this);
-//        search_textView_workoutName = (TextView) findViewById(R.id.searchview_event_name);
-
+        handleIntent(getIntent());
     }
 
     /**
@@ -142,7 +139,14 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
             cursor.moveToFirst();
         }
         return cursor;
+    }
 
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Cursor cursor = search(query);
+            Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+        }
     }
 
     public boolean deleteAllEntries() {
@@ -157,6 +161,7 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        handleIntent(intent);
     }
 
     @Override
