@@ -50,8 +50,6 @@ public class SearchResultsAdapter extends CursorAdapter {
         } finally {
             cursor.close();
         }
-
         workout_name.setText(eventString);
-
     }
 }

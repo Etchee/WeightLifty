@@ -17,14 +17,6 @@
         </activity>
         <activity android:name=".data.DBviewer" />
 
-        <activity android:name=".Activity.ListActivity">
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-
-        </activity>
-
         <!--Searchable Activity, triggered by the SearchView widget in the ListView-->
         <activity
             android:name=".Search.SearchViewActivity"
@@ -33,6 +25,22 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.Searchable"
+                android:resource="@xml/searchable"
+                />
+
+
+        </activity>
+
+        <!--Activity TAKING the searchable activity-->
+        <activity android:name=".Activity.ListActivity">
+            <!--Enable search diaog to send searches to SearchViewActivity-->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchViewActivity"
+                />
 
         </activity>
 

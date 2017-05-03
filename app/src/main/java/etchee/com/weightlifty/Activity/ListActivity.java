@@ -21,6 +21,7 @@ import android.support.v7.widget.SearchView;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +55,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     private ContentResolver contentResolver;
     private int eventID;
     private final int CREATE_LOADER_ID = 1;
+    private final String TAG = getClass().getSimpleName();
+    private SearchView searchView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,8 +81,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         listview = (ListView)findViewById(R.id.listview_workout);
         listview.setEmptyView(emptyView);
         Cursor cursor = createCursor();
-        if (cursor == null) throw new IllegalArgumentException("Cursor creation failed: " +
-                "check projection, it might not be matching with the table.");
 
         mAdapter = new listActivityAdapter(getApplicationContext(), cursor, 0);
         listview.setAdapter(mAdapter);
@@ -352,10 +353,16 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.swapCursor(null);
     }
 
-
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
+        deleteOptionRed(menu);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
+    private void deleteOptionRed(Menu menu) {
         //set delete menu text to red color
         MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events);
         SpannableString string = new SpannableString(delete_all_events.getTitle());
@@ -366,8 +373,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 Spanned.SPAN_PRIORITY);
 
         delete_all_events.setTitle(string);
-
-        return super.onPrepareOptionsMenu(menu);
     }
 
     //if searchView is expanded, then collapse
@@ -392,6 +397,11 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+
+            case R.id.search:
+                Log.v(TAG, "search button pressed");
+                onSearchRequested();
+                break;
 
             case R.id.menu_delete_all_events:
                 int numOfDeletedRows = deleteEventTable();

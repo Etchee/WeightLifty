@@ -48,56 +48,29 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
         //component setting
         listview = (ListView) findViewById(R.id.view_search_list);
         context = SearchViewActivity.this;
+        adapter = new SearchResultsAdapter(context, initCursor(), 0);
+        setListAdapter(adapter);
 
         handleIntent(getIntent());
     }
 
     /**
-     *  This method takes the resulting cursor from the "search method" and then inflate the
-     *  result in listView.a
-     * @param query
+     *  This method extracts the query string (USER INPUT) from the intent, do the search and return
+     *  cursor.
+     * @param intent Quote from Android Dev doc: "When a user executes a search from
+     *               the search dialog or widget, the system starts your
+     *               searchable activity and sends it a ACTION_SEARCH intent"
      */
-    private void showResults(String query) {
-        Cursor cursor = search((query != null ? query.toString() : "@@@@"));
-
-        if (cursor == null) {
-            Log.e(TAG, "InstaSearch cursor returned null");
-        } else {
-            // Specify the columns we want to display in the result
-            String[] projection = new String[]{
-                    DataContract.EventTypeEntry.COLUMN_EVENT_NAME
-            };
-
-            // Specify the Corresponding layout elements where we want the columns to go
-            int[] searchView_element = new int[]{
-                    R.id.searchview_event_name  //the array will match because this method is about
-                    //what the cursor will return.
-            };
-
-            // Create a simple cursor adapter for the definitions and apply them to the ListView
-            android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(
-                    this, R.layout.item_single_searchview, cursor, projection, searchView_element, 0);
-            listview.setAdapter(adapter);
-
-            // Define the on-click listener for the list items
-            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    // Get the cursor, positioned to the corresponding row in the result set
-                    Cursor cursor = (Cursor) listview.getItemAtPosition(position);
-
-                    // Get the state's capital from this row in the database.
-                    String workoutName = cursor.getString(cursor.getColumnIndexOrThrow(
-                            DataContract.EventTypeEntry.COLUMN_EVENT_NAME
-                    ));
-
-
-                    // Update the parent class's TextView
-                    search_textView_workoutName.setText(workoutName);
-                    searchView.setQuery("", true);
-                }
-            });
-        }
+    private void handleIntent(Intent intent) {
+        //referenced from the dev doc.
+        //https://developer.android.com/guide/topics/search/search-dialog.html
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Cursor cursor = search(query);
+            Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+        } else Log.e(TAG, "Intent not handled properly. Check handleIntent method.");
     }
+
 
     /**
      * Takes userInput, search thru the db and then returns cursor to iterate in the adapter.
@@ -137,16 +110,76 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
 
         if (cursor != null) {
             cursor.moveToFirst();
-        }
+        } else Log.v(TAG, "Query returning null cursor.");
+
         return cursor;
     }
 
-    private void handleIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            Cursor cursor = search(query);
-            Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+
+    /**
+     *  This method takes the resulting cursor from the "search method" and then inflate the
+     *  result in listView.
+     * @param query
+     */
+    private void showResults(String query) {
+        Cursor cursor = search((query != null ? query.toString() : "@@@@"));
+
+        if (cursor == null) {
+            Log.e(TAG, "InstaSearch cursor returned null");
+        } else {
+            // Specify the columns we want to display in the result
+            String[] projection = new String[] {
+                    DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+            };
+
+            // Specify the Corresponding layout elements where we want the columns to go
+            int[] searchView_element = new int[]{
+                    R.id.searchview_event_name  //the array will match because this method is about
+                    //what the cursor will return.
+            };
+
+            // Create a simple cursor adapter for the definitions and apply them to the ListView
+            android.widget.SimpleCursorAdapter adapter = new android.widget.SimpleCursorAdapter(
+                    this, R.layout.item_single_searchview, cursor, projection, searchView_element, 0);
+            listview.setAdapter(adapter);
+
+            // Define the on-click listener for the list items
+            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // Get the cursor, positioned to the corresponding row in the result set
+                    Cursor cursor = (Cursor) listview.getItemAtPosition(position);
+
+                    // Get the state's capital from this row in the database.
+                    String workoutName = cursor.getString(cursor.getColumnIndexOrThrow(
+                            DataContract.EventTypeEntry.COLUMN_EVENT_NAME
+                    ));
+
+
+                    // Update the parent class's TextView
+                    search_textView_workoutName.setText(workoutName);
+                    searchView.setQuery("", true);
+                }
+            });
         }
+    }
+
+    private Cursor initCursor() {
+        Cursor cursor;
+
+        String projection[] = {
+                DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME,
+                DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE
+        };
+
+        cursor = context.getContentResolver().query(
+                DataContract.EventType_FTSEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null );
+
+        return cursor;
     }
 
     public boolean deleteAllEntries() {
