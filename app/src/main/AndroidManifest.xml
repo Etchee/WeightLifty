@@ -19,7 +19,7 @@
 
         <!--Searchable Activity, triggered by the SearchView widget in the ListView-->
         <activity
-            android:name=".Search.SearchViewActivity"
+            android:name=".Search.SearchResultsActivity"
             android:launchMode="singleTop">
 
             <intent-filter>
@@ -36,9 +36,10 @@
 
         <!--Activity TAKING the searchable activity-->
         <activity android:name=".Activity.ListActivity">
-            <!--Enable search diaog to send searches to SearchViewActivity-->
+            <!--Enable search dialog to send searches to SearchResultsActivity-->
             <meta-data
-                android:name="android.app.default_searchable"
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
                 android:value=".SearchViewActivity"
                 />
 

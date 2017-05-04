@@ -1,9 +1,7 @@
 package etchee.com.weightlifty.Search;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.SearchManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,14 +20,13 @@ import android.widget.TextView;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 
-import static android.content.ContentValues.TAG;
 import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.TABLE_NAME;
 
 /**
  * Created by rikutoechigoya on 2017/04/21.
  */
 
-public class SearchViewActivity extends ListActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+public class SearchResultsActivity extends ListActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private String query;
     private Context context;
@@ -47,7 +44,7 @@ public class SearchViewActivity extends ListActivity implements SearchView.OnQue
 
         //component setting
         listview = (ListView) findViewById(R.id.view_search_list);
-        context = SearchViewActivity.this;
+        context = SearchResultsActivity.this;
         adapter = new SearchResultsAdapter(context, initCursor(), 0);
         setListAdapter(adapter);
 

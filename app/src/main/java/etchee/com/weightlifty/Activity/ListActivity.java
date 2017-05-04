@@ -353,12 +353,10 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.swapCursor(null);
     }
 
+    //if searchView is expanded, then collapse
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        deleteOptionRed(menu);
-
-        return super.onPrepareOptionsMenu(menu);
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
 
@@ -375,10 +373,10 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         delete_all_events.setTitle(string);
     }
 
-    //if searchView is expanded, then collapse
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        deleteOptionRed(menu);
+        return super.onPrepareOptionsMenu(menu);
     }
 
 
@@ -386,11 +384,13 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_list, menu);
+
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
         //Get searchableInfo Object created from the searchable.xml config file
-        searchManager.getSearchableInfo(getComponentName());
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
     @Override
@@ -455,7 +455,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     *  Here send an intent to SearchViewActivity
+     *  Here send an intent to SearchResultsActivity
      * @param query
      * @return
      */
