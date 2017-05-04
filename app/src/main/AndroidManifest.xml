@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="etchee.com.weightlifty">
 
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="25" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_app_logo"
@@ -9,49 +13,54 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <meta-data
             android:name="android.app.default_searchable"
-            android:value=".SearchResultsActivity" />
-        <activity android:name=".Activity.MainActivity">
+            android:value=".Search.SearchResultsActivity">
+
+        </meta-data>
+
+        <activity
+            android:name=".Activity.MainActivity"
+            android:label="@string/app_name">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".data.DBviewer" />
 
-        <!--Searchable Activity, triggered by the SearchView widget in the ListView-->
         <activity
             android:name=".Search.SearchResultsActivity"
+            android:label="@string/input_event"
             android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
-                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
             <meta-data
-                android:name="android.app.Searchable"
-                android:resource="@xml/searchable"
-                />
-
-
+                android:name="android.app.default_searchable"
+                android:value=".data.DataProvider"
+                android:resource="@xml/searchable" />
         </activity>
-        
+
         <provider
-            android:authorities= "suggestionProviderAuthority"
             android:name=".Search.SuggestionProvider"
+            android:authorities="suggestionProviderAuthority"
             android:syncable="false" />
 
-        <!--Activity TAKING the searchable activity-->
+        <!--ListActivity has the search bar-->
         <activity android:name=".Activity.ListActivity">
-            <!--Enable search dialog to send searches to SearchResultsActivity-->
             <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable"
-                android:value=".SearchViewActivity"
-                />
+                android:name="android.app.default_searchable"
+                android:value="data.DataProvider" />
 
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".Activity.EditEventActivity" />

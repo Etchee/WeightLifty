@@ -387,9 +387,12 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search_button).getActionView();
 
+        //checking logger
+        if (searchManager.getSearchableInfo(getComponentName()) == null) {
+            Log.e(TAG, "getSearchableInfo method returning null!");
+        }
         //Get searchableInfo Object created from the searchable.xml config file
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
         return true;
     }
     @Override
@@ -399,7 +402,10 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
             case R.id.action_search_button:
                 Log.v(TAG, "search button pressed");
+//                Intent intent = new Intent(Intent.ACTION_SEARCH);
+//                intent.putExtra(SearchManager.QUERY, "Test");
                 onSearchRequested();
+//                startActivity(intent);
                 break;
 
             case R.id.menu_delete_all_events:
@@ -460,7 +466,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     @Override
     public boolean onQueryTextSubmit(String query) {
-        return false;
+        onSearchRequested();
+        return true;
     }
 
     /**
@@ -470,7 +477,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     @Override
     public boolean onQueryTextChange(String newText) {
-        return false;
+        onSearchRequested();
+        return true;
     }
 }
 

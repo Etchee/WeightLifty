@@ -30,4 +30,5 @@
     <string name="hint_search_events">Search Events...</string>
     <string name="hint_text_example">Hint Text</string>
     <string name="suggestion_provider_authority">suggestion_provider_authority</string>
+    <string name="input_event">Input Event</string>
 </resources>
