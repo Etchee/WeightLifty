@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.SpannableString;
@@ -30,7 +29,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.Calendar;
 
@@ -57,6 +55,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     private final int CREATE_LOADER_ID = 1;
     private final String TAG = getClass().getSimpleName();
     private SearchView searchView;
+    private SearchManager searchManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -385,8 +384,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_list, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.action_search_button).getActionView();
 
         //Get searchableInfo Object created from the searchable.xml config file
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -398,7 +397,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
         switch (item.getItemId()) {
 
-            case R.id.search:
+            case R.id.action_search_button:
                 Log.v(TAG, "search button pressed");
                 onSearchRequested();
                 break;
