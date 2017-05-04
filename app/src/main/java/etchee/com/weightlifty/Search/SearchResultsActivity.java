@@ -9,6 +9,7 @@ import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -65,6 +66,12 @@ public class SearchResultsActivity extends ListActivity implements SearchView.On
             String query = intent.getStringExtra(SearchManager.QUERY);
             Cursor cursor = search(query);
             Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
+                    this,
+                    "suggestionProviderAuthority",
+                    SuggestionProvider.DATABASE_MODE_QUERIES
+                    );
+            suggestions.saveRecentQuery(query, null);
         } else Log.e(TAG, "Intent not handled properly. Check handleIntent method.");
     }
 

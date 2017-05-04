@@ -9,6 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".SearchResultsActivity" />
         <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +27,7 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
             <meta-data
@@ -33,6 +37,11 @@
 
 
         </activity>
+        
+        <provider
+            android:authorities= "suggestionProviderAuthority"
+            android:name=".Search.SuggestionProvider"
+            android:syncable="false" />
 
         <!--Activity TAKING the searchable activity-->
         <activity android:name=".Activity.ListActivity">

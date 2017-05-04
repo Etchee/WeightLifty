@@ -51,6 +51,10 @@ public final class DataContract {
         public static final String PASS_EVENT_ID = "eventIDpassed";
     }
 
+    public static final class EventSuggestion_Provider {
+        public static final String AUTHORITY = "provider-authority";
+    }
+
     public static final class EventType_FTSEntry {
 
         public static final Uri CONTENT_URI =
