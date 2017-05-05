@@ -379,7 +379,11 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
-
+    /**
+     *  When creating the option, define the searchView. (Pretty sure this is done right)
+     * @param menu menu layout
+     * @return  true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_list, menu);
