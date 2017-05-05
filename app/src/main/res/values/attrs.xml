@@ -83,5 +83,4 @@
         <attr name="menu_fab_show_animation" format="reference" />
         <attr name="menu_fab_hide_animation" format="reference" />
     </declare-styleable>
-
 </resources>

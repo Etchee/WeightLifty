@@ -29,7 +29,7 @@ import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.TABLE_
 
 public class SearchResultsActivity extends ListActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
-    private String query;
+
     private Context context;
     private ListView listview;
     private SearchResultsAdapter adapter;
@@ -88,7 +88,7 @@ public class SearchResultsActivity extends ListActivity implements SearchView.On
     public Cursor search(String inputText) throws SQLException {
         Log.w(TAG, "Input text: " + inputText);
 
-        /** taken from FTS3_example project **/
+        /* taken from FTS3_example project **/
 //        String query = "SELECT docid as _id," +
 //                DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + "," +
 //                " from " + TABLE_NAME +
@@ -124,11 +124,11 @@ public class SearchResultsActivity extends ListActivity implements SearchView.On
 
     /**
      *  This method takes the resulting cursor from the "search method" and then inflate the
-     *  result in listView.
-     * @param query
+     *  result in listView
+     * @param query sent with an intent
      */
     private void showResults(String query) {
-        Cursor cursor = search((query != null ? query.toString() : "@@@@"));
+        Cursor cursor = search((query != null ? query : "@@@@"));
 
         if (cursor == null) {
             Log.e(TAG, "InstaSearch cursor returned null");
@@ -186,15 +186,6 @@ public class SearchResultsActivity extends ListActivity implements SearchView.On
                 null );
 
         return cursor;
-    }
-
-    public boolean deleteAllEntries() {
-
-        int numberOfRowsDeleted;
-        numberOfRowsDeleted = mDb.delete(TABLE_NAME, null, null);
-        Log.w(TAG, Integer.toString(numberOfRowsDeleted));
-        return numberOfRowsDeleted > 0;
-
     }
 
     @Override

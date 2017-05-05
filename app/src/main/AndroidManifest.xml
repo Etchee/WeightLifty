@@ -37,13 +37,9 @@
             android:label="@string/input_event"
             android:launchMode="singleTop">
 
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value=".data.DataProvider"
+                android:value="etchee.com.weightlifty.Search.SearchResultsActivity"
                 android:resource="@xml/searchable" />
         </activity>
 
@@ -53,10 +49,12 @@
             android:syncable="false" />
 
         <!--ListActivity has the search bar-->
-        <activity android:name=".Activity.ListActivity">
+        <activity android:name=".Activity.ListActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            >
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value="data.DataProvider" />
+                android:value=".Search.SearchResultsActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

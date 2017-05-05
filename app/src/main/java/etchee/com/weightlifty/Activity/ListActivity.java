@@ -1,5 +1,6 @@
 package etchee.com.weightlifty.Activity;
 
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
@@ -17,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -43,7 +45,8 @@ import etchee.com.weightlifty.DataMethods.subIDfixHelper;
  * Created by rikutoechigoya on 2017/03/30.
  */
 
-public class ListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+public class ListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private ListView listview;
     private listActivityAdapter mAdapter;
@@ -56,12 +59,16 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     private final String TAG = getClass().getSimpleName();
     private SearchView searchView;
     private SearchManager searchManager;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list);
+
+        toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+        setSupportActionBar(toolbar);
 
         contentResolver = getContentResolver();
 
@@ -101,14 +108,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 launchEditActivityWithEventID(position);
             }
         });
-    }
-
-
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-
-        new subIDfixHelper(getApplicationContext()).execute(getDateAsInt());
     }
 
     private int getEventID() {
@@ -292,6 +291,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onResume() {
         super.onResume();
+        new subIDfixHelper(getApplicationContext()).execute(getDateAsInt());
     }
 
 
@@ -393,7 +393,8 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //checking logger
         if (searchManager.getSearchableInfo(getComponentName()) == null) {
-            Log.e(TAG, "getSearchableInfo method returning null!");
+//            throw new IllegalArgumentException(TAG + ": getSearchableInfo() returns null. " +
+//                    "Cannot start search");
         }
         //Get searchableInfo Object created from the searchable.xml config file
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -405,7 +406,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (item.getItemId()) {
 
             case R.id.action_search_button:
-                Log.v(TAG, "search button pressed");
 //                Intent intent = new Intent(Intent.ACTION_SEARCH);
 //                intent.putExtra(SearchManager.QUERY, "Test");
                 onSearchRequested();
@@ -425,7 +425,6 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
                 Intent intent = new Intent(getApplicationContext(), DBviewer.class);
                 startActivity(intent);
                 break;
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -454,35 +453,21 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         Toast.makeText(this, "EventType inserted", Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     *  Search bar listener implementation
-     * @return
-     */
     @Override
     public boolean onClose() {
         return false;
     }
 
-    /**
-     *  Here send an intent to SearchResultsActivity
-     * @param query
-     * @return
-     */
     @Override
     public boolean onQueryTextSubmit(String query) {
-        onSearchRequested();
-        return true;
+        Log.v(TAG, "Text submitted: " + query);
+        return false;
     }
 
-    /**
-     *  Fire query via content provider to the SearchView Activity
-     * @param newText
-     * @return
-     */
     @Override
     public boolean onQueryTextChange(String newText) {
-        onSearchRequested();
-        return true;
+        Log.v(TAG, "Text changed: " + newText);
+        return false;
     }
 }
 
