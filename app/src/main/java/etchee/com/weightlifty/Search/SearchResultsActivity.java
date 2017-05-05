@@ -46,7 +46,6 @@ public class SearchResultsActivity extends ListActivity implements SearchView.On
         Log.v(TAG, "SEARCH ACTIVITY IS FUCKING LAUNCHED BRO");
 
         //component setting
-        listview = (ListView) findViewById(R.id.list);
         context = SearchResultsActivity.this;
         adapter = new SearchResultsAdapter(context, initCursor(), 0);
         setListAdapter(adapter);

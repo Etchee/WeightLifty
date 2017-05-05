@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -391,13 +392,16 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search_button).getActionView();
 
+        ComponentName componentName = new ComponentName(getApplicationContext(), ListActivity.class);
+
         //checking logger
-        if (searchManager.getSearchableInfo(getComponentName()) == null) {
-//            throw new IllegalArgumentException(TAG + ": getSearchableInfo() returns null. " +
-//                    "Cannot start search");
+        if (searchManager.getSearchableInfo(componentName) == null) {
+            throw new IllegalArgumentException(TAG + ": getSearchableInfo() returns null. " +
+                    "Cannot start search");
         }
+
         //Get searchableInfo Object created from the searchable.xml config file
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
         return true;
     }
     @Override

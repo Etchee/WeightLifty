@@ -39,7 +39,7 @@ public class SearchResultsAdapter extends CursorAdapter {
         hint_text = (TextView)view.findViewById(R.id.searchview_hint_text);
 
         try {
-            int index = cursor.getColumnIndex(DataContract.EventTypeEntry.COLUMN_EVENT_NAME);
+            int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
             if (cursor.moveToFirst()){
                 eventString = cursor.getString(index);
             } else if (!cursor.moveToFirst()){

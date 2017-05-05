@@ -17,5 +17,8 @@
     <item android:title="@string/view_tables"
         android:id="@+id/menu_view_tables"
         app:showAsAction="never" />
+    <item android:title="@string/launch_searchactivity"
+        android:id="@+id/menu_launch_searchactivity"
+        app:showAsAction="never" />
 
 </menu>

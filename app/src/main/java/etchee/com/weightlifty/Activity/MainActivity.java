@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.R;
+import etchee.com.weightlifty.Search.SearchResultsActivity;
 import etchee.com.weightlifty.data.DataContract.CalendarEntry;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
@@ -308,6 +309,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
 
+            case R.id.menu_launch_searchactivity:
+                startActivity(new Intent(context, SearchResultsActivity.class));
+                break;
         }
 
         return super.onOptionsItemSelected(item);

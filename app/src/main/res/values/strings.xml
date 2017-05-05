@@ -31,4 +31,5 @@
     <string name="hint_text_example">Hint Text</string>
     <string name="suggestion_provider_authority">suggestion_provider_authority</string>
     <string name="input_event">Input Event</string>
+    <string name="launch_searchactivity">Launch SearchActivity</string>
 </resources>

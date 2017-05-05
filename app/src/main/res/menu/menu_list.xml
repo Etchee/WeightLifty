@@ -7,8 +7,7 @@
         android:title="@string/search_events"
         android:icon="@drawable/ic_add_list"
         app:showAsAction="ifRoom|collapseActionView"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        />
+        app:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item
         android:title="@string/insert_event_values"
