@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.Adapter.listActivityAdapter;
@@ -57,7 +59,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     private int eventID;
     private final int CREATE_LOADER_ID = 1;
     private final String TAG = getClass().getSimpleName();
-    private SearchView searchView;
     private SearchManager searchManager;
     private Toolbar toolbar;
 
@@ -389,21 +390,13 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         getMenuInflater().inflate(R.menu.menu_list, menu);
 
         searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search_button).getActionView();
 
-        if (searchView == null) throw new NullPointerException(TAG + ": SearchView returns null");
+        final MenuItem item = menu.findItem(R.id.action_search_button);
+        MenuItemCompat.expandActionView(item);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setQueryHint(getString(R.string.hint_search_events));
+        searchView.setOnQueryTextListener(this);
 
-        ComponentName componentName = new ComponentName(getApplicationContext(),
-                WorkoutListActivity.class);
-
-        //checking logger
-        if (searchManager.getSearchableInfo(componentName) == null) {
-            throw new IllegalArgumentException(TAG + ": getSearchableInfo() returns null. " +
-                    "Cannot start search");
-        }
-
-        //Get searchableInfo Object created from the searchable.xml config file
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
         return true;
     }
     @Override
@@ -473,7 +466,10 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     @Override
     public boolean onQueryTextChange(String newText) {
         Log.v(TAG, "Text changed: " + newText);
+
         return false;
     }
+
+
 }
 
