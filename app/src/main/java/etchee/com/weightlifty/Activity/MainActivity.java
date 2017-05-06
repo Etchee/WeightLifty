@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteTableLockedException;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.R;
@@ -32,9 +29,6 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataDbHelper;
-
-import static android.R.attr.id;
-import static etchee.com.weightlifty.R.string.begin_workout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         begin_workout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+                Intent intent = new Intent(getApplicationContext(), WorkoutListActivity.class);
                 startActivity(intent);
             }
         });

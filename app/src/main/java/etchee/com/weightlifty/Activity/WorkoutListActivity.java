@@ -1,6 +1,5 @@
 package etchee.com.weightlifty.Activity;
 
-import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
@@ -46,7 +45,7 @@ import etchee.com.weightlifty.DataMethods.subIDfixHelper;
  * Created by rikutoechigoya on 2017/03/30.
  */
 
-public class ListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+public class WorkoutListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private ListView listview;
@@ -365,7 +364,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events);
         SpannableString string = new SpannableString(delete_all_events.getTitle());
         string.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(ListActivity.this, R.color.colorPrimary)),
+                new ForegroundColorSpan(ContextCompat.getColor(WorkoutListActivity.this, R.color.colorPrimary)),
                 0,
                 string.length(),
                 Spanned.SPAN_PRIORITY);
@@ -392,7 +391,10 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
         searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search_button).getActionView();
 
-        ComponentName componentName = new ComponentName(getApplicationContext(), ListActivity.class);
+        if (searchView == null) throw new NullPointerException(TAG + ": SearchView returns null");
+
+        ComponentName componentName = new ComponentName(getApplicationContext(),
+                WorkoutListActivity.class);
 
         //checking logger
         if (searchManager.getSearchableInfo(componentName) == null) {
@@ -418,7 +420,7 @@ public class ListActivity extends AppCompatActivity implements LoaderManager.Loa
 
             case R.id.menu_delete_all_events:
                 int numOfDeletedRows = deleteEventTable();
-                Toast.makeText(ListActivity.this, String.valueOf(numOfDeletedRows) + " deleted.",
+                Toast.makeText(WorkoutListActivity.this, String.valueOf(numOfDeletedRows) + " deleted.",
                         Toast.LENGTH_SHORT).show();
                 break;
             case R.id.menu_insert_event:

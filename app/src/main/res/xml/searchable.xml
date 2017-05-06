@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
-    android:label="@string/app_name"
     android:hint="@string/hint_search_events"
+    android:label="@string/app_name"
     android:searchSuggestAuthority="@string/suggestion_provider_authority"
     >
-
-    <!--やんざむさんの追加情報-->
-    <!--android:searchSuggestSelection=" ? "-->
-    <!--android:searchSuggestIntentAction="android.Intent.action.VIEW"-->
-    <!--android:includeInGlobalSearch="true"-->
-
-    <!--android:searchSuggestAuthority="etchee.com.weightlifty.data.DataProvider"-->
-    <!-- Taken from Android Dev Doc
-Use the SUGGEST_COLUMN_INTENT_ACTION column to define the action for individual suggestions.
-Add the SUGGEST_COLUMN_INTENT_ACTION column to your suggestions table and, for each suggestion, place in it the action to use (such as "android.Intent.action.VIEW").
--->
 </searchable>
