@@ -34,7 +34,7 @@ import com.github.clans.fab.FloatingActionButton;
 
 import java.util.Calendar;
 
-import etchee.com.weightlifty.Adapter.listActivityAdapter;
+import etchee.com.weightlifty.Adapter.WorkoutListAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
@@ -49,7 +49,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private ListView listview;
-    private listActivityAdapter mAdapter;
+    private WorkoutListAdapter mAdapter;
     private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -91,7 +91,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         listview.setEmptyView(emptyView);
         Cursor cursor = createCursor();
 
-        mAdapter = new listActivityAdapter(getApplicationContext(), cursor, 0);
+        mAdapter = new WorkoutListAdapter(getApplicationContext(), cursor, 0);
         listview.setAdapter(mAdapter);
 
         //Init the loader
@@ -145,10 +145,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         switch (item.getItemId()) {
 
             case R.id.action_search_button:
-//                Intent intent = new Intent(Intent.ACTION_SEARCH);
-//                intent.putExtra(SearchManager.QUERY, "Test");
                 onSearchRequested();
-//                startActivity(intent);
                 break;
 
             case R.id.menu_delete_all_events:
@@ -475,13 +472,14 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.v(TAG, "Text submitted: " + query);
+        //INITIATE SEARCH
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
         Log.v(TAG, "Text changed: " + newText);
-
+        //INITIATE SEARCH
         return false;
     }
 

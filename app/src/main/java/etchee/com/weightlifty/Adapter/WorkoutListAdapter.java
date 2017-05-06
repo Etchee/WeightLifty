@@ -19,14 +19,14 @@ import etchee.com.weightlifty.DataMethods.QueryResponceHandler;
  * Created by rikutoechigoya on 2017/03/27.
  */
 
-public class listActivityAdapter extends CursorAdapter implements QueryResponceHandler{
+public class WorkoutListAdapter extends CursorAdapter implements QueryResponceHandler{
 
     private TextView field_workout_name, field_repCount, field_setCount;
     private String eventString;
     private EventNameQueryHelper eventNameQueryHelper;
     private static final String TAG = "ListActivityAdapter";
 
-    public listActivityAdapter(Context context, Cursor c, int flags) {
+    public WorkoutListAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         eventNameQueryHelper = new EventNameQueryHelper(context);
     }
@@ -45,14 +45,16 @@ public class listActivityAdapter extends CursorAdapter implements QueryResponceH
         field_repCount = (TextView)view.findViewById(R.id.item_count_rep);
         field_setCount = (TextView)view.findViewById(R.id.item_count_set);
 
+        //Get cursor indexes
         int index;
         int repCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_REP_COUNT);
         int setCount_columnIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_SET_COUNT);
         int eventID = cursor.getInt(cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_ID));
-
+        //get resource from the cursor
         String rep_count = cursor.getString(repCount_columnIndex);
         String set_count = cursor.getString(setCount_columnIndex);
 
+        // Query the appropriate event name
         String projection[] = new String[]{
                 DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
                 DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE,
