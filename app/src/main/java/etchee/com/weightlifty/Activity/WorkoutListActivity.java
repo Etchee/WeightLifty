@@ -61,6 +61,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     private final String TAG = getClass().getSimpleName();
     private SearchManager searchManager;
     private Toolbar toolbar;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                event_insertDummyValues();
+                searchView.setIconified(false);
             }
         });
 
@@ -109,6 +110,70 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 launchEditActivityWithEventID(position);
             }
         });
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        deleteOptionRed(menu);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
+    /**
+     *  When creating the option, define the searchView. (Pretty sure this is done right)
+     * @param menu menu layout
+     * @return  true
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_list, menu);
+
+        searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        final MenuItem item = menu.findItem(R.id.action_search_button);
+        MenuItemCompat.expandActionView(item);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setQueryHint(getString(R.string.hint_search_events));
+        searchView.setOnQueryTextListener(this);
+
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.action_search_button:
+//                Intent intent = new Intent(Intent.ACTION_SEARCH);
+//                intent.putExtra(SearchManager.QUERY, "Test");
+                onSearchRequested();
+//                startActivity(intent);
+                break;
+
+            case R.id.menu_delete_all_events:
+                int numOfDeletedRows = deleteEventTable();
+                Toast.makeText(WorkoutListActivity.this, String.valueOf(numOfDeletedRows) + " deleted.",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.menu_insert_event:
+                event_insertDummyValues();
+                break;
+
+            case R.id.menu_view_tables:
+                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private int deleteEventTable() {
+        int numberOfDeletedRows = getContentResolver().delete(
+                EventEntry.CONTENT_URI,
+                null,
+                null
+        );
+        return numberOfDeletedRows;
     }
 
     private int getEventID() {
@@ -177,6 +242,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
         return sub_id;
     }
+
+
 
     /**
      * @param position equals to that of the sub_id in the event table.
@@ -254,8 +321,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         );
     }
 
-
-
     private Cursor createCursor() {
         Cursor cursor;
 
@@ -289,12 +354,12 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         return Integer.parseInt(concatenated);
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
         new subIDfixHelper(getApplicationContext()).execute(getDateAsInt());
     }
-
 
     /**
      *
@@ -353,12 +418,12 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         mAdapter.swapCursor(null);
     }
 
+
     //if searchView is expanded, then collapse
     @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
-
 
     private void deleteOptionRed(Menu menu) {
         //set delete menu text to red color
@@ -371,70 +436,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 Spanned.SPAN_PRIORITY);
 
         delete_all_events.setTitle(string);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        deleteOptionRed(menu);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-
-    /**
-     *  When creating the option, define the searchView. (Pretty sure this is done right)
-     * @param menu menu layout
-     * @return  true
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_list, menu);
-
-        searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
-        final MenuItem item = menu.findItem(R.id.action_search_button);
-        MenuItemCompat.expandActionView(item);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-        searchView.setQueryHint(getString(R.string.hint_search_events));
-        searchView.setOnQueryTextListener(this);
-
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-
-            case R.id.action_search_button:
-//                Intent intent = new Intent(Intent.ACTION_SEARCH);
-//                intent.putExtra(SearchManager.QUERY, "Test");
-                onSearchRequested();
-//                startActivity(intent);
-                break;
-
-            case R.id.menu_delete_all_events:
-                int numOfDeletedRows = deleteEventTable();
-                Toast.makeText(WorkoutListActivity.this, String.valueOf(numOfDeletedRows) + " deleted.",
-                        Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.menu_insert_event:
-                event_insertDummyValues();
-                break;
-
-            case R.id.menu_view_tables:
-                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
-                startActivity(intent);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private int deleteEventTable() {
-        int numberOfDeletedRows = getContentResolver().delete(
-                EventEntry.CONTENT_URI,
-                null,
-                null
-        );
-        return numberOfDeletedRows;
     }
 
     private void eventType_insertDummyValues() {
