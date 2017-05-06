@@ -3,7 +3,6 @@ package etchee.com.weightlifty.Activity;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -33,7 +32,6 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.Adapter.listActivityAdapter;
@@ -77,10 +75,13 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.list_fab);
 
+        /**
+         *  on FAB click, enter chooseEventMode
+         */
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchView.setIconified(false);
+                enterChooseEventMode();
             }
         });
 
@@ -151,7 +152,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 break;
 
             case R.id.menu_delete_all_events:
-                int numOfDeletedRows = deleteEventTable();
+                int numOfDeletedRows = deleteEventTableDatabase();
                 Toast.makeText(WorkoutListActivity.this, String.valueOf(numOfDeletedRows) + " deleted.",
                         Toast.LENGTH_SHORT).show();
                 break;
@@ -167,7 +168,20 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         return super.onOptionsItemSelected(item);
     }
 
-    private int deleteEventTable() {
+    /**
+     * When user clicks FAB, this method is called.
+     * User will direcly start typing their desired events.
+     *
+     *  1. searchView must open
+     *  2. Wipe the contents in the listView.
+     *  3. Hook up a new adapter.
+     */
+    private void enterChooseEventMode() {
+        searchView.setIconified(false);
+        listview.setAdapter(null);
+    }
+
+    private int deleteEventTableDatabase() {
         int numberOfDeletedRows = getContentResolver().delete(
                 EventEntry.CONTENT_URI,
                 null,
