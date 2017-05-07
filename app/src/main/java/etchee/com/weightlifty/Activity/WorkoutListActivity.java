@@ -54,7 +54,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private ListView listview;
-    private ListAdapter listAdapter;
     private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -66,6 +65,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     private Toolbar toolbar;
     private SearchView searchView;
     private Context context;
+    private ListAdapter listAdapter;
+    private SearchAdapter searchAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,9 +98,14 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         View emptyView = findViewById(R.id.view_empty);
         listview = (ListView)findViewById(R.id.listview_workout);
         listview.setEmptyView(emptyView);
-        Cursor cursor = createCursor();
 
-        listAdapter = new ListAdapter(getApplicationContext(), cursor, 0);
+        //cursor init
+        Cursor listCursor = initListCursor();
+        Cursor eventTypeCursor = initEventTypeCursor();
+
+        //adapter initialization
+        searchAdapter = new SearchAdapter(context, eventTypeCursor);
+        listAdapter = new ListAdapter(getApplicationContext(), listCursor, 0);
         listview.setAdapter(listAdapter);
 
         //Init the loader
@@ -340,7 +346,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         );
     }
 
-    private Cursor createCursor() {
+    private Cursor initListCursor() {
         Cursor cursor;
 
         String projection[] = {
@@ -359,6 +365,30 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 null,
                 null );
         return cursor;
+    }
+
+    private Cursor initEventTypeCursor() {
+        Cursor cursor;
+
+        String projection[] = {
+                EventType_FTSEntry.COLUMN_ROW_ID,
+                EventType_FTSEntry.COLUMN_EVENT_TYPE,
+                EventType_FTSEntry.COLUMN_EVENT_NAME
+        };
+
+        String selection = EventType_FTSEntry.COLUMN_ROW_ID + "=?";
+        String selectionArgs[] = new String[]{ String.valueOf(1) };
+
+        cursor = contentResolver.query(
+                EventType_FTSEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null
+        );
+
+        if (cursor != null) return cursor;
+        else throw new NullPointerException(TAG + ": FTS table cursor initialization has failed");
     }
 
     private int getDateAsInt() {
@@ -494,8 +524,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         Log.v(TAG, "Text submitted: " + query);
         //INITIATE SEARCH
         Cursor cursor = queryWorkout(query);
-        //cursor is successfully received here
-        listview.setAdapter(new SearchAdapter(context, cursor));
+        listview.setAdapter(searchAdapter);
+        searchAdapter.swapCursor(cursor);
         return false;
     }
 
@@ -503,7 +533,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     public boolean onQueryTextChange(String newText) {
         Log.v(TAG, "Text changed: " + newText);
         //INITIATE SEARCH
-
+//        Cursor cursor = queryWorkout(newText);
+//        listview.setAdapter(new SearchAdapter(context, cursor));
         return false;
     }
 

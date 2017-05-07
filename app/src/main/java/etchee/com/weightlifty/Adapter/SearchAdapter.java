@@ -71,6 +71,11 @@ public class SearchAdapter extends BaseAdapter {
 
     }
 
+    public void swapCursor(Cursor newCursor) {
+        cursor = newCursor;
+        notifyDataSetChanged();
+    }
+
 
     private static class ViewHolder {
 
