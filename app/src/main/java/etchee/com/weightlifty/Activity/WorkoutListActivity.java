@@ -54,7 +54,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private ListView listview;
-    private ListAdapter mAdapter;
+    private ListAdapter listAdapter;
     private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -99,8 +99,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         listview.setEmptyView(emptyView);
         Cursor cursor = createCursor();
 
-        mAdapter = new ListAdapter(getApplicationContext(), cursor, 0);
-        listview.setAdapter(mAdapter);
+        listAdapter = new ListAdapter(getApplicationContext(), cursor, 0);
+        listview.setAdapter(listAdapter);
 
         //Init the loader
 
@@ -428,20 +428,25 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        mAdapter.swapCursor(cursor);
-        mAdapter.notifyDataSetChanged();
+        listAdapter.swapCursor(cursor);
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
+        listAdapter.swapCursor(null);
     }
 
 
     //if searchView is expanded, then collapse
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+       if (!searchView.isIconified()) {
+           searchView.onActionViewCollapsed();
+           listview.setAdapter(listAdapter);
+       } else {
+           super.onBackPressed();
+       }
     }
 
     private void deleteOptionRed(Menu menu) {
@@ -472,8 +477,15 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         Toast.makeText(this, "EventType inserted", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     *      When SearchView is closed, the listView should have the list of today's workouts
+     * @return false
+     */
     @Override
     public boolean onClose() {
+
+        listview.setAdapter(listAdapter);
+
         return false;
     }
 
