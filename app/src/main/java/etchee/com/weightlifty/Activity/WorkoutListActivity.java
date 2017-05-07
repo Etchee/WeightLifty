@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.database.DatabaseUtils;
+import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -34,22 +36,25 @@ import com.github.clans.fab.FloatingActionButton;
 
 import java.util.Calendar;
 
-import etchee.com.weightlifty.Adapter.WorkoutListAdapter;
+import etchee.com.weightlifty.Adapter.ListAdapter;
+import etchee.com.weightlifty.Adapter.SearchAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.DataMethods.subIDfixHelper;
+import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 
 /**
- * Created by rikutoechigoya on 2017/03/30.
+ *  From MainActivity -> Loads today's data, display as a list.
+ *  When SearchView is initiated -> Performs a search, then pass the resulting cursor to SearchAdapter
  */
 
 public class WorkoutListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private ListView listview;
-    private WorkoutListAdapter mAdapter;
+    private ListAdapter mAdapter;
     private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -60,12 +65,15 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     private SearchManager searchManager;
     private Toolbar toolbar;
     private SearchView searchView;
+    private Context context;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list);
+
+        context = getApplicationContext();
 
         toolbar = (Toolbar) findViewById(R.id.list_toolbar);
         setSupportActionBar(toolbar);
@@ -91,7 +99,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         listview.setEmptyView(emptyView);
         Cursor cursor = createCursor();
 
-        mAdapter = new WorkoutListAdapter(getApplicationContext(), cursor, 0);
+        mAdapter = new ListAdapter(getApplicationContext(), cursor, 0);
         listview.setAdapter(mAdapter);
 
         //Init the loader
@@ -473,6 +481,9 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     public boolean onQueryTextSubmit(String query) {
         Log.v(TAG, "Text submitted: " + query);
         //INITIATE SEARCH
+        Cursor cursor = queryWorkout(query);
+        //cursor is successfully received here
+        listview.setAdapter(new SearchAdapter(context, cursor, 0));
         return false;
     }
 
@@ -480,9 +491,79 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     public boolean onQueryTextChange(String newText) {
         Log.v(TAG, "Text changed: " + newText);
         //INITIATE SEARCH
+
         return false;
     }
 
+
+
+    /**
+     *  Search method that returns a cursor.
+     *
+     * @param inputText User input text sent from the UI
+     * @return cursor that contains the results of the search
+     * @throws SQLException if search fails.
+     */
+    public Cursor queryWorkout(String inputText) {
+        Log.w(TAG, inputText);
+
+        /*
+                Original sample code:
+                String query = "SELECT docid as _id," +
+                KEY_CUSTOMER + "," +
+                KEY_NAME + "," +
+                "(" + KEY_ADDRESS1 + "||" +
+                "(case when " + KEY_ADDRESS2 + "> '' then '\n' || "
+                + KEY_ADDRESS2 + " else '' end)) as " + KEY_ADDRESS + "," +
+                KEY_ADDRESS1 + "," +
+                KEY_ADDRESS2 + "," +
+                KEY_CITY + "," +
+                KEY_STATE + "," +
+                KEY_ZIP +
+                " from " + FTS_VIRTUAL_TABLE +
+                " where " + KEY_SEARCH + " MATCH '" + inputText + "';";
+         */
+
+        /*
+                Original sample code output:
+                SELECT docid as _id,customer,name,(address1||(case when address2> '' then '
+               ' || address2 else '' end)) as address,address1,address2,city,state,zipCode from
+               CustomerInfo where searchData MATCH 'Piz*';
+         */
+
+//        String query = "SELECT " + EventType_FTSEntry.COLUMN_ROW_ID + " as _id," +
+//                KEY_CUSTOMER + "," +
+//                KEY_NAME + "," +
+//                "(" + KEY_ADDRESS1 + "||" +
+//                "(case when " + KEY_ADDRESS2 + "> '' then '\n' || "
+//                + KEY_ADDRESS2 + " else '' end)) as " + KEY_ADDRESS + "," +
+//                KEY_ADDRESS1 + "," +
+//                KEY_ADDRESS2 + "," +
+//                KEY_CITY + "," +
+//                KEY_STATE + "," +
+//                KEY_ZIP +
+//                " from " + FTS_VIRTUAL_TABLE +
+//                " where " + KEY_SEARCH + " MATCH '" + inputText + "';";
+
+        String fakeProjection[] = new String[]{
+                EventType_FTSEntry.COLUMN_ROW_ID,
+                EventType_FTSEntry.COLUMN_EVENT_NAME,
+                EventType_FTSEntry.COLUMN_EVENT_TYPE
+        };
+
+        Cursor fakeCursor = getContentResolver().query(
+                EventType_FTSEntry.CONTENT_URI,
+                fakeProjection,
+                null,
+                null,
+                null
+        );
+        if (fakeCursor.moveToFirst()) {
+            Log.v(TAG, "Result cursor: " + DatabaseUtils.dumpCursorToString(fakeCursor));
+        } else fakeCursor = null;
+
+        return fakeCursor;
+    }
 
 }
 

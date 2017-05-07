@@ -16,17 +16,22 @@ import etchee.com.weightlifty.DataMethods.EventNameQueryHelper;
 import etchee.com.weightlifty.DataMethods.QueryResponceHandler;
 
 /**
- * Created by rikutoechigoya on 2017/03/27.
+ *  This adapter is set on the listView when SearchView is being opened.
+ *
+ *  Function 1: takes the query in the searchView
+ *  Function 2: performs search in the FTS_EventType table.
+ *  Function 3: Search returns a cursor
+ *  Function 4: cursor contents are converted into a single listView
  */
 
-public class WorkoutListAdapter extends CursorAdapter implements QueryResponceHandler{
+public class ListAdapter extends CursorAdapter implements QueryResponceHandler{
 
     private TextView field_workout_name, field_repCount, field_setCount;
     private String eventString;
     private EventNameQueryHelper eventNameQueryHelper;
     private static final String TAG = "ListActivityAdapter";
 
-    public WorkoutListAdapter(Context context, Cursor c, int flags) {
+    public ListAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         eventNameQueryHelper = new EventNameQueryHelper(context);
     }

@@ -32,16 +32,6 @@
 
         <activity android:name=".data.DBviewer" />
 
-        <activity
-            android:name=".Search.SearchResultsActivity"
-            android:label="@string/input_event"
-            android:launchMode="singleTop">
-
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:resource="@xml/searchable" />
-        </activity>
-
 
         <activity
             android:name=".Activity.WorkoutListActivity"
