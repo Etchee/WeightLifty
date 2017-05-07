@@ -8,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 
@@ -18,24 +16,21 @@ import etchee.com.weightlifty.data.DataContract;
  */
 
 public class SearchAdapter extends BaseAdapter {
-
-    private ArrayList myListItems;
-    private LayoutInflater myLayoutInflater;
+    private LayoutInflater layoutInflater;
     private Cursor cursor;
     private String workout;
 
     public SearchAdapter(Context context, Cursor cursor){
-        myLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.cursor = cursor;
     }
 
     @Override
     public int getCount() {
-        return 0;
+        return cursor.getCount();
     }
 
     @Override
-
     public Object getItem(int i) {
         return null;
     }
@@ -46,17 +41,13 @@ public class SearchAdapter extends BaseAdapter {
     }
 
     @Override
-
     public View getView(int position, View view, ViewGroup viewGroup) {
-
-
         ViewHolder holder;
-
 
         if (view == null) {
             holder = new ViewHolder();
 
-            view = myLayoutInflater.inflate(R.layout.item_single_workout_events, null);
+            view = layoutInflater.inflate(R.layout.item_single_workout_events, null);
             holder.workout_textView = (TextView) view.findViewById(R.id.name_workout_item_single_workout_events);
             view.setTag(holder);
         } else {

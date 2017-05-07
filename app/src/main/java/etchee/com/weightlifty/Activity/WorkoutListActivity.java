@@ -483,7 +483,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         //INITIATE SEARCH
         Cursor cursor = queryWorkout(query);
         //cursor is successfully received here
-        listview.setAdapter(new SearchAdapter(context, cursor, 0));
+        listview.setAdapter(new SearchAdapter(context, cursor));
         return false;
     }
 
@@ -545,6 +545,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 //                " from " + FTS_VIRTUAL_TABLE +
 //                " where " + KEY_SEARCH + " MATCH '" + inputText + "';";
 
+        //Fake cursor for now
         String fakeProjection[] = new String[]{
                 EventType_FTSEntry.COLUMN_ROW_ID,
                 EventType_FTSEntry.COLUMN_EVENT_NAME,
