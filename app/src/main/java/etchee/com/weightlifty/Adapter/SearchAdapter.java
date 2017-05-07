@@ -2,48 +2,87 @@ package etchee.com.weightlifty.Adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import etchee.com.weightlifty.R;
-import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
+import etchee.com.weightlifty.data.DataContract;
 
 /** This adapter takes the query from searchView, performs search and then display the result as
  * a listView.
  */
 
-public class SearchAdapter extends CursorAdapter {
+public class SearchAdapter extends BaseAdapter {
 
-    private TextView field_workout_name;
-    private Context context;
-    private final String TAG = getClass().getSimpleName();
+    private ArrayList myListItems;
+    private LayoutInflater myLayoutInflater;
+    private Cursor cursor;
+    private String workout;
 
-    public SearchAdapter(Context context, Cursor cursor, int flags) {
-        super(context, cursor, flags);
-        this.context = context;
-        Log.v(TAG, "Adapter cursor: " + DatabaseUtils.dumpCursorToString(cursor));
+    public SearchAdapter(Context context, Cursor cursor){
+        myLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.cursor = cursor;
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        return LayoutInflater.from(context)
-                .inflate(R.layout.item_single_workout_events, viewGroup, false);
+    public int getCount() {
+        return 0;
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        field_workout_name = (TextView)view.findViewById(R.id.name_workout_item_single_workout_events);
+
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+
+    public View getView(int position, View view, ViewGroup viewGroup) {
 
 
-        int workoutName_columnIndex = cursor.getColumnIndex(EventType_FTSEntry.COLUMN_EVENT_NAME);
+        ViewHolder holder;
 
-        String workout = cursor.getString(workoutName_columnIndex);
 
-        field_workout_name.setText(workout);
+        if (view == null) {
+            holder = new ViewHolder();
+
+            view = myLayoutInflater.inflate(R.layout.item_single_workout_events, null);
+            holder.workout_textView = (TextView) view.findViewById(R.id.name_workout_item_single_workout_events);
+            view.setTag(holder);
+        } else {
+            holder = (ViewHolder)view.getTag();
+        }
+
+        // get the workout name String
+
+        int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
+        if (cursor.moveToNext()) {
+            workout = cursor.getString(index);
+        }
+
+        if (workout != null) {
+            if (holder.workout_textView != null) {
+                //set the item name on the TextView
+                holder.workout_textView.setText(workout);
+            }
+        }
+        return view;
+
+    }
+
+
+    private static class ViewHolder {
+
+        protected TextView workout_textView;
     }
 }

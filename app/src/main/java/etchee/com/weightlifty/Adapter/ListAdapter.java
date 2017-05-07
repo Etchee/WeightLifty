@@ -3,6 +3,7 @@ package etchee.com.weightlifty.Adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
