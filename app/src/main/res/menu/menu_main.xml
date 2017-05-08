@@ -26,5 +26,8 @@
     <item android:title="@string/reset_fts_table"
         android:id="@+id/reset_FTS_table"
         app:showAsAction="never" />
+    <item android:title="@string/test_eventtype_db"
+        android:id="@+id/test_eventType_db"
+        app:showAsAction="never" />
 
 </menu>

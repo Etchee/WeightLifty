@@ -25,5 +25,4 @@
         android:title="@string/delete_all_events"
         app:showAsAction="never" />
 
-
 </menu>

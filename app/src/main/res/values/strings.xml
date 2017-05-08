@@ -33,4 +33,5 @@
     <string name="input_event">Input Event</string>
     <string name="launch_searchactivity">Launch SearchActivity</string>
     <string name="reset_fts_table">Reset FTS Table</string>
+    <string name="test_eventtype_db">Test EventType DB</string>
 </resources>
