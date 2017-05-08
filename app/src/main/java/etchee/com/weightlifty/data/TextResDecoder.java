@@ -121,12 +121,13 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
         int numOfUpdatedRow = 0;
         Uri uri;
         ContentValues values = new ContentValues();
-        for (int i = 0; i<jsonArray.length(); i+=2) {
+        int counter = 0;
+        while(counter < jsonArray.length()){
             //if even, then Event Name
             //if odd, then Event Type
             try {
-                values.put(EventType_FTSEntry.COLUMN_EVENT_NAME, jsonArray.get(i).toString());
-                values.put(EventType_FTSEntry.COLUMN_EVENT_TYPE, jsonArray.get(i + 1).toString());
+                values.put(EventType_FTSEntry.COLUMN_EVENT_NAME, jsonArray.get(counter).toString());
+                values.put(EventType_FTSEntry.COLUMN_EVENT_TYPE, jsonArray.get(counter + 1).toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -140,6 +141,7 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
             }
             values.clear();
             numOfUpdatedRow++;
+            counter += 2;
         }
 
         if (errorFlag == 1) {
@@ -156,29 +158,43 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
                 Toast.LENGTH_SHORT).show();
 
         //Debug purpose
-        queryFTSforDebug();
+        Toast.makeText(context, "(Debug) Item 259 is: " + queryFTSforDebug(), Toast.LENGTH_SHORT).show();
     }
 
-    private void queryFTSforDebug() {
+    private String queryFTSforDebug() {
         Cursor cursor = null;
+        String str = null;
         try {
+
+            String projection[] = new String[] {
+                    EventType_FTSEntry.COLUMN_ROW_ID,
+                    EventType_FTSEntry.COLUMN_EVENT_NAME
+            };
+
+            String selection = EventType_FTSEntry.COLUMN_ROW_ID + "=?";
+            String selectionArgs[] = new String[]{
+                String.valueOf(259)
+            };
               cursor = context.getContentResolver().query(
                     EventType_FTSEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
+                    projection,
+                    selection,
+                    selectionArgs,
                     null
             );
+            int index = cursor.getColumnIndex(EventType_FTSEntry.COLUMN_EVENT_NAME);
+            if (cursor.moveToFirst()) str = cursor.getString(index);
         } finally {
-            Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
             cursor.close();
         }
+
+        return str;
     }
 
     private StringBuffer getStringBufferFromRawFile() {
         String str;
         StringBuffer buffer = new StringBuffer();
-        InputStream is = context.getResources().openRawResource(R.raw.list_short_workout);
+        InputStream is = context.getResources().openRawResource(R.raw.raw_list_workout);
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             if (is != null) {
@@ -198,13 +214,15 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
     private JSONArray convertBufferIntoJSONArray(StringBuffer buffer) throws JSONException {
         JSONArray jsonArray = new JSONArray();
         String str = buffer.toString();
+        str = str.replaceAll("\\\\", ",");
 
         String[] array = str.split(",");
+        for (int k = 0; k<array.length; k++) {
+            System.out.println(array[k]);
+        }
         for (int i = 0; i<array.length; i++){
             //in index i, put the processed version of the array
-            jsonArray.put(i, array[i].replace("\\", " ").replace("}", "").replace("{", "").trim());
-            jsonArray.get(i).toString();
-            //successful up to here!
+            jsonArray.put(i, array[i].trim());
         }
 
         return jsonArray;
