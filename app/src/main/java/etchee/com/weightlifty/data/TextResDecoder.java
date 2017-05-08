@@ -183,7 +183,8 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             if (is != null) {
                 while ((str = reader.readLine()) != null) {
-                    buffer.append(str + "\n" );
+//                    buffer.append(str + "\n" );
+                      buffer.append(str);
                 }
             }
         } catch (IOException e) {
@@ -201,7 +202,7 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
         String[] array = str.split(",");
         for (int i = 0; i<array.length; i++){
             //in index i, put the processed version of the array
-            jsonArray.put(i, array[i].replace("\\", "").trim());
+            jsonArray.put(i, array[i].replace("\\", " ").replace("}", "").replace("{", "").trim());
             jsonArray.get(i).toString();
             //successful up to here!
         }
