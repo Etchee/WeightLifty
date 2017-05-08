@@ -199,7 +199,6 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             if (is != null) {
                 while ((str = reader.readLine()) != null) {
-//                    buffer.append(str + "\n" );
                       buffer.append(str);
                 }
             }

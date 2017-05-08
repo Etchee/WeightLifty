@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionButton;
 
 import java.util.Calendar;
+import java.util.Random;
 
 import etchee.com.weightlifty.Adapter.ListAdapter;
 import etchee.com.weightlifty.Adapter.SearchAdapter;
@@ -115,16 +116,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         bundle.putInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, getDateAsInt());
         getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
 
-        /**
-         *  When an item on the listView is clicked, get the (INT) item id, put on the bundle and deliver
-         *      to EditActivity.
-         */
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                launchEditActivityWithEventID(position);
-            }
-        });
+        //listView setup
+        listview.setOnClickListener(listViewOnClickSetup());
     }
 
     @Override
@@ -180,6 +173,36 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     }
 
     /**
+     *  OnClickListener of the listView. Behaves differently depending on which of the two adapters
+     *  are set atm.
+     *
+     *  case 1: listAdapter →　gets the SUB_ID, moves on to EditEventActivity
+     *
+     *  case 2: SearchAdapter → gets the ROW_ID (FTS Table), moves on to EditEventActivity
+     * @return
+     */
+    private AdapterView.OnItemClickListener listViewOnClickSetup() {
+        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //check which adapters are set
+                if (listview.getAdapter() == searchAdapter) {
+
+                    //I have to get either ROW_ID or just item name here
+
+                } else if (listview.getAdapter() == listAdapter) {
+                    launchEditActivityWithEventID(position);
+                    Log.v(TAG, "SUB_ID received as: " + String.valueOf(position));
+                } else {
+                    //adapter null. Do nothing
+                }
+            }
+        };
+
+        return listener;
+    }
+
+    /**
      * When user clicks FAB, this method is called.
      * User will direcly start typing their desired events.
      *
@@ -213,12 +236,12 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
         ContentValues values = new ContentValues();
 
-        int rep_count = 7;
-        int set_count = 5;
+        int rep_count = new Random().nextInt(10);
+        int set_count = new Random().nextInt(20);
         int date = getDateAsInt();
         int weight_count = 70;
         int sub_ID = getNextSub_id();
-        int eventID = 5;
+        int eventID = new Random().nextInt(900);
 
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);
