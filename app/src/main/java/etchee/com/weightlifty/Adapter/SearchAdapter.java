@@ -2,6 +2,9 @@ package etchee.com.weightlifty.Adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import android.widget.TextView;
 
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
+import etchee.com.weightlifty.data.DataDbHelper;
 
 /** This adapter takes the query from searchView, performs search and then display the result as
  * a listView.
@@ -21,10 +25,13 @@ public class SearchAdapter extends BaseAdapter {
     private String workout;
     private String number_String;
     private String hint_string;
+    private Context context;
+    private final String TAG = getClass().getSimpleName();
 
     public SearchAdapter(Context context, Cursor cursor){
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.cursor = cursor;
+        this.context = context;
     }
 
     @Override
@@ -33,8 +40,31 @@ public class SearchAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int i) {
-        return null;
+    public Object getItem(int position) {
+        int rowid = -1;
+
+        //rawQuery must be used because FTS table row_id column is "hidden"
+
+        try {
+            Cursor cursor;
+            SQLiteDatabase db = new DataDbHelper(context).getReadableDatabase();
+            String query = "SELECT " + DataContract.EventType_FTSEntry.COLUMN_ROW_ID + ", "
+                    + DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + " FROM "
+                    + DataContract.EventType_FTSEntry.TABLE_NAME + " WHERE "
+                    + DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?";
+            String selectionArgs[] = new String[]{String.valueOf(position)};
+            cursor = db.rawQuery(query, selectionArgs);
+            Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+
+            int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_ROW_ID);
+            if (cursor.moveToFirst()) {
+                rowid = cursor.getInt(index);
+            }
+        } finally {
+            if (cursor != null)  cursor.close();
+        }
+
+        return rowid ;
     }
 
     @Override

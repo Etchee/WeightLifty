@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
@@ -117,7 +116,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
 
         //listView setup
-        listview.setOnItemClickListener(listViewOnClickSetup());
+        listview.setOnItemClickListener(listViewOnItemClickSetup());
     }
 
     @Override
@@ -181,14 +180,47 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
      *  case 2: SearchAdapter → gets the ROW_ID (FTS Table), moves on to EditEventActivity
      * @return
      */
-    private AdapterView.OnItemClickListener listViewOnClickSetup() {
+    private AdapterView.OnItemClickListener listViewOnItemClickSetup() {
         AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 //check which adapters are set
                 if (listview.getAdapter() == searchAdapter) {
-
                     //I have to get either ROW_ID or just item name here
+                    int itemID = (int) searchAdapter.getItem(position);
+
+                    //for debug, query the FTS table to see if the item name is correct
+                    String projection[] = new String[]{
+                            EventType_FTSEntry.COLUMN_ROW_ID,
+                            EventType_FTSEntry.COLUMN_EVENT_NAME
+                    };
+
+                    String selection = EventType_FTSEntry.COLUMN_ROW_ID + "=?";
+                    String selectionArgs[] = new String[]{String.valueOf(itemID)};
+
+                    String eventName = null;
+                    Cursor cursor = null;
+                    try {
+
+                        cursor = getContentResolver().query(
+                                DataContract.EventType_FTSEntry.CONTENT_URI,
+                                projection,
+                                selection,
+                                selectionArgs,
+                                null
+                        );
+                        if (cursor.moveToFirst()) {
+                            eventName = cursor.getString(cursor.getColumnIndex(
+                                    EventType_FTSEntry.COLUMN_EVENT_NAME));
+                        }
+
+                    } finally {
+                        if (cursor != null) {
+                            cursor.close();
+                        }
+                    }
+                    Toast.makeText(context, "Event String: " + eventName, Toast.LENGTH_SHORT).show();
 
                 } else if (listview.getAdapter() == listAdapter) {
                     launchEditActivityWithEventID(position);

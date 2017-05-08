@@ -52,7 +52,6 @@
             android:syncable="false" />
 
         <activity android:name=".Activity.EditEventActivity" />
-        <activity android:name=".Activity.ChooseEventActivity" />
 
         <provider
             android:name=".data.DataProvider"
