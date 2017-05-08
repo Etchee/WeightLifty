@@ -1,8 +1,11 @@
 package etchee.com.weightlifty.data;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -16,8 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
+import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.R;
 
 /**
@@ -26,7 +29,7 @@ import etchee.com.weightlifty.R;
  *  Function 1:
  */
 
-public class TextResDecoder extends AsyncTask<Void, Void, JSONObject> {
+public class TextResDecoder {
 
     private Context context;
     private final String TAG = getClass().getSimpleName();
@@ -41,57 +44,9 @@ public class TextResDecoder extends AsyncTask<Void, Void, JSONObject> {
         if (!checkIfEventTypeIsOk()) {
             Log.v(TAG, "Optimizing db process starts:");
             //fire AsyncTask here
+            new AsyncEventTypleInsertProcess(context).execute();
         } else Toast.makeText(activity, "EventType data optimized!", Toast.LENGTH_SHORT).show();
     }
-
-    private StringBuffer getStringBufferFromRawFile() {
-        String str;
-        StringBuffer buffer = new StringBuffer();
-        InputStream is = context.getResources().openRawResource(R.raw.list_short_workout);
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            if (is != null) {
-                while ((str = reader.readLine()) != null) {
-                    buffer.append(str + "\n" );
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try { is.close(); } catch (Throwable ignore) {}
-        }
-        return buffer;
-    }
-
-    private JSONArray convertBufferIntoJSONArray(StringBuffer buffer) throws JSONException {
-        JSONArray jsonArray = null;
-        String str = buffer.toString();
-
-        String[] array = str.split(",");
-        for (int i = 0; i<array.length; i++){
-            //in index i, put the processed version of the array
-            jsonArray.put(i, array[i].replace("\\", "").trim());
-
-            System.out.println(jsonArray.get(i).toString());
-        }
-
-        return jsonArray;
-    }
-
-    /**
-     *  This method converts the array thrown in → JSON object
-     * @param array
-     * @return
-     */
-    private JSONObject convertArrayToJSON(JSONArray array) {
-        JSONObject jsonObject = new JSONObject();
-
-        //if even number starting from 0 → workout name
-        //if odd number starting from 1 → category.
-
-        return jsonObject;
-    }
-
 
     /**
      *  This method checks if the raw workout file has already been input in the FTS table.
@@ -139,29 +94,109 @@ public class TextResDecoder extends AsyncTask<Void, Void, JSONObject> {
 
         return TF;
     }
+}
 
-    /**
-     *  Async process to optimize the database (input from raw file into FTS table)
-     * @param params nothing passed here
-     * @return JSON Object sorted (workout and muscle category)
-     */
+class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Void> {
+
+    private String TAG = getClass().getSimpleName();
+    private Context context;
+
+    public AsyncEventTypleInsertProcess(Context context) {
+        this.context = context;
+    }
+
     @Override
-    protected JSONObject doInBackground(Void...params) {
+    protected Void doInBackground(Void... params) {
         //init JSON object
-        JSONObject jsonObject;
+        JSONObject jsonObject = null;
         JSONArray jsonArray = null;
         try {
             jsonArray = convertBufferIntoJSONArray(getStringBufferFromRawFile());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        jsonObject = convertArrayToJSON(jsonArray);
+
+        //now insert the contents in jsonArray into the FTS table
+        int errorFlag = 0;
+        Uri uri;
+        ContentValues values = new ContentValues();
+        for (int i = 0; i<jsonArray.length(); i+=2) {
+            //if even, then Event Name
+            //if odd, then Event Type
+            try {
+                values.put(EventType_FTSEntry.COLUMN_EVENT_NAME, jsonArray.get(i).toString());
+                values.put(EventType_FTSEntry.COLUMN_EVENT_TYPE, jsonArray.get(i + 1).toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            uri = context.getContentResolver().insert(
+                    EventType_FTSEntry.CONTENT_URI,
+                    values
+            );
+            if (uri == null){
+                errorFlag = 1;
+                break;
+            }
+            values.clear();
+        }
+
+        if (errorFlag == 1) {
+            throw new SQLException(TAG + ": Data insertion has failed. Check the Async method.");
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+    }
+
+    private StringBuffer getStringBufferFromRawFile() {
+        String str;
+        StringBuffer buffer = new StringBuffer();
+        InputStream is = context.getResources().openRawResource(R.raw.list_short_workout);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            if (is != null) {
+                while ((str = reader.readLine()) != null) {
+                    buffer.append(str + "\n" );
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try { is.close(); } catch (Throwable ignore) {}
+        }
+        return buffer;
+    }
+
+    private JSONArray convertBufferIntoJSONArray(StringBuffer buffer) throws JSONException {
+        JSONArray jsonArray = new JSONArray();
+        String str = buffer.toString();
+
+        String[] array = str.split(",");
+        for (int i = 0; i<array.length; i++){
+            //in index i, put the processed version of the array
+            jsonArray.put(i, array[i].replace("\\", "").trim());
+            //successful up to here!
+        }
+
+        return jsonArray;
+    }
+
+    /**
+     *  This method converts the array thrown in → JSON object
+     * @param array
+     * @return
+     */
+    private JSONObject convertArrayToJSON(JSONArray array) {
+        JSONObject jsonObject = new JSONObject();
+
+        //if even number starting from 0 → workout name
+        //if odd number starting from 1 → category.
 
         return jsonObject;
     }
 
-    @Override
-    protected void onPostExecute(JSONObject jsonObject) {
-        super.onPostExecute(jsonObject);
-    }
 }

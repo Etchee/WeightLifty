@@ -23,5 +23,8 @@
     <item android:title="Decode Workout Resource"
         android:id="@+id/decode_workout_res"
         app:showAsAction="never" />
+    <item android:title="@string/reset_fts_table"
+        android:id="@+id/reset_FTS_table"
+        app:showAsAction="never" />
 
 </menu>

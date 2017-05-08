@@ -228,24 +228,13 @@ public class MainActivity extends AppCompatActivity {
         return numberOfDeletedRows;
     }
 
-    private int deleteAllTableData() {
+    private int deleteEventTypeTable() {
         int numberOfDeletedRows = getContentResolver().delete(
-                CalendarEntry.CONTENT_URI,
+                DataContract.EventType_FTSEntry.CONTENT_URI,
                 null,
-                null);
-
-        //if succeeded
-        if (numberOfDeletedRows > 0) {
-            Toast.makeText(this,
-                    "Deleted: " + String.valueOf(numberOfDeletedRows) + " rows",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        //if failed
-        if (numberOfDeletedRows <= 0) {
-            Toast.makeText(this, "reset failed", Toast.LENGTH_SHORT).show();
-        }
-
+                null
+        );
+        Toast.makeText(context, String.valueOf(numberOfDeletedRows) + " rows deleted.", Toast.LENGTH_SHORT).show();
         return numberOfDeletedRows;
     }
 
@@ -304,6 +293,10 @@ public class MainActivity extends AppCompatActivity {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
+                break;
+
+            case R.id.reset_FTS_table:
+                deleteEventTypeTable();
                 break;
 
         }
