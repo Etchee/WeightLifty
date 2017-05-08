@@ -117,7 +117,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
 
         //listView setup
-        listview.setOnClickListener(listViewOnClickSetup());
+        listview.setOnItemClickListener(listViewOnClickSetup());
     }
 
     @Override
@@ -626,7 +626,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 null
         );
         if (fakeCursor.moveToFirst()) {
-            Log.v(TAG, "Result cursor: " + DatabaseUtils.dumpCursorToString(fakeCursor));
+
         } else fakeCursor = null;
 
         return fakeCursor;

@@ -19,6 +19,8 @@ public class SearchAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private Cursor cursor;
     private String workout;
+    private String number_String;
+    private String hint_string;
 
     public SearchAdapter(Context context, Cursor cursor){
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -47,8 +49,12 @@ public class SearchAdapter extends BaseAdapter {
         if (view == null) {
             holder = new ViewHolder();
 
-            view = layoutInflater.inflate(R.layout.item_single_workout_events, null);
-            holder.workout_textView = (TextView) view.findViewById(R.id.name_workout_item_single_workout_events);
+            view = layoutInflater.inflate(R.layout.item_single_search, null);
+
+            holder.workout_textView = (TextView) view.findViewById(R.id.searchview_workout_text);
+            holder.hint_textView = (TextView)view.findViewById(R.id.searchview_hint_text);
+            holder.number_textView = (TextView)view.findViewById(R.id.searchview_number);
+
             view.setTag(holder);
         } else {
             holder = (ViewHolder)view.getTag();
@@ -56,15 +62,22 @@ public class SearchAdapter extends BaseAdapter {
 
         // get the workout name String
 
-        int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
+        int index_name = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
+        int index_hint = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE);
+//        int index_number = cursor.getColumnIndex("rowid");
+
         if (cursor.moveToNext()) {
-            workout = cursor.getString(index);
+            workout = cursor.getString(index_name);
+            hint_string = cursor.getString(index_hint);
+//            number_String = String.valueOf(cursor.getInt(index_number));
         }
 
         if (workout != null) {
             if (holder.workout_textView != null) {
                 //set the item name on the TextView
                 holder.workout_textView.setText(workout);
+                holder.hint_textView.setText(hint_string);
+//                holder.number_textView.setText(number_String);
             }
         }
         return view;
@@ -79,6 +92,8 @@ public class SearchAdapter extends BaseAdapter {
 
     private static class ViewHolder {
 
-        protected TextView workout_textView;
+        private TextView workout_textView;
+        private TextView hint_textView;
+        private TextView number_textView;
     }
 }

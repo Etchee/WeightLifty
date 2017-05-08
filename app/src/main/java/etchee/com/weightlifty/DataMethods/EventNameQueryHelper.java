@@ -16,7 +16,7 @@ public class EventNameQueryHelper extends AsyncTask<Integer, Void, String> {
     private Context context;
     private String eventString;
 
-    public QueryResponceHandler delegate = null;
+    public QueryResponceHandler queryResponceHandler = null;
 
     public EventNameQueryHelper(Context context) {
         this.context = context;
@@ -59,6 +59,6 @@ public class EventNameQueryHelper extends AsyncTask<Integer, Void, String> {
     @Override
     protected void onPostExecute(String eventString) {
         super.onPostExecute(eventString);
-        delegate.EventNameHolder(eventString);
+        queryResponceHandler.EventNameHolder(eventString);
     }
 }
