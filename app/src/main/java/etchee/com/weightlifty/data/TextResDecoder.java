@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -83,7 +84,6 @@ public class TextResDecoder {
                 else TF = false;
             } else{
                 TF = false;
-                Log.e(TAG, "Check method cursor has returned null");
             }
 
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public class TextResDecoder {
     }
 }
 
-class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Void> {
+class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
 
     private String TAG = getClass().getSimpleName();
     private Context context;
@@ -106,7 +106,7 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Integer doInBackground(Void... params) {
         //init JSON object
         JSONObject jsonObject = null;
         JSONArray jsonArray = null;
@@ -118,6 +118,7 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Void> {
 
         //now insert the contents in jsonArray into the FTS table
         int errorFlag = 0;
+        int numOfUpdatedRow = 0;
         Uri uri;
         ContentValues values = new ContentValues();
         for (int i = 0; i<jsonArray.length(); i+=2) {
@@ -138,18 +139,40 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Void> {
                 break;
             }
             values.clear();
+            numOfUpdatedRow++;
         }
 
         if (errorFlag == 1) {
             throw new SQLException(TAG + ": Data insertion has failed. Check the Async method.");
         }
 
-        return null;
+        return numOfUpdatedRow;
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(Integer result) {
+        super.onPostExecute(result);
+        Toast.makeText(context, "Inserted: " + String.valueOf(result) + " rows.",
+                Toast.LENGTH_SHORT).show();
+
+        //Debug purpose
+        queryFTSforDebug();
+    }
+
+    private void queryFTSforDebug() {
+        Cursor cursor = null;
+        try {
+              cursor = context.getContentResolver().query(
+                    EventType_FTSEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        } finally {
+            Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+            cursor.close();
+        }
     }
 
     private StringBuffer getStringBufferFromRawFile() {
@@ -179,24 +202,10 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Void> {
         for (int i = 0; i<array.length; i++){
             //in index i, put the processed version of the array
             jsonArray.put(i, array[i].replace("\\", "").trim());
+            jsonArray.get(i).toString();
             //successful up to here!
         }
 
         return jsonArray;
     }
-
-    /**
-     *  This method converts the array thrown in → JSON object
-     * @param array
-     * @return
-     */
-    private JSONObject convertArrayToJSON(JSONArray array) {
-        JSONObject jsonObject = new JSONObject();
-
-        //if even number starting from 0 → workout name
-        //if odd number starting from 1 → category.
-
-        return jsonObject;
-    }
-
 }
