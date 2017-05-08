@@ -1,5 +1,6 @@
 package etchee.com.weightlifty.Activity;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.R;
@@ -28,6 +30,7 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataDbHelper;
+import etchee.com.weightlifty.data.TextResDecoder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -287,19 +290,20 @@ public class MainActivity extends AppCompatActivity {
                 /**
                  * V/MainActivity: Columns in FTS are: [table_eventType_event_name, table_eventType_event_type]
                  */
-//                SQLiteDatabase db = dbHelper.getWritableDatabase();
-//                Cursor cursor = db.query(
-//                        DataContract.EventType_FTSEntry.TABLE_NAME,
-//                        null, null, null, null, null, null
-//                );
-//
-//                String columns[] = cursor.getColumnNames();
-//                Log.v(TAG, "Columns in FTS are: " +  Arrays.toString(columns));
                 break;
 
             case R.id.menu_view_tables:
                 Intent intent = new Intent(getApplicationContext(), DBviewer.class);
                 startActivity(intent);
+                break;
+
+            case R.id.decode_workout_res:
+                try {
+                    TextResDecoder decoder = new TextResDecoder(context, this);
+                    decoder.main();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 break;
 
         }

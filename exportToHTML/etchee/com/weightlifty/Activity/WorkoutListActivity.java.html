@@ -1,0 +1,614 @@
+<html>
+<head>
+<title>WorkoutListActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(204,120,50); }
+.s1 { color: rgb(169,183,198); }
+.s2 { color: rgb(98,151,85); font-style: italic; }
+.s3 { color: rgb(128,128,128); }
+.s4 { color: rgb(104,151,187); }
+.s5 { color: rgb(98,151,85); font-weight: bold; font-style: italic; }
+.s6 { color: rgb(106,135,89); }
+.ls0 { height: 1px; border-width: 0; color: rgb(77,77,77); background-color:rgb(77,77,77)}
+</style>
+</head>
+<BODY BGCOLOR="#2b2b2b">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+WorkoutListActivity.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">etchee.com.weightlifty.Activity</span><span class="s0">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">android.app.LoaderManager</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.app.SearchManager</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.content.AsyncQueryHandler</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.content.ContentResolver</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.content.ContentValues</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.content.Context</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.content.CursorLoader</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.content.Intent</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.content.Loader</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.database.Cursor</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.database.CursorIndexOutOfBoundsException</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.database.DatabaseUtils</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.database.SQLException</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.net.Uri</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.os.Bundle</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.support.annotation.Nullable</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.support.v4.content.ContextCompat</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.support.v4.view.MenuItemCompat</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.support.v7.app.AppCompatActivity</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.support.v7.widget.SearchView</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.support.v7.widget.Toolbar</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.text.SpannableString</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.text.Spanned</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.text.style.ForegroundColorSpan</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.util.Log</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.view.Menu</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.view.MenuItem</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.view.View</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.widget.AdapterView</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.widget.ListView</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">android.widget.Toast</span><span class="s0">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">com.github.clans.fab.FloatingActionButton</span><span class="s0">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">java.util.Calendar</span><span class="s0">;</span><span class="s1"> 
+ 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.Adapter.ListAdapter</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.Adapter.SearchAdapter</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.R</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.data.DBviewer</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.data.DataContract</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.data.DataContract.EventEntry</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.DataMethods.subIDfixHelper</span><span class="s0">;</span><span class="s1"> 
+</span><span class="s0">import </span><span class="s1">etchee.com.weightlifty.data.DataContract.EventType_FTSEntry</span><span class="s0">;</span><span class="s1"> 
+ 
+</span><span class="s2">/** 
+ *  From MainActivity -&gt; Loads today's data, display as a list. 
+ *  When SearchView is initiated -&gt; Performs a search, then pass the resulting cursor to SearchAdapter 
+ */</span><span class="s1"> 
+ 
+</span><span class="s0">public class </span><span class="s1">WorkoutListActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity </span><span class="s0">implements </span><span class="s1">LoaderManager.LoaderCallbacks&lt;Cursor&gt;</span><span class="s0">,</span><span class="s1"> 
+        SearchView.OnQueryTextListener</span><span class="s0">, </span><span class="s1">SearchView.OnCloseListener { 
+ 
+    </span><span class="s0">private </span><span class="s1">ListView listview</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">FloatingActionButton fab</span><span class="s0">;</span><span class="s1"> 
+ 
+    </span><span class="s3">//To make sure that there is only one instance because OpenHelper will serialize requests anyways</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">ContentResolver contentResolver</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private int </span><span class="s1">eventID</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private final int </span><span class="s1">CREATE_LOADER_ID = </span><span class="s4">1</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private final </span><span class="s1">String TAG = getClass().getSimpleName()</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">SearchManager searchManager</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">Toolbar toolbar</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">SearchView searchView</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">Context context</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">ListAdapter listAdapter</span><span class="s0">;</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">SearchAdapter searchAdapter</span><span class="s0">;</span><span class="s1"> 
+ <hr class="ls0">    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onCreate(@Nullable Bundle savedInstanceState) { 
+        </span><span class="s0">super</span><span class="s1">.onCreate(savedInstanceState)</span><span class="s0">;</span><span class="s1"> 
+ 
+        setContentView(R.layout.activity_list)</span><span class="s0">;</span><span class="s1"> 
+ 
+        context = getApplicationContext()</span><span class="s0">;</span><span class="s1"> 
+ 
+        toolbar = (Toolbar) findViewById(R.id.list_toolbar)</span><span class="s0">;</span><span class="s1"> 
+        setSupportActionBar(toolbar)</span><span class="s0">;</span><span class="s1"> 
+ 
+        contentResolver = getContentResolver()</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//fab setup</span><span class="s1"> 
+        fab = (FloatingActionButton) findViewById(R.id.list_fab)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s2">/** 
+         *  on FAB click, enter chooseEventMode 
+         */</span><span class="s1"> 
+        fab.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onClick(View v) { 
+                enterChooseEventMode()</span><span class="s0">;</span><span class="s1"> 
+            } 
+        })</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//for the empty view</span><span class="s1"> 
+        View emptyView = findViewById(R.id.view_empty)</span><span class="s0">;</span><span class="s1"> 
+        listview = (ListView)findViewById(R.id.listview_workout)</span><span class="s0">;</span><span class="s1"> 
+        listview.setEmptyView(emptyView)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//cursor init</span><span class="s1"> 
+        Cursor listCursor = initListCursor()</span><span class="s0">;</span><span class="s1"> 
+        Cursor eventTypeCursor = initEventTypeCursor()</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//adapter initialization</span><span class="s1"> 
+        searchAdapter = </span><span class="s0">new </span><span class="s1">SearchAdapter(context</span><span class="s0">, </span><span class="s1">eventTypeCursor)</span><span class="s0">;</span><span class="s1"> 
+        listAdapter = </span><span class="s0">new </span><span class="s1">ListAdapter(getApplicationContext()</span><span class="s0">, </span><span class="s1">listCursor</span><span class="s0">, </span><span class="s4">0</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+        listview.setAdapter(listAdapter)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//Init the loader</span><span class="s1"> 
+ 
+        </span><span class="s3">//only display today's data for now</span><span class="s1"> 
+        Bundle bundle = </span><span class="s0">new </span><span class="s1">Bundle()</span><span class="s0">;</span><span class="s1"> 
+        bundle.putInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE</span><span class="s0">, </span><span class="s1">getDateAsInt())</span><span class="s0">;</span><span class="s1"> 
+        getLoaderManager().initLoader(CREATE_LOADER_ID</span><span class="s0">, </span><span class="s1">bundle</span><span class="s0">, this</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s2">/** 
+         *  When an item on the listView is clicked, get the (INT) item id, put on the bundle and deliver 
+         *      to EditActivity. 
+         */</span><span class="s1"> 
+        listview.setOnItemClickListener(</span><span class="s0">new </span><span class="s1">AdapterView.OnItemClickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onItemClick(AdapterView&lt;?&gt; adapterView</span><span class="s0">, </span><span class="s1">View view</span><span class="s0">, int </span><span class="s1">position</span><span class="s0">, long </span><span class="s1">id) { 
+                launchEditActivityWithEventID(position)</span><span class="s0">;</span><span class="s1"> 
+            } 
+        })</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onPrepareOptionsMenu(Menu menu) { 
+        deleteOptionRed(menu)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">return super</span><span class="s1">.onPrepareOptionsMenu(menu)</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+ <hr class="ls0">    </span><span class="s2">/** 
+     *  When creating the option, define the searchView. (Pretty sure this is done right) 
+     * </span><span class="s5">@param </span><span class="s2">menu menu layout 
+     * </span><span class="s5">@return  </span><span class="s2">true 
+     */</span><span class="s1"> 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onCreateOptionsMenu(Menu menu) { 
+        getMenuInflater().inflate(R.menu.menu_list</span><span class="s0">, </span><span class="s1">menu)</span><span class="s0">;</span><span class="s1"> 
+ 
+        searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">final </span><span class="s1">MenuItem item = menu.findItem(R.id.action_search_button)</span><span class="s0">;</span><span class="s1"> 
+        MenuItemCompat.expandActionView(item)</span><span class="s0">;</span><span class="s1"> 
+        searchView = (SearchView) MenuItemCompat.getActionView(item)</span><span class="s0">;</span><span class="s1"> 
+        searchView.setQueryHint(getString(R.string.hint_search_events))</span><span class="s0">;</span><span class="s1"> 
+        searchView.setOnQueryTextListener(</span><span class="s0">this</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">return true;</span><span class="s1"> 
+    } <hr class="ls0">    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onOptionsItemSelected(MenuItem item) { 
+ 
+        </span><span class="s0">switch </span><span class="s1">(item.getItemId()) { 
+ 
+            </span><span class="s0">case </span><span class="s1">R.id.action_search_button: 
+                onSearchRequested()</span><span class="s0">;</span><span class="s1"> 
+                </span><span class="s0">break;</span><span class="s1"> 
+ 
+            </span><span class="s0">case </span><span class="s1">R.id.menu_delete_all_events: 
+                </span><span class="s0">int </span><span class="s1">numOfDeletedRows = deleteEventTableDatabase()</span><span class="s0">;</span><span class="s1"> 
+                Toast.makeText(WorkoutListActivity.</span><span class="s0">this, </span><span class="s1">String.valueOf(numOfDeletedRows) + </span><span class="s6">&quot; deleted.&quot;</span><span class="s0">,</span><span class="s1"> 
+                        Toast.LENGTH_SHORT).show()</span><span class="s0">;</span><span class="s1"> 
+                </span><span class="s0">break;</span><span class="s1"> 
+            </span><span class="s0">case </span><span class="s1">R.id.menu_insert_event: 
+                event_insertDummyValues()</span><span class="s0">;</span><span class="s1"> 
+                </span><span class="s0">break;</span><span class="s1"> 
+ 
+            </span><span class="s0">case </span><span class="s1">R.id.menu_view_tables: 
+                Intent intent = </span><span class="s0">new </span><span class="s1">Intent(getApplicationContext()</span><span class="s0">, </span><span class="s1">DBviewer.</span><span class="s0">class</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+                startActivity(intent)</span><span class="s0">;</span><span class="s1"> 
+                </span><span class="s0">break;</span><span class="s1"> 
+        } 
+        </span><span class="s0">return super</span><span class="s1">.onOptionsItemSelected(item)</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s2">/** 
+     * When user clicks FAB, this method is called. 
+     * User will direcly start typing their desired events. 
+     * 
+     *  1. searchView must open 
+     *  2. Wipe the contents in the listView. 
+     *  3. Hook up a new adapter. 
+     */</span><span class="s1"> 
+    </span><span class="s0">private void </span><span class="s1">enterChooseEventMode() { 
+        searchView.setIconified(</span><span class="s0">false</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+        listview.setAdapter(</span><span class="s0">null</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private int </span><span class="s1">deleteEventTableDatabase() { 
+        </span><span class="s0">int </span><span class="s1">numberOfDeletedRows = getContentResolver().delete( 
+                EventEntry.CONTENT_URI</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s0">null,</span><span class="s1"> 
+                </span><span class="s0">null</span><span class="s1"> 
+        )</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">return </span><span class="s1">numberOfDeletedRows</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private int </span><span class="s1">getEventID() { 
+        </span><span class="s0">return </span><span class="s1">eventID</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private void </span><span class="s1">setEventID(</span><span class="s0">int </span><span class="s1">eventID) { 
+        </span><span class="s0">this</span><span class="s1">.eventID = eventID</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private void </span><span class="s1">event_insertDummyValues() { 
+ 
+        ContentValues values = </span><span class="s0">new </span><span class="s1">ContentValues()</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">int </span><span class="s1">rep_count = </span><span class="s4">7</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">set_count = </span><span class="s4">5</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">date = getDateAsInt()</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">weight_count = </span><span class="s4">70</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">sub_ID = getNextSub_id()</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">eventID = </span><span class="s4">5</span><span class="s0">;</span><span class="s1"> 
+ 
+        values.put(EventEntry.COLUMN_SUB_ID</span><span class="s0">, </span><span class="s1">sub_ID)</span><span class="s0">;</span><span class="s1"> 
+        values.put(EventEntry.COLUMN_DATE</span><span class="s0">, </span><span class="s1">date)</span><span class="s0">;</span><span class="s1"> 
+        values.put(EventEntry.COLUMN_EVENT_ID</span><span class="s0">, </span><span class="s1">eventID)</span><span class="s0">;</span><span class="s1"> 
+        values.put(EventEntry.COLUMN_REP_COUNT</span><span class="s0">, </span><span class="s1">rep_count)</span><span class="s0">;</span><span class="s1"> 
+        values.put(EventEntry.COLUMN_SET_COUNT</span><span class="s0">, </span><span class="s1">set_count)</span><span class="s0">;</span><span class="s1"> 
+        values.put(EventEntry.COLUMN_WEIGHT_COUNT</span><span class="s0">, </span><span class="s1">weight_count)</span><span class="s0">;</span><span class="s1"> 
+ 
+        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI</span><span class="s0">, </span><span class="s1">values)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(uri == </span><span class="s0">null</span><span class="s1">) </span><span class="s0">throw new </span><span class="s1">IllegalArgumentException(</span><span class="s6">&quot;Calendar table (insert dummy)&quot; </span><span class="s1">+ 
+                </span><span class="s6">&quot;failed to insert data. check the MainActivity method and the table.&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+ 
+    } 
+ <hr class="ls0">    </span><span class="s0">private int </span><span class="s1">getNextSub_id() { 
+        </span><span class="s0">int </span><span class="s1">sub_id</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">date = getDateAsInt()</span><span class="s0">;</span><span class="s1"> 
+ 
+        String projection[] = </span><span class="s0">new </span><span class="s1">String[]{EventEntry.COLUMN_DATE</span><span class="s0">, </span><span class="s1">EventEntry.COLUMN_SUB_ID}</span><span class="s0">;</span><span class="s1"> 
+        String selection = EventEntry.COLUMN_DATE + </span><span class="s6">&quot;=?&quot;</span><span class="s0">;</span><span class="s1"> 
+        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{String.valueOf(date)}</span><span class="s0">;</span><span class="s1"> 
+        Cursor cursor = </span><span class="s0">null;</span><span class="s1"> 
+ 
+        </span><span class="s0">try </span><span class="s1">{ 
+            cursor = getContentResolver().query( 
+                    EventEntry.CONTENT_URI</span><span class="s0">,</span><span class="s1"> 
+                    projection</span><span class="s0">,</span><span class="s1"> 
+                    selection</span><span class="s0">,</span><span class="s1"> 
+                    selectionArgs</span><span class="s0">,</span><span class="s1"> 
+                    </span><span class="s0">null</span><span class="s1"> 
+            )</span><span class="s0">;</span><span class="s1"> 
+ 
+            </span><span class="s3">//if cursor comes back, there is already some rows</span><span class="s1"> 
+            </span><span class="s0">if </span><span class="s1">(cursor.moveToLast()) { 
+                </span><span class="s0">int </span><span class="s1">index = cursor.getColumnIndex(EventEntry.COLUMN_SUB_ID)</span><span class="s0">;</span><span class="s1"> 
+                sub_id = cursor.getInt(index) + </span><span class="s4">1</span><span class="s0">;</span><span class="s1"> 
+ 
+            } </span><span class="s0">else </span><span class="s1">{ 
+                sub_id = </span><span class="s4">0</span><span class="s0">;</span><span class="s1"> 
+            } 
+        } </span><span class="s0">finally </span><span class="s1">{ 
+            cursor.close()</span><span class="s0">;</span><span class="s1"> 
+        } 
+ 
+ 
+        </span><span class="s0">return </span><span class="s1">sub_id</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+ 
+ <hr class="ls0">    </span><span class="s2">/** 
+     * </span><span class="s5">@param </span><span class="s2">position equals to that of the sub_id in the event table. 
+     *                 This method find the specific row with the sub_id, then get the event_id 
+     *                 back in that row. 
+     */</span><span class="s1"> 
+    </span><span class="s0">private void </span><span class="s1">launchEditActivityWithEventID(</span><span class="s0">final int </span><span class="s1">position) { 
+ 
+        </span><span class="s0">int </span><span class="s1">date_today = getDateAsInt()</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//Define async query handler</span><span class="s1"> 
+        AsyncQueryHandler queryHandler = </span><span class="s0">new </span><span class="s1">AsyncQueryHandler(contentResolver) { 
+ 
+            @Override 
+            </span><span class="s0">protected void </span><span class="s1">onQueryComplete(</span><span class="s0">int </span><span class="s1">token</span><span class="s0">, </span><span class="s1">Object cookie</span><span class="s0">, </span><span class="s1">Cursor cursor) { 
+                </span><span class="s0">int </span><span class="s1">eventID = -</span><span class="s4">1</span><span class="s0">;</span><span class="s1"> 
+ 
+                </span><span class="s0">try </span><span class="s1">{ 
+                    </span><span class="s3">//Token will be passed to prevent confusion on multi querying</span><span class="s1"> 
+                    </span><span class="s0">if </span><span class="s1">(token == DataContract.GlobalConstants.QUERY_EVENT_ID) { 
+                        </span><span class="s0">if </span><span class="s1">(cursor.moveToFirst()) { 
+                            </span><span class="s0">int </span><span class="s1">index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID)</span><span class="s0">;</span><span class="s1"> 
+                            eventID = Integer.parseInt(cursor.getString(index))</span><span class="s0">;</span><span class="s1"> 
+ 
+                        } 
+ 
+                        </span><span class="s0">else if </span><span class="s1">(!cursor.moveToFirst()) </span><span class="s0">throw new </span><span class="s1">CursorIndexOutOfBoundsException(</span><span class="s6">&quot;EventID query: Cursor might be empty&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+ 
+                    } </span><span class="s0">else throw new </span><span class="s1">IllegalArgumentException(</span><span class="s6">&quot;Invalid token received at Event ID query.&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+                } </span><span class="s0">catch </span><span class="s1">(CursorIndexOutOfBoundsException e) { 
+                    e.printStackTrace()</span><span class="s0">;</span><span class="s1"> 
+                } </span><span class="s0">catch </span><span class="s1">(IllegalArgumentException e) { 
+                    e.printStackTrace()</span><span class="s0">;</span><span class="s1"> 
+                }</span><span class="s0">finally </span><span class="s1">{ 
+                    cursor.close()</span><span class="s0">;</span><span class="s1"> 
+                } 
+ 
+                setEventID(eventID)</span><span class="s0">;</span><span class="s1"> 
+ 
+                Intent intent = </span><span class="s0">new </span><span class="s1">Intent(getApplicationContext()</span><span class="s0">, </span><span class="s1">EditEventActivity.</span><span class="s0">class</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+                Bundle bundle = </span><span class="s0">new </span><span class="s1">Bundle()</span><span class="s0">;</span><span class="s1"> 
+                bundle.putInt(DataContract.GlobalConstants.PASS_EVENT_ID</span><span class="s0">, </span><span class="s1">getEventID())</span><span class="s0">;</span><span class="s1"> 
+                bundle.putInt(DataContract.GlobalConstants.PASS_SUB_ID</span><span class="s0">, </span><span class="s1">position)</span><span class="s0">;</span><span class="s1"> 
+                bundle.putInt(DataContract.GlobalConstants.PASS_SELECTED_DATE</span><span class="s0">, </span><span class="s1">getDateAsInt())</span><span class="s0">;</span><span class="s1"> 
+                intent.putExtras(bundle)</span><span class="s0">;</span><span class="s1"> 
+                startActivity(intent)</span><span class="s0">;</span><span class="s1"> 
+            } 
+        }</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//projection</span><span class="s1"> 
+        String projection[] = </span><span class="s0">new </span><span class="s1">String[]{ 
+                EventEntry.COLUMN_DATE</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_SUB_ID</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_EVENT_ID 
+        }</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//selection</span><span class="s1"> 
+        String selection = EventEntry.COLUMN_DATE + </span><span class="s6">&quot;=?&quot; </span><span class="s1">+ </span><span class="s6">&quot; AND &quot; </span><span class="s1">+ EventEntry.COLUMN_SUB_ID + </span><span class="s6">&quot;=?&quot;</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//selectionArgs</span><span class="s1"> 
+        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{ 
+                String.valueOf(date_today)</span><span class="s0">,</span><span class="s1"> 
+                String.valueOf(position) 
+        }</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">//Finally, fire the query!</span><span class="s1"> 
+        queryHandler.startQuery( 
+                DataContract.GlobalConstants.QUERY_EVENT_ID</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s0">null,</span><span class="s1"> 
+                EventEntry.CONTENT_URI</span><span class="s0">,</span><span class="s1"> 
+                projection</span><span class="s0">,</span><span class="s1"> 
+                selection</span><span class="s0">,</span><span class="s1"> 
+                selectionArgs</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s0">null</span><span class="s1"> 
+        )</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private </span><span class="s1">Cursor initListCursor() { 
+        Cursor cursor</span><span class="s0">;</span><span class="s1"> 
+ 
+        String projection[] = { 
+                EventEntry._ID</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_WEIGHT_COUNT</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_REP_COUNT</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_SUB_ID</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_SET_COUNT</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_EVENT_ID 
+        }</span><span class="s0">;</span><span class="s1"> 
+ 
+        cursor = contentResolver.query( 
+                EventEntry.CONTENT_URI</span><span class="s0">,</span><span class="s1"> 
+                projection</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s0">null,</span><span class="s1"> 
+                </span><span class="s0">null,</span><span class="s1"> 
+                </span><span class="s0">null </span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">return </span><span class="s1">cursor</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private </span><span class="s1">Cursor initEventTypeCursor() { 
+        Cursor cursor</span><span class="s0">;</span><span class="s1"> 
+ 
+        String projection[] = { 
+                EventType_FTSEntry.COLUMN_ROW_ID</span><span class="s0">,</span><span class="s1"> 
+                EventType_FTSEntry.COLUMN_EVENT_TYPE</span><span class="s0">,</span><span class="s1"> 
+                EventType_FTSEntry.COLUMN_EVENT_NAME 
+        }</span><span class="s0">;</span><span class="s1"> 
+ 
+        String selection = EventType_FTSEntry.COLUMN_ROW_ID + </span><span class="s6">&quot;=?&quot;</span><span class="s0">;</span><span class="s1"> 
+        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{ String.valueOf(</span><span class="s4">1</span><span class="s1">) }</span><span class="s0">;</span><span class="s1"> 
+ 
+        cursor = contentResolver.query( 
+                EventType_FTSEntry.CONTENT_URI</span><span class="s0">,</span><span class="s1"> 
+                projection</span><span class="s0">,</span><span class="s1"> 
+                selection</span><span class="s0">,</span><span class="s1"> 
+                selectionArgs</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s0">null</span><span class="s1"> 
+        )</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(cursor != </span><span class="s0">null</span><span class="s1">) </span><span class="s0">return </span><span class="s1">cursor</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">else throw new </span><span class="s1">NullPointerException(TAG + </span><span class="s6">&quot;: FTS table cursor initialization has failed&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private int </span><span class="s1">getDateAsInt() { 
+        Calendar calendar = Calendar.getInstance()</span><span class="s0">;</span><span class="s1"> 
+        calendar.setTimeInMillis(System.currentTimeMillis())</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">year = calendar.get(Calendar.YEAR)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">month = calendar.get(Calendar.MONTH) + </span><span class="s4">1</span><span class="s0">;   </span><span class="s3">//month starts from zero</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">day = calendar.get(Calendar.DAY_OF_MONTH)</span><span class="s0">;</span><span class="s1"> 
+ 
+        String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">return </span><span class="s1">Integer.parseInt(concatenated)</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+ <hr class="ls0">    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onResume() { 
+        </span><span class="s0">super</span><span class="s1">.onResume()</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">new </span><span class="s1">subIDfixHelper(getApplicationContext()).execute(getDateAsInt())</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s2">/** 
+     * 
+     * </span><span class="s5">@param </span><span class="s2">id Just select any desired ID. Here I define in the global constant 
+     * </span><span class="s5">@param </span><span class="s2">bundle  pass any object in bundle, no need to pass anything in here. 
+     * </span><span class="s5">@return  </span><span class="s2">defined cursor 
+     */</span><span class="s1"> 
+    @Override 
+    </span><span class="s0">public </span><span class="s1">Loader&lt;Cursor&gt; onCreateLoader(</span><span class="s0">int </span><span class="s1">id</span><span class="s0">, </span><span class="s1">Bundle bundle) { 
+ 
+        </span><span class="s2">/** 
+         *  ListView will contain specified date's events. 
+         *  Required components 
+         * 
+         *  1. date to specify date 
+         *  2. event ID to get the workout name 
+         *  3. set_count 
+         *  4. rep_count 
+         * 
+         */</span><span class="s1"> 
+ 
+        </span><span class="s0">int </span><span class="s1">date</span><span class="s0">;</span><span class="s1"> 
+ 
+        date = bundle.getInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE)</span><span class="s0">;</span><span class="s1"> 
+ 
+        String projection[] = </span><span class="s0">new </span><span class="s1">String[]{ 
+                EventEntry._ID</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_DATE</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_EVENT_ID</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_WEIGHT_COUNT</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_SET_COUNT</span><span class="s0">,</span><span class="s1"> 
+                EventEntry.COLUMN_REP_COUNT 
+        }</span><span class="s0">;</span><span class="s1"> 
+ 
+        String selection = EventEntry.COLUMN_DATE + </span><span class="s6">&quot;=?&quot;</span><span class="s0">;</span><span class="s1"> 
+        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{String.valueOf(date)}</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">return new </span><span class="s1">CursorLoader( 
+                </span><span class="s0">this,</span><span class="s1"> 
+                EventEntry.CONTENT_URI</span><span class="s0">,</span><span class="s1"> 
+                projection</span><span class="s0">,</span><span class="s1"> 
+                selection</span><span class="s0">,</span><span class="s1"> 
+                selectionArgs</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s0">null</span><span class="s1"> 
+        )</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    @Override 
+    </span><span class="s0">public void </span><span class="s1">onLoadFinished(Loader&lt;Cursor&gt; loader</span><span class="s0">, </span><span class="s1">Cursor cursor) { 
+        listAdapter.swapCursor(cursor)</span><span class="s0">;</span><span class="s1"> 
+        listAdapter.notifyDataSetChanged()</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    @Override 
+    </span><span class="s0">public void </span><span class="s1">onLoaderReset(Loader&lt;Cursor&gt; loader) { 
+        listAdapter.swapCursor(</span><span class="s0">null</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+ <hr class="ls0">    </span><span class="s3">//if searchView is expanded, then collapse</span><span class="s1"> 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onBackPressed() { 
+       </span><span class="s0">if </span><span class="s1">(!searchView.isIconified()) { 
+           searchView.onActionViewCollapsed()</span><span class="s0">;</span><span class="s1"> 
+           listview.setAdapter(listAdapter)</span><span class="s0">;</span><span class="s1"> 
+       } </span><span class="s0">else </span><span class="s1">{ 
+           </span><span class="s0">super</span><span class="s1">.onBackPressed()</span><span class="s0">;</span><span class="s1"> 
+       } 
+    } 
+ <hr class="ls0">    </span><span class="s0">private void </span><span class="s1">deleteOptionRed(Menu menu) { 
+        </span><span class="s3">//set delete menu text to red color</span><span class="s1"> 
+        MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events)</span><span class="s0">;</span><span class="s1"> 
+        SpannableString string = </span><span class="s0">new </span><span class="s1">SpannableString(delete_all_events.getTitle())</span><span class="s0">;</span><span class="s1"> 
+        string.setSpan( 
+                </span><span class="s0">new </span><span class="s1">ForegroundColorSpan(ContextCompat.getColor(WorkoutListActivity.</span><span class="s0">this, </span><span class="s1">R.color.colorPrimary))</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s4">0</span><span class="s0">,</span><span class="s1"> 
+                string.length()</span><span class="s0">,</span><span class="s1"> 
+                Spanned.SPAN_PRIORITY)</span><span class="s0">;</span><span class="s1"> 
+ 
+        delete_all_events.setTitle(string)</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s0">private void </span><span class="s1">eventType_insertDummyValues() { 
+ 
+        ContentValues dummyValues = </span><span class="s0">new </span><span class="s1">ContentValues()</span><span class="s0">;</span><span class="s1"> 
+ 
+        dummyValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME</span><span class="s0">, </span><span class="s6">&quot;Test Event&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+ 
+        Uri uri = getContentResolver().insert(DataContract.EventTypeEntry.CONTENT_URI</span><span class="s0">, </span><span class="s1">dummyValues)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">if </span><span class="s1">(uri == </span><span class="s0">null</span><span class="s1">) </span><span class="s0">throw new </span><span class="s1">IllegalArgumentException(</span><span class="s6">&quot;Calendar table (inser dummy)&quot; </span><span class="s1">+ 
+                </span><span class="s6">&quot;failed to insert data. check the MainActivity method and the table.&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1"> 
+ 
+ 
+        Toast.makeText(</span><span class="s0">this, </span><span class="s6">&quot;EventType inserted&quot;</span><span class="s0">, </span><span class="s1">Toast.LENGTH_SHORT).show()</span><span class="s0">;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    </span><span class="s2">/** 
+     *      When SearchView is closed, the listView should have the list of today's workouts 
+     * </span><span class="s5">@return </span><span class="s2">false 
+     */</span><span class="s1"> 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onClose() { 
+ 
+        listview.setAdapter(listAdapter)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s0">return false;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onQueryTextSubmit(String query) { 
+        Log.v(TAG</span><span class="s0">, </span><span class="s6">&quot;Text submitted: &quot; </span><span class="s1">+ query)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s3">//INITIATE SEARCH</span><span class="s1"> 
+        Cursor cursor = queryWorkout(query)</span><span class="s0">;</span><span class="s1"> 
+        listview.setAdapter(searchAdapter)</span><span class="s0">;</span><span class="s1"> 
+        searchAdapter.swapCursor(cursor)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">return false;</span><span class="s1"> 
+    } 
+ <hr class="ls0">    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onQueryTextChange(String newText) { 
+        Log.v(TAG</span><span class="s0">, </span><span class="s6">&quot;Text changed: &quot; </span><span class="s1">+ newText)</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s3">//INITIATE SEARCH</span><span class="s1"> 
+</span><span class="s3">//        Cursor cursor = queryWorkout(newText);</span><span class="s1"> 
+</span><span class="s3">//        listview.setAdapter(new SearchAdapter(context, cursor));</span><span class="s1"> 
+        </span><span class="s0">return false;</span><span class="s1"> 
+    } 
+ 
+ 
+ <hr class="ls0">    </span><span class="s2">/** 
+     *  Search method that returns a cursor. 
+     * 
+     * </span><span class="s5">@param </span><span class="s2">inputText User input text sent from the UI 
+     * </span><span class="s5">@return </span><span class="s2">cursor that contains the results of the search 
+     * </span><span class="s5">@throws </span><span class="s2">SQLException if search fails. 
+     */</span><span class="s1"> 
+    </span><span class="s0">public </span><span class="s1">Cursor queryWorkout(String inputText) { 
+        Log.w(TAG</span><span class="s0">, </span><span class="s1">inputText)</span><span class="s0">;</span><span class="s1"> 
+ 
+        </span><span class="s3">/* 
+                Original sample code: 
+                String query = &quot;SELECT docid as _id,&quot; + 
+                KEY_CUSTOMER + &quot;,&quot; + 
+                KEY_NAME + &quot;,&quot; + 
+                &quot;(&quot; + KEY_ADDRESS1 + &quot;||&quot; + 
+                &quot;(case when &quot; + KEY_ADDRESS2 + &quot;&gt; '' then '\n' || &quot; 
+                + KEY_ADDRESS2 + &quot; else '' end)) as &quot; + KEY_ADDRESS + &quot;,&quot; + 
+                KEY_ADDRESS1 + &quot;,&quot; + 
+                KEY_ADDRESS2 + &quot;,&quot; + 
+                KEY_CITY + &quot;,&quot; + 
+                KEY_STATE + &quot;,&quot; + 
+                KEY_ZIP + 
+                &quot; from &quot; + FTS_VIRTUAL_TABLE + 
+                &quot; where &quot; + KEY_SEARCH + &quot; MATCH '&quot; + inputText + &quot;';&quot;; 
+         */</span><span class="s1"> 
+ 
+        </span><span class="s3">/* 
+                Original sample code output: 
+                SELECT docid as _id,customer,name,(address1||(case when address2&gt; '' then ' 
+               ' || address2 else '' end)) as address,address1,address2,city,state,zipCode from 
+               CustomerInfo where searchData MATCH 'Piz*'; 
+         */</span><span class="s1"> 
+ 
+</span><span class="s3">//        String query = &quot;SELECT &quot; + EventType_FTSEntry.COLUMN_ROW_ID + &quot; as _id,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                KEY_CUSTOMER + &quot;,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                KEY_NAME + &quot;,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                &quot;(&quot; + KEY_ADDRESS1 + &quot;||&quot; +</span><span class="s1"> 
+</span><span class="s3">//                &quot;(case when &quot; + KEY_ADDRESS2 + &quot;&gt; '' then '\n' || &quot;</span><span class="s1"> 
+</span><span class="s3">//                + KEY_ADDRESS2 + &quot; else '' end)) as &quot; + KEY_ADDRESS + &quot;,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                KEY_ADDRESS1 + &quot;,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                KEY_ADDRESS2 + &quot;,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                KEY_CITY + &quot;,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                KEY_STATE + &quot;,&quot; +</span><span class="s1"> 
+</span><span class="s3">//                KEY_ZIP +</span><span class="s1"> 
+</span><span class="s3">//                &quot; from &quot; + FTS_VIRTUAL_TABLE +</span><span class="s1"> 
+</span><span class="s3">//                &quot; where &quot; + KEY_SEARCH + &quot; MATCH '&quot; + inputText + &quot;';&quot;;</span><span class="s1"> 
+ 
+        </span><span class="s3">//Fake cursor for now</span><span class="s1"> 
+        String fakeProjection[] = </span><span class="s0">new </span><span class="s1">String[]{ 
+                EventType_FTSEntry.COLUMN_ROW_ID</span><span class="s0">,</span><span class="s1"> 
+                EventType_FTSEntry.COLUMN_EVENT_NAME</span><span class="s0">,</span><span class="s1"> 
+                EventType_FTSEntry.COLUMN_EVENT_TYPE 
+        }</span><span class="s0">;</span><span class="s1"> 
+ 
+        Cursor fakeCursor = getContentResolver().query( 
+                EventType_FTSEntry.CONTENT_URI</span><span class="s0">,</span><span class="s1"> 
+                fakeProjection</span><span class="s0">,</span><span class="s1"> 
+                </span><span class="s0">null,</span><span class="s1"> 
+                </span><span class="s0">null,</span><span class="s1"> 
+                </span><span class="s0">null</span><span class="s1"> 
+        )</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(fakeCursor.moveToFirst()) { 
+            Log.v(TAG</span><span class="s0">, </span><span class="s6">&quot;Result cursor: &quot; </span><span class="s1">+ DatabaseUtils.dumpCursorToString(fakeCursor))</span><span class="s0">;</span><span class="s1"> 
+        } </span><span class="s0">else </span><span class="s1">fakeCursor = </span><span class="s0">null;</span><span class="s1"> 
+ 
+        </span><span class="s0">return </span><span class="s1">fakeCursor</span><span class="s0">;</span><span class="s1"> 
+    } 
+ 
+} 
+ 
+</span></pre>
+</body>
+</html>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -14,29 +15,41 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import etchee.com.weightlifty.R;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+
 /**
- * Created by rikutoechigoya on 2017/05/07.
+ *  This class is called in the MainActivity's option menu
+ *
+ *  Function 1:
  */
 
-public class WorkoutResourceDownloader extends AsyncTask {
+public class TextResDecoder extends AsyncTask {
 
     private Context context;
     private final String TAG = getClass().getSimpleName();
+    private Activity activity;
 
-    public WorkoutResourceDownloader(Context context, Activity activity) throws FileNotFoundException {
+    public TextResDecoder(Context context, Activity activity) throws FileNotFoundException {
         this.context = context;
+        this.activity = activity;
+    }
 
+    public void main() {
+        if (!checkIfEventTypeIsOk()) {
+            convertBufferIntoArrayList(getStringBufferFromRawFile());
+        } else Toast.makeText(activity, "EventType data optimized!", Toast.LENGTH_SHORT).show();
 
     }
 
     private StringBuffer getStringBufferFromRawFile() {
-        String str = "";
+        String str;
         StringBuffer buffer = new StringBuffer();
-        InputStream is = context.getResources().openRawResource(R.raw.raw_list_workout);
+        InputStream is = context.getResources().openRawResource(R.raw.list_short_workout);
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             if (is != null) {
@@ -52,9 +65,17 @@ public class WorkoutResourceDownloader extends AsyncTask {
         return buffer;
     }
 
-    private JSONObject convertBufferIntoJSON(StringBuffer buffer) {
-        
+    private ArrayList<String> convertBufferIntoArrayList(StringBuffer buffer) {
+        ArrayList<String> list = new ArrayList<>();
+        String str = buffer.toString();
+        Log.v(TAG, str);
+        String[] array = str.split(",");
+        for (int i = 0; i<array.length; i++){
+            System.out.println(array[i]);
+        }
+        return list;
     }
+
 
 
     /**
@@ -68,6 +89,7 @@ public class WorkoutResourceDownloader extends AsyncTask {
         Boolean TF = null;
         Cursor cursor = null;
         try {
+            String eventName;
 
             String projection[] = new String[]{
                     DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
@@ -83,16 +105,19 @@ public class WorkoutResourceDownloader extends AsyncTask {
                     selectionArgs,
                     null
             );
-
             int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
-            String eventName = cursor.getString(index);
 
-            if (eventName != null) TF = true;
-            else TF = false;
+            if (cursor.moveToFirst()){
+                eventName = cursor.getString(index);
+                if (!eventName.equals("")) TF = true;
+                else TF = false;
+            } else{
+                TF = false;
+                Log.e(TAG, "Check method cursor has returned null");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new NullPointerException(TAG + ": EventType checking has failed. Check the method.");
         } finally {
             cursor.close();
         }

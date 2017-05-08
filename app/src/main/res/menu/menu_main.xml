@@ -20,5 +20,8 @@
     <item android:title="@string/launch_searchactivity"
         android:id="@+id/menu_launch_searchactivity"
         app:showAsAction="never" />
+    <item android:title="Decode Workout Resource"
+        android:id="@+id/decode_workout_res"
+        app:showAsAction="never" />
 
 </menu>
