@@ -7,20 +7,18 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import etchee.com.weightlifty.R;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  *  This class is called in the MainActivity's option menu
@@ -28,7 +26,7 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
  *  Function 1:
  */
 
-public class TextResDecoder extends AsyncTask {
+public class TextResDecoder extends AsyncTask<Void, Void, JSONObject> {
 
     private Context context;
     private final String TAG = getClass().getSimpleName();
@@ -41,9 +39,9 @@ public class TextResDecoder extends AsyncTask {
 
     public void main() {
         if (!checkIfEventTypeIsOk()) {
-            convertBufferIntoArrayList(getStringBufferFromRawFile());
+            Log.v(TAG, "Optimizing db process starts:");
+            //fire AsyncTask here
         } else Toast.makeText(activity, "EventType data optimized!", Toast.LENGTH_SHORT).show();
-
     }
 
     private StringBuffer getStringBufferFromRawFile() {
@@ -65,17 +63,34 @@ public class TextResDecoder extends AsyncTask {
         return buffer;
     }
 
-    private ArrayList<String> convertBufferIntoArrayList(StringBuffer buffer) {
-        ArrayList<String> list = new ArrayList<>();
+    private JSONArray convertBufferIntoJSONArray(StringBuffer buffer) throws JSONException {
+        JSONArray jsonArray = null;
         String str = buffer.toString();
-        Log.v(TAG, str);
+
         String[] array = str.split(",");
         for (int i = 0; i<array.length; i++){
-            System.out.println(array[i]);
+            //in index i, put the processed version of the array
+            jsonArray.put(i, array[i].replace("\\", "").trim());
+
+            System.out.println(jsonArray.get(i).toString());
         }
-        return list;
+
+        return jsonArray;
     }
 
+    /**
+     *  This method converts the array thrown in → JSON object
+     * @param array
+     * @return
+     */
+    private JSONObject convertArrayToJSON(JSONArray array) {
+        JSONObject jsonObject = new JSONObject();
+
+        //if even number starting from 0 → workout name
+        //if odd number starting from 1 → category.
+
+        return jsonObject;
+    }
 
 
     /**
@@ -125,8 +140,28 @@ public class TextResDecoder extends AsyncTask {
         return TF;
     }
 
+    /**
+     *  Async process to optimize the database (input from raw file into FTS table)
+     * @param params nothing passed here
+     * @return JSON Object sorted (workout and muscle category)
+     */
     @Override
-    protected Object doInBackground(Object[] params) {
-        return null;
+    protected JSONObject doInBackground(Void...params) {
+        //init JSON object
+        JSONObject jsonObject;
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = convertBufferIntoJSONArray(getStringBufferFromRawFile());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        jsonObject = convertArrayToJSON(jsonArray);
+
+        return jsonObject;
+    }
+
+    @Override
+    protected void onPostExecute(JSONObject jsonObject) {
+        super.onPostExecute(jsonObject);
     }
 }
