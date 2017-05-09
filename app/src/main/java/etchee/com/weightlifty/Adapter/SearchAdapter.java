@@ -27,11 +27,16 @@ public class SearchAdapter extends BaseAdapter {
     private String hint_string;
     private Context context;
     private final String TAG = getClass().getSimpleName();
+    private int index_name, index_hint;
 
     public SearchAdapter(Context context, Cursor cursor){
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.cursor = cursor;
         this.context = context;
+        // get the workout name String
+
+        index_name = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
+        index_hint = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE);
     }
 
     @Override
@@ -73,44 +78,46 @@ public class SearchAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup viewGroup) {
+    public View getView(int position, View convertView, ViewGroup viewGroup) {
         ViewHolder holder;
 
-        if (view == null) {
+        // no view at this position so create a new one.
+        if (convertView == null) {
+            //get the layout information
+            convertView = layoutInflater.inflate(R.layout.item_single_search, null);
             holder = new ViewHolder();
 
-            view = layoutInflater.inflate(R.layout.item_single_search, null);
+            //assign component IDs
+            holder.workout_textView = (TextView) convertView.findViewById(R.id.searchview_workout_text);
+            holder.hint_textView = (TextView)convertView.findViewById(R.id.searchview_hint_text);
+            holder.number_textView = (TextView)convertView.findViewById(R.id.searchview_number);
 
-            holder.workout_textView = (TextView) view.findViewById(R.id.searchview_workout_text);
-            holder.hint_textView = (TextView)view.findViewById(R.id.searchview_hint_text);
-            holder.number_textView = (TextView)view.findViewById(R.id.searchview_number);
 
-            view.setTag(holder);
+            //setTag for reuse
+            convertView.setTag(holder);
         } else {
-            holder = (ViewHolder)view.getTag();
+            holder = (ViewHolder)convertView.getTag();
         }
 
-        // get the workout name String
+        //        int index_number = cursor.getColumnIndex("rowid");
 
-        int index_name = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
-        int index_hint = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE);
-//        int index_number = cursor.getColumnIndex("rowid");
-
-        if (cursor.moveToNext()) {
+        //open the passed cursor from the constructor
+        if (cursor.moveToPosition(position)) {
             workout = cursor.getString(index_name);
             hint_string = cursor.getString(index_hint);
 //            number_String = String.valueOf(cursor.getInt(index_number));
         }
 
-        if (workout != null) {
-            if (holder.workout_textView != null) {
-                //set the item name on the TextView
-                holder.workout_textView.setText(workout);
-                holder.hint_textView.setText(hint_string);
+        //set the item name on the TextView.
+        //prevent NullPointer on fast scrolling?
+        if (holder.workout_textView != null) {
+
+            holder.workout_textView.setText(workout);
+            holder.hint_textView.setText(hint_string);
 //                holder.number_textView.setText(number_String);
-            }
         }
-        return view;
+
+        return convertView;
 
     }
 
