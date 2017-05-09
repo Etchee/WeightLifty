@@ -597,7 +597,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Log.v(TAG, "Text changed: " + newText);
         //INITIATE SEARCH
 //        Cursor cursor = queryWorkout(newText);
 //        listview.setAdapter(new SearchAdapter(context, cursor));
