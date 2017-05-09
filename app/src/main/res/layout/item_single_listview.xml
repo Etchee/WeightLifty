@@ -15,48 +15,55 @@
         android:textColor="@color/colorPrimary"
         android:textSize="18sp" />
 
+
     <TextView
-        android:id="@+id/item_text_rep"
+        android:id="@+id/item_count_rep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/name_workout"
-        android:layout_marginLeft="34dp"
-        android:layout_marginStart="34dp"
-        android:layout_toEndOf="@+id/name_workout"
-        android:layout_toRightOf="@+id/name_workout"
-        android:text="@string/rep"
+        android:layout_alignBaseline="@id/name_workout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/small_item_right_margin"
+        android:layout_marginEnd="@dimen/small_item_right_margin"
+        android:text="@string/sample_rep"
+        android:textColor="@android:color/darker_gray" />
+
+
+    <TextView
+        android:id="@+id/item_count_set"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/small_item_right_margin"
+        android:layout_marginEnd="@dimen/small_item_right_margin"
+        android:layout_marginTop="@dimen/small_margin_top"
+        android:layout_alignBottom="@+id/item_text_set"
+        android:text="@string/sample_set"
         android:textColor="@android:color/darker_gray" />
 
     <TextView
         android:id="@+id/item_text_set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/item_text_rep"
-        android:layout_alignLeft="@+id/item_text_rep"
-        android:layout_alignStart="@+id/item_text_rep"
+        android:layout_marginTop="@dimen/small_margin_top"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="@dimen/list_set_and_rep_right_margin"
+        android:layout_marginEnd="@dimen/list_set_and_rep_right_margin"
         android:text="@string/set"
         android:textColor="@android:color/darker_gray" />
 
     <TextView
-        android:id="@+id/item_count_rep"
+        android:id="@+id/item_text_rep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/item_text_set"
-        android:layout_marginLeft="17dp"
-        android:layout_marginStart="17dp"
-        android:layout_toEndOf="@+id/item_text_set"
-        android:layout_toRightOf="@+id/item_text_set"
-        android:text="@string/sample_rep"
-        android:textColor="@android:color/darker_gray" />
-
-    <TextView
-        android:id="@+id/item_count_set"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/item_count_rep"
-        android:layout_alignStart="@+id/item_count_rep"
-        android:layout_alignTop="@+id/item_text_set"
-        android:text="@string/sample_set"
+        android:layout_alignBottom="@+id/name_workout"
+        android:layout_alignLeft="@id/item_text_set"
+        android:layout_alignStart="@id/item_text_set"
+        android:layout_marginRight="@dimen/small_item_right_margin"
+        android:layout_marginEnd="@dimen/small_item_right_margin"
+        android:text="@string/rep"
         android:textColor="@android:color/darker_gray" />
 
 </RelativeLayout>
