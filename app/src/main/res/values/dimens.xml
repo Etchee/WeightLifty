@@ -13,4 +13,8 @@
     <dimen name="main_logo_width">200dp</dimen>
     <dimen name="main_logo_height">150dp</dimen>
     <dimen name="main_logo_marginTop">20dp</dimen>
+    <dimen name="numberPicker_marginleft">10dp</dimen>
+    <dimen name="numberPIcer_marginTop">15dp</dimen>
+    <dimen name="edit_set_hint_margintop">15dp</dimen>
+    <dimen name="edit_set_hint_marginLeft">30dp</dimen>
 </resources>

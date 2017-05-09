@@ -21,9 +21,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/sample_image_deadlift"
-        android:layout_marginLeft="17dp"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="@dimen/small_margin_top"
+        android:layout_marginLeft="@dimen/small_item_right_margin"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="@android:string/untitled"
@@ -37,57 +36,45 @@
         android:layout_height="wrap_content"
         android:text="@string/delete_event"
         android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/hint_text_set"
-        android:layout_alignStart="@+id/hint_text_set" />
+        android:layout_marginBottom="@dimen/small_margin_top"
+        />
+
+    <TextView
+        android:id="@+id/edit_hint_set_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/set"
+        android:layout_below="@id/edit_workout_name"
+        android:layout_marginTop="@dimen/edit_set_hint_margintop"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/edit_set_hint_marginLeft"
+        />
 
     <NumberPicker
         android:id="@+id/set_numberPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/delete_workout"
+        android:layout_below="@id/edit_hint_set_text"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/numberPicker_marginleft"
         android:layout_alignLeft="@+id/edit_workout_name"
         android:layout_alignStart="@+id/edit_workout_name"
-        android:paddingTop="10dp" />
+        />
 
     <NumberPicker
         android:id="@+id/rep_numberPicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/set_numberPicker"
-        android:paddingTop="10dp"
+        android:layout_alignTop="@id/set_numberPicker"
         android:layout_centerHorizontal="true" />
 
     <TextView
-        android:id="@+id/hint_text_set"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/hint_text_rep"
-        android:layout_alignBottom="@+id/hint_text_rep"
-        android:layout_alignEnd="@+id/set_numberPicker"
-        android:layout_alignRight="@+id/set_numberPicker"
-        android:layout_marginEnd="18dp"
-        android:layout_marginRight="18dp"
-        android:layout_marginTop="15dp"
-        android:text="@string/set" />
-
-    <TextView
-        android:id="@+id/hint_text_rep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/rep"
-        android:layout_below="@+id/edit_workout_name"
+        android:layout_above="@id/rep_numberPicker"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp" />
-
-    <EditText
-        android:id="@+id/input_weight_number"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:text="@string/hint_text_weight"
-        android:inputType="numberDecimal"
-        android:layout_alignTop="@+id/hint_text_rep"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        />
 
     <Button
         android:id="@+id/add_event"
@@ -97,5 +84,16 @@
         android:layout_alignParentBottom="true"
         android:layout_alignStart="@+id/input_weight_number"
         android:text="@string/add_event" />
+
+    <EditText
+        android:id="@+id/input_weight_number"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_text_weight"
+        android:inputType="numberDecimal"
+        android:layout_above="@id/add_event"
+        android:layout_marginBottom="80dp"
+        android:layout_alignParentRight="true"
+        />
 
 </RelativeLayout>
