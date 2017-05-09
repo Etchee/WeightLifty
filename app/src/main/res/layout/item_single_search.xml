@@ -7,44 +7,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="@dimen/list_marginTop"
-        android:layout_toRightOf="@+id/searchview_number"
+        android:layout_marginTop="@dimen/small_margin_top"
         android:text="@string/sample_workout_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/colorPrimary"
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/searchview_the_num_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="@dimen/list_smalltxt_marginTop"
-        android:text="@string/number_text"
-        android:textColor="@android:color/darker_gray" />
-
-    <TextView
-        android:id="@+id/searchview_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="@dimen/list_smalltxt_marginTop"
-        android:layout_toRightOf="@id/searchview_the_num_text"
-        android:text="@string/nulltext"
-        android:textColor="@android:color/darker_gray" />
+        android:textSize="@dimen/large_text_size" />
 
     <TextView
         android:id="@+id/searchview_hint_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="@dimen/list_smalltxt_marginTop"
+        android:layout_below="@id/searchview_workout_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="@dimen/small_margin_top"
         android:text="@string/hint_text"
         android:textColor="@android:color/darker_gray" />
 

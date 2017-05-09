@@ -99,8 +99,6 @@ public class SearchAdapter extends BaseAdapter {
             //assign component IDs
             holder.workout_textView = (TextView) convertView.findViewById(R.id.searchview_workout_text);
             holder.hint_textView = (TextView)convertView.findViewById(R.id.searchview_hint_text);
-            holder.number_textView = (TextView)convertView.findViewById(R.id.searchview_number);
-
 
             //setTag for reuse
             convertView.setTag(holder);

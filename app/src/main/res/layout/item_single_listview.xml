@@ -13,7 +13,7 @@
         android:text="@string/sample_workout_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/colorPrimary"
-        android:textSize="18sp" />
+        android:textSize="@dimen/large_text_size" />
 
 
     <TextView
