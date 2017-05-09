@@ -145,6 +145,12 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         final MenuItem item = menu.findItem(R.id.action_search_button);
         MenuItemCompat.expandActionView(item);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listview.setAdapter(null);
+            }
+        });
         searchView.setQueryHint(getString(R.string.hint_search_events));
         searchView.setOnQueryTextListener(this);
 
@@ -207,7 +213,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                     String eventName = null;
                     Cursor cursor = null;
                     try {
-
                         cursor = getContentResolver().query(
                                 DataContract.EventType_FTSEntry.CONTENT_URI,
                                 projection,
@@ -591,7 +596,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     public boolean onQueryTextSubmit(String query) {
         Log.v(TAG, "Text submitted: " + query);
         query = query + "*";
-        Cursor cursor = queryWorkout(query != null ? query : "@@@@");
+        Cursor cursor = queryWorkout(query);
         listview.setAdapter(searchAdapter);
         searchAdapter.swapCursor(cursor);
         return false;
@@ -600,8 +605,11 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     @Override
     public boolean onQueryTextChange(String newText) {
         //INITIATE SEARCH
-//        Cursor cursor = queryWorkout(newText);
-//        listview.setAdapter(new SearchAdapter(context, cursor));
+        Log.v(TAG, "Text submitted: " + newText);
+        newText = newText + "*";
+        Cursor cursor = queryWorkout(newText);
+        listview.setAdapter(searchAdapter);
+        searchAdapter.swapCursor(cursor);
         return false;
     }
 
@@ -657,16 +665,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
         Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
 
-        //This works but the user has to match the workout name completely... Sucks!
-        /*
-        Cursor cursor = getContentResolver().query(
-                EventType_FTSEntry.CONTENT_URI,
-                new String[]{EventType_FTSEntry.COLUMN_EVENT_NAME},
-                EventType_FTSEntry.COLUMN_EVENT_NAME + "=?",
-                new String[]{inputText},
-                EventType_FTSEntry.COLUMN_EVENT_NAME + " DESC"
-        );
-        */
         return cursor;
     }
 

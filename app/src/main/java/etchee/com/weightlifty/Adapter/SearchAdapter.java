@@ -27,16 +27,12 @@ public class SearchAdapter extends BaseAdapter {
     private String hint_string;
     private Context context;
     private final String TAG = getClass().getSimpleName();
-    private int index_name, index_hint;
 
     public SearchAdapter(Context context, Cursor cursor){
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.cursor = cursor;
         this.context = context;
         // get the workout name String
-
-        index_name = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
-        index_hint = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE);
     }
 
     @Override
@@ -107,6 +103,8 @@ public class SearchAdapter extends BaseAdapter {
         }
 
         //        int index_number = cursor.getColumnIndex("rowid");
+        int index_name = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
+        int index_hint = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE);
 
         //open the passed cursor from the constructor
         if (cursor.moveToPosition(position)) {
