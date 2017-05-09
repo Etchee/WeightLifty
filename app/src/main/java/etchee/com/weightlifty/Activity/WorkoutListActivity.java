@@ -16,6 +16,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -229,7 +230,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                             cursor.close();
                         }
                     }
-                    Toast.makeText(context, "Event String: " + eventName, Toast.LENGTH_SHORT).show();
+                    launchEditEventActivityWithNewEvent(eventName);
 
                 } else if (listview.getAdapter() == listAdapter) {
                     launchEditActivityWithEventID(position);
@@ -242,6 +243,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
         return listener;
     }
+
+
 
     /**
      * When user clicks FAB, this method is called.
@@ -409,6 +412,16 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 null
         );
     }
+
+    //Send contentValues
+    private void launchEditEventActivityWithNewEvent(String eventName) {
+        Intent intent = new Intent(this, EditEventActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(DataContract.GlobalConstants.PASS_EVENT_STRING, eventName);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
 
     private Cursor initListCursor() {
         Cursor cursor;

@@ -4,12 +4,16 @@ import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
@@ -24,6 +28,7 @@ import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.DataMethods.DeleteActionHelper;
 import etchee.com.weightlifty.DataMethods.ModifyEventHelper;
+import etchee.com.weightlifty.data.DataDbHelper;
 
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
@@ -52,6 +57,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     private static final int SET_MINVALUE = 1;
     private static final int REP_MAXVALUE = 500;
     private static final int REP_MINVALUE = 1;
+    private final String TAG = getClass().getSimpleName();
 
     private static final String ORDER_DECENDING = " DESC";
     private static final String ORDER_ASCENDING = " ASC";
@@ -97,10 +103,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
         defineQueryHandler();
 
-
         Bundle bundle = getIntent().getExtras();
-
-        sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID);
 
         delete_event.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,17 +126,38 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             }
         });
 
-        // Case 1: creating a new event → bundle with contentValues.
+        // Case 1: creating a new event → bundle with Event String.
         // use inner class to just get the title of the workout, then display.
-        if (bundle.get(DataContract.GlobalConstants.CONTENT_VALUES) != null) {
+        if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_STRING) != null) {
+            //delete button doesn't make sense here
+            delete_event.setVisibility(View.GONE);
+            eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
 
-            ContentValues values = (ContentValues) bundle.get(DataContract.GlobalConstants.CONTENT_VALUES);
-            int sampleValue = values.getAsInteger(EventEntry.COLUMN_SUB_ID);
+            receivedEventID = queryEventID(eventString);
+            if (receivedEventID < 0) throw new IllegalArgumentException(TAG + ": Event ID query failed.");
+
+            String event = getIntent().getStringExtra(DataContract.GlobalConstants.PASS_EVENT_STRING);
+            name_workout.setText(event);
+
+            //(DEBUG)check if the item id is correct
+//            Cursor cursor = getContentResolver().query(
+//                    DataContract.EventType_FTSEntry.CONTENT_URI,
+//                    new String[]{DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
+//                            DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME},
+//                    DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?",
+//                    new String[]{String.valueOf(receivedEventID)},
+//                    null
+//            );
+//            if (cursor.moveToFirst()){
+//                String temp = cursor.getString(cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME));
+//                cursor.close();
+//                Toast.makeText(this, "Event: " + temp, Toast.LENGTH_SHORT).show();
+//            }
         }
 
         // Case 2: modifying an already existing event → bundle with selection.
-        if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
+        else if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
 
             //currently in WorkoutListActivity, this date is just set as today's date. Just pass another date
             //in future updates.
@@ -157,6 +181,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             if (receivedEventID < 0 ) {
                 throw new IllegalArgumentException("Null contentValues");
             }
+            sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID);
 
             //init the loader
             getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
@@ -456,6 +481,41 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                 selectionArgs,
                 null
         );
+    }
+
+    private Cursor initFTSCursor() {
+        Cursor cursor = getContentResolver().query(
+                DataContract.EventType_FTSEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        return cursor;
+    }
+
+    private int queryEventID(String event) {
+        int id = -1;
+        Cursor cursor = initFTSCursor();
+        try {
+            SQLiteDatabase db = new DataDbHelper(getApplicationContext()).getReadableDatabase();
+            String query = "SELECT docid," + "* " + " FROM "
+                    + DataContract.EventType_FTSEntry.TABLE_NAME
+                    + " WHERE " + DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + " MATCH '"
+                    + event + "';";
+            cursor = db.rawQuery(query, null);
+            if (cursor.moveToFirst()) {
+                id = cursor.getInt(cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_ROW_ID));
+                Log.v(TAG , DatabaseUtils.dumpCursorToString(cursor));
+            } else throw new CursorIndexOutOfBoundsException("query Event ID failed.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            cursor.close();
+        }
+
+        return id;
     }
 
     private int getReceivedEventID() {

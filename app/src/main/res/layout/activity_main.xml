@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context="etchee.com.weightlifty.Activity.MainActivity">
 
+    <!--ImageView to hold the pretty icon for the app-->
+    <ImageView
+        android:id="@+id/main_logo_view"
+        android:layout_width="@dimen/main_logo_width"
+        android:layout_height="@dimen/main_logo_height"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/main_logo_marginTop"
+        app:srcCompat="@drawable/welcome_title" />
+
     <!--Button to begin workout-->
     <Button
         android:id="@+id/begin_workout_button"
@@ -14,19 +23,11 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:paddingRight="10dp"
+        android:layout_marginTop="@dimen/list_marginTop"
+        android:layout_below="@+id/main_logo_view"
         android:paddingBottom="20dp"
         android:paddingTop="20dp"
         android:text="@string/begin_workout" />
-
-    <!--ImageView to hold the pretty icon for the app-->
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:contentDescription=""
-        app:srcCompat="@drawable/welcome_title" />
 
 
 </RelativeLayout>
