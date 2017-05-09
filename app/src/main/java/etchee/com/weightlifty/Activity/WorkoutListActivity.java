@@ -48,6 +48,8 @@ import etchee.com.weightlifty.DataMethods.subIDfixHelper;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
 
+import static android.R.attr.data;
+
 /**
  *  From MainActivity -> Loads today's data, display as a list.
  *  When SearchView is initiated -> Performs a search, then pass the resulting cursor to SearchAdapter
@@ -588,8 +590,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.v(TAG, "Text submitted: " + query);
-        //INITIATE SEARCH
-        Cursor cursor = queryWorkout(query);
+        query = query + "*";
+        Cursor cursor = queryWorkout(query != null ? query : "@@@@");
         listview.setAdapter(searchAdapter);
         searchAdapter.swapCursor(cursor);
         return false;
@@ -608,12 +610,12 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     /**
      *  Search method that returns a cursor.
      *
-     * @param inputText User input text sent from the UI
+     * @param input User input text sent from the UI
      * @return cursor that contains the results of the search
      * @throws SQLException if search fails.
      */
-    public Cursor queryWorkout(String inputText) {
-        Log.w(TAG, inputText);
+    public Cursor queryWorkout(String input) {
+        Log.w(TAG, input);
 
         /*
                 Original sample code:
@@ -637,41 +639,35 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 SELECT docid as _id,customer,name,(address1||(case when address2> '' then '
                ' || address2 else '' end)) as address,address1,address2,city,state,zipCode from
                CustomerInfo where searchData MATCH 'Piz*';
+
+               My output:
+               SELECT docid as _id,name_event,type_event FROM table_eventType_FTS WHERE name_event MATCH 'dumb';
+
+               TODO I should make another column that joints all other columns (key_search) to search EVERYTHING
          */
 
-//        String query = "SELECT " + EventType_FTSEntry.COLUMN_ROW_ID + " as _id," +
-//                KEY_CUSTOMER + "," +
-//                KEY_NAME + "," +
-//                "(" + KEY_ADDRESS1 + "||" +
-//                "(case when " + KEY_ADDRESS2 + "> '' then '\n' || "
-//                + KEY_ADDRESS2 + " else '' end)) as " + KEY_ADDRESS + "," +
-//                KEY_ADDRESS1 + "," +
-//                KEY_ADDRESS2 + "," +
-//                KEY_CITY + "," +
-//                KEY_STATE + "," +
-//                KEY_ZIP +
-//                " from " + FTS_VIRTUAL_TABLE +
-//                " where " + KEY_SEARCH + " MATCH '" + inputText + "';";
+        String query = "SELECT docid as _id," +
+                EventType_FTSEntry.COLUMN_EVENT_NAME + "," +
+                EventType_FTSEntry.COLUMN_EVENT_TYPE +
+                " FROM " + EventType_FTSEntry.TABLE_NAME +
+                " WHERE " + EventType_FTSEntry.COLUMN_EVENT_NAME + " MATCH '" + input + "';";
 
-        //Fake cursor for now
-        String fakeProjection[] = new String[]{
-                EventType_FTSEntry.COLUMN_ROW_ID,
-                EventType_FTSEntry.COLUMN_EVENT_NAME,
-                EventType_FTSEntry.COLUMN_EVENT_TYPE
-        };
 
-        Cursor fakeCursor = getContentResolver().query(
+        Cursor cursor = new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
+
+        Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
+
+        //This works but the user has to match the workout name completely... Sucks!
+        /*
+        Cursor cursor = getContentResolver().query(
                 EventType_FTSEntry.CONTENT_URI,
-                fakeProjection,
-                null,
-                null,
-                null
+                new String[]{EventType_FTSEntry.COLUMN_EVENT_NAME},
+                EventType_FTSEntry.COLUMN_EVENT_NAME + "=?",
+                new String[]{inputText},
+                EventType_FTSEntry.COLUMN_EVENT_NAME + " DESC"
         );
-        if (fakeCursor.moveToFirst()) {
-
-        } else fakeCursor = null;
-
-        return fakeCursor;
+        */
+        return cursor;
     }
 
 }
