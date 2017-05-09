@@ -11,7 +11,9 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -44,6 +46,7 @@ import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.DataMethods.subIDfixHelper;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
+import etchee.com.weightlifty.data.DataDbHelper;
 
 /**
  *  From MainActivity -> Loads today's data, display as a list.
@@ -423,24 +426,32 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     }
 
     private Cursor initEventTypeCursor() {
+
+        //Cursor cursor;
+//        String projection[] = {
+//                EventType_FTSEntry.COLUMN_ROW_ID,
+//                EventType_FTSEntry.COLUMN_EVENT_TYPE,
+//                EventType_FTSEntry.COLUMN_EVENT_NAME
+//        };
+//
+//        String selection = EventType_FTSEntry.COLUMN_ROW_ID + "=?";
+//        String selectionArgs[] = new String[]{ String.valueOf(1) };
+//
+//        cursor = contentResolver.query(
+//                EventType_FTSEntry.CONTENT_URI,
+//                projection,
+//                selection,
+//                selectionArgs,
+//                null
+//        );
+
+        //do a rawQuery because I want to specify the hidden docid column
         Cursor cursor;
-
-        String projection[] = {
-                EventType_FTSEntry.COLUMN_ROW_ID,
-                EventType_FTSEntry.COLUMN_EVENT_TYPE,
-                EventType_FTSEntry.COLUMN_EVENT_NAME
-        };
-
-        String selection = EventType_FTSEntry.COLUMN_ROW_ID + "=?";
-        String selectionArgs[] = new String[]{ String.valueOf(1) };
-
-        cursor = contentResolver.query(
-                EventType_FTSEntry.CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                null
-        );
+        SQLiteDatabase db = new DataDbHelper(context).getReadableDatabase();
+        String query = "SELECT " + " * " + " FROM "
+                + DataContract.EventType_FTSEntry.TABLE_NAME;
+        cursor = db.rawQuery(query, null);
+        Log.v(TAG, "Init cursor gave a count of " + String.valueOf(cursor.getCount()));
 
         if (cursor != null) return cursor;
         else throw new NullPointerException(TAG + ": FTS table cursor initialization has failed");

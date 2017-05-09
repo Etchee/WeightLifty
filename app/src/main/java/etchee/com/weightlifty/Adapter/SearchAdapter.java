@@ -57,7 +57,7 @@ public class SearchAdapter extends BaseAdapter {
                     + DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + " FROM "
                     + DataContract.EventType_FTSEntry.TABLE_NAME + " WHERE "
                     + DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?";
-            String selectionArgs[] = new String[]{String.valueOf(position)};
+            String selectionArgs[] = new String[]{String.valueOf(position + 1)};
             cursor = db.rawQuery(query, selectionArgs);
             Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
 
