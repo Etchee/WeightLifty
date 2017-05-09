@@ -42,39 +42,14 @@ public class SearchAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        int rowid = -1;
+        String event = null;
 
-        //rawQuery must be used because FTS table row_id column is "hidden"
-
-        //I feel like this query is redundant...?
-        Cursor cursor;
-        SQLiteDatabase db = new DataDbHelper(context).getReadableDatabase();
-        String query = "SELECT " + DataContract.EventType_FTSEntry.COLUMN_ROW_ID + ", "
-                + DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + " FROM "
-                + DataContract.EventType_FTSEntry.TABLE_NAME + " WHERE "
-                + DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?";
-        String selectionArgs[] = new String[]{String.valueOf(position + 1)};
-        cursor = db.rawQuery(query, selectionArgs);
-        Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
-
-        int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_ROW_ID);
-        if (cursor.moveToFirst()) {
-            rowid = cursor.getInt(index);
+        int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
+        if (cursor.moveToPosition(position)) {
+            event = cursor.getString(index);
         }
 
-        return rowid;
-
-//        int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_ROW_ID);
-//        if (cursor.moveToPosition(position)) {
-//            rowid = cursor.getInt(index);
-//        }
-//
-//        if (rowid == -1) {
-//            Log.e(TAG, "getItem() has failed.");
-//            return null;
-//        } else {
-//            return rowid;
-//        }
+        return event;
     }
 
     @Override

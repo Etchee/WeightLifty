@@ -199,16 +199,15 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                 //check which adapters are set
                 if (listview.getAdapter() == searchAdapter) {
                     //I have to get either ROW_ID or just item name here
-                    int itemID = (int) searchAdapter.getItem(position);
+                    String event = (String) searchAdapter.getItem(position);
 
                     //for debug, query the FTS table to see if the item name is correct
                     String projection[] = new String[]{
-                            EventType_FTSEntry.COLUMN_ROW_ID,
                             EventType_FTSEntry.COLUMN_EVENT_NAME
                     };
 
-                    String selection = EventType_FTSEntry.COLUMN_ROW_ID + "=?";
-                    String selectionArgs[] = new String[]{String.valueOf(itemID)};
+                    String selection = EventType_FTSEntry.COLUMN_EVENT_NAME + "=?";
+                    String selectionArgs[] = new String[]{String.valueOf(event)};
 
                     String eventName = null;
                     Cursor cursor = null;
