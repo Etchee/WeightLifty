@@ -108,7 +108,7 @@ public class ListAdapter extends CursorAdapter implements QueryResponceHandler{
     }
 
     @Override
-    public void EventIDHolder(int id) {
-        this.eventID = id;
+    public void EventIDHolder(String id) {
+        this.eventID = Integer.parseInt(id);
     }
 }

@@ -4,8 +4,6 @@ import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,7 +11,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
@@ -23,14 +20,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import etchee.com.weightlifty.DataMethods.DeleteActionHelper;
+import etchee.com.weightlifty.DataMethods.ModifyEventHelper;
 import etchee.com.weightlifty.DataMethods.QueryEventIDFromName;
 import etchee.com.weightlifty.DataMethods.QueryResponceHandler;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
-import etchee.com.weightlifty.DataMethods.DeleteActionHelper;
-import etchee.com.weightlifty.DataMethods.ModifyEventHelper;
-import etchee.com.weightlifty.data.DataDbHelper;
 
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
@@ -134,7 +130,10 @@ public class EditEventActivity extends FragmentActivity implements
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
             eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
             //first thing fire the asyncTask to get the id
-            new QueryEventIDFromName(getApplicationContext(), this).execute(eventString);
+            QueryEventIDFromName queryEventIDFromName =
+                    new QueryEventIDFromName(getApplicationContext(), this);
+            queryEventIDFromName.queryResponceHandler = this;
+            queryEventIDFromName.execute(eventString);
 
             //delete button doesn't make sense here
             delete_event.setVisibility(View.GONE);
@@ -555,12 +554,10 @@ public class EditEventActivity extends FragmentActivity implements
         // not needed as of now
     }
 
-    /**
-     *  When firing EventID, the Async result is received thru this interface instance.
-     * @param id
-     */
     @Override
-    public void EventIDHolder(int id) {
-        receivedEventID = id;
+    public void EventIDHolder(String id) {
+        receivedEventID = Integer.parseInt(id);
     }
+
+
 }

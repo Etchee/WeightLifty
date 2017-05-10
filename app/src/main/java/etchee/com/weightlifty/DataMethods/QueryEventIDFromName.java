@@ -28,7 +28,7 @@ public class QueryEventIDFromName extends AsyncTask<String, Void, Integer> {
     private Context context;
     private Activity activity;
     private final String TAG = getClass().getSimpleName();
-    private QueryResponceHandler queryResponceHandler = null;
+    public QueryResponceHandler queryResponceHandler = null;
     private SQLiteDatabase db;
 
     public QueryEventIDFromName(Context context, Activity activity) {
@@ -69,6 +69,6 @@ public class QueryEventIDFromName extends AsyncTask<String, Void, Integer> {
 
     @Override
     protected void onPostExecute(Integer id) {
-        queryResponceHandler.EventIDHolder(Integer.parseInt(String.valueOf(id)));
+        queryResponceHandler.EventIDHolder(String.valueOf(id));
     }
 }

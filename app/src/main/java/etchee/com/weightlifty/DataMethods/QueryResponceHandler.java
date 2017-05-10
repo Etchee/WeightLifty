@@ -6,5 +6,5 @@ package etchee.com.weightlifty.DataMethods;
 
 public interface QueryResponceHandler {
     void EventNameHolder(String EventName);
-    void EventIDHolder(int id);
+    void EventIDHolder(String id);
 }
