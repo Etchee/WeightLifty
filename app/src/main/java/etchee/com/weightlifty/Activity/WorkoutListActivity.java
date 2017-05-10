@@ -470,7 +470,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         String query = "SELECT " + " * " + " FROM "
                 + DataContract.EventType_FTSEntry.TABLE_NAME;
         cursor = db.rawQuery(query, null);
-        Log.v(TAG, "Init cursor gave a count of " + String.valueOf(cursor.getCount()));
 
         if (cursor != null) return cursor;
         else throw new NullPointerException(TAG + ": FTS table cursor initialization has failed");

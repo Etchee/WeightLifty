@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/menu_insert_event"
-        android:title="@string/insert_event_values"
+        android:title="@string/insert_random_values"
         app:showAsAction="never"
         />
 

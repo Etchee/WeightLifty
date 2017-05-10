@@ -11,8 +11,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +52,7 @@ public class EditEventActivity extends FragmentActivity implements
     private TextView name_workout;
     private TextView weight_count;
     private Button button_add_event;
-    private Button delete_event;
+    private Button button_delete_event;
 
     private static final int SET_MAXVALUE = 30;
     private static final int SET_MINVALUE = 1;
@@ -96,15 +98,15 @@ public class EditEventActivity extends FragmentActivity implements
         numberPicker_rep.setMaxValue(REP_MAXVALUE);
         numberPicker_rep.setMinValue(REP_MINVALUE);
         name_workout = (TextView) findViewById(R.id.edit_workout_name);
-        weight_count = (TextView) findViewById(R.id.input_weight_number);
+        weight_count = (EditText) findViewById(R.id.input_weight_number);
         button_add_event = (Button) findViewById(R.id.add_event);
-        delete_event = (Button) findViewById(R.id.delete_workout);
+        button_delete_event = (Button) findViewById(R.id.delete_workout);
 
         defineQueryHandler();
 
         Bundle bundle = getIntent().getExtras();
 
-        delete_event.setOnClickListener(new View.OnClickListener() {
+        button_delete_event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 deleteHelper = new DeleteActionHelper(
@@ -125,6 +127,14 @@ public class EditEventActivity extends FragmentActivity implements
             }
         });
 
+        weight_count.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                weight_count.setText("");
+                return false;
+            }
+        });
+
         // Case 1: creating a new event → bundle with Event String.
         if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_STRING) != null) {
             Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
@@ -135,8 +145,8 @@ public class EditEventActivity extends FragmentActivity implements
             queryEventIDFromName.queryResponceHandler = this;
             queryEventIDFromName.execute(eventString);
 
-            //delete button doesn't make sense here
-            delete_event.setVisibility(View.GONE);
+            //not "delete", but "cancel"
+            button_delete_event.setText(R.string.cancel);
 
             //add button behavior
             button_add_event.setOnClickListener(new View.OnClickListener() {
@@ -180,7 +190,7 @@ public class EditEventActivity extends FragmentActivity implements
             final int selectedDate = bundle.getInt(DataContract.GlobalConstants.PASS_SELECTED_DATE);
 
             //Not create event but modify event
-            button_add_event.setText(R.string.modify_event);
+            button_add_event.setText(R.string.update_event);
             button_add_event.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

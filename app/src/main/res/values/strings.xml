@@ -23,8 +23,8 @@
     <string name="insert_today_calendar">Insert today Calendar</string>
     <string name="delete_all_events">Delete All Events</string>
     <string name="add_event">Add Event</string>
-    <string name="modify_event">Modify Event</string>
-    <string name="insert_event_values">Insert Event Values</string>
+    <string name="update_event">Update Event</string>
+    <string name="insert_random_values">Insert Random Values</string>
     <string name="insert_type_event">Insert Event Type</string>
     <string name="search_events">Search Events</string>
     <string name="hint_search_events">Search Events...</string>
@@ -38,4 +38,6 @@
     <string name="nulltext">null</string>
     <string name="number_text">No.</string>
     <string name="hint_text">Hint Text</string>
+    <string name="cancel">Cancel</string>
+    <string name="weight">Weight:</string>
 </resources>
