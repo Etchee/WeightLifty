@@ -146,6 +146,7 @@ public class EditEventActivity extends FragmentActivity implements
                     Uri uri = addNewEvent(getUserInputsAsContentValues(getDateAsInt()));
                     Toast.makeText(EditEventActivity.this, "New event added in: " + uri.toString(),
                             Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             });
 
@@ -285,6 +286,19 @@ public class EditEventActivity extends FragmentActivity implements
 
     private ContentValues getUserInputsAsContentValues(int date) {
         ContentValues values = new ContentValues();
+        /*
+             From DataContract:
+              "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
+                + EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + EventEntry.COLUMN_DATE + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SET_COUNT + " INTEGER, "
+                + EventEntry.COLUMN_REP_COUNT + " INTEGER, "
+                + EventEntry.COLUMN_WEIGHT_COUNT + " INTEGER);";
+
+                Not null: date, sub_id, event_id
+         */
 
         int set_count = numberPicker_set.getValue();
         int rep_count = numberPicker_rep.getValue();
@@ -295,6 +309,8 @@ public class EditEventActivity extends FragmentActivity implements
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
         values.put(EventEntry.COLUMN_EVENT_ID, receivedEventID);
         values.put(EventEntry.COLUMN_DATE, date);
+        //subID doesn't matter because this will be organized onResume for ListActivity anyways
+        values.put(EventEntry.COLUMN_SUB_ID, 0);
 
         return values;
     }
