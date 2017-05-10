@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -23,6 +23,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import etchee.com.weightlifty.DataMethods.QueryEventIDFromName;
+import etchee.com.weightlifty.DataMethods.QueryResponceHandler;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
@@ -43,14 +45,15 @@ import static java.lang.Integer.parseInt;
  *  specific event.
  */
 
-public class EditEventActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, NumberPicker.OnValueChangeListener {
+public class EditEventActivity extends FragmentActivity implements
+        LoaderManager.LoaderCallbacks<Cursor>, NumberPicker.OnValueChangeListener, QueryResponceHandler {
 
     //component declaration
     private NumberPicker numberPicker_set;
     private NumberPicker numberPicker_rep;
     private TextView name_workout;
     private TextView weight_count;
-    private Button event_button;
+    private Button button_add_event;
     private Button delete_event;
 
     private static final int SET_MAXVALUE = 30;
@@ -74,7 +77,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     private int sub_ID;
 
     private String eventString;
-
+    private QueryResponceHandler queryResponceHandler;
     private DeleteActionHelper deleteHelper;
 
     /**
@@ -98,7 +101,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         numberPicker_rep.setMinValue(REP_MINVALUE);
         name_workout = (TextView) findViewById(R.id.edit_workout_name);
         weight_count = (TextView) findViewById(R.id.input_weight_number);
-        event_button = (Button) findViewById(R.id.add_event);
+        button_add_event = (Button) findViewById(R.id.add_event);
         delete_event = (Button) findViewById(R.id.delete_workout);
 
         defineQueryHandler();
@@ -127,15 +130,28 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         });
 
         // Case 1: creating a new event → bundle with Event String.
-        // use inner class to just get the title of the workout, then display.
         if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_STRING) != null) {
+            Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
+            eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
+            //first thing fire the asyncTask to get the id
+            new QueryEventIDFromName(getApplicationContext(), this).execute(eventString);
+
             //delete button doesn't make sense here
             delete_event.setVisibility(View.GONE);
-            eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
-            Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
 
-            receivedEventID = queryEventID(eventString);
-            if (receivedEventID < 0) throw new IllegalArgumentException(TAG + ": Event ID query failed.");
+            //add button behavior
+            button_add_event.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //make correct contentValues here
+                    Uri uri = addNewEvent(getUserInputsAsContentValues(getDateAsInt()));
+                    Toast.makeText(EditEventActivity.this, "New event added in: " + uri.toString(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+            if (receivedEventID < 0) Toast.makeText(this, "Event ID query failed.", Toast.LENGTH_SHORT).show();
 
             String event = getIntent().getStringExtra(DataContract.GlobalConstants.PASS_EVENT_STRING);
             name_workout.setText(event);
@@ -164,8 +180,8 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
             final int selectedDate = bundle.getInt(DataContract.GlobalConstants.PASS_SELECTED_DATE);
 
             //Not create event but modify event
-            event_button.setText(R.string.modify_event);
-            event_button.setOnClickListener(new View.OnClickListener() {
+            button_add_event.setText(R.string.modify_event);
+            button_add_event.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new ModifyEventHelper(
@@ -173,7 +189,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
                             EditEventActivity.this,
                             selectedDate,
                             sub_ID
-                            ).execute(getUserInputs());
+                            ).execute(getUserInputsAsContentValues(selectedDate));
                 }
             });
 
@@ -268,7 +284,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         };
     }
 
-    private ContentValues getUserInputs() {
+    private ContentValues getUserInputsAsContentValues(int date) {
         ContentValues values = new ContentValues();
 
         int set_count = numberPicker_set.getValue();
@@ -279,6 +295,7 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
         values.put(EventEntry.COLUMN_EVENT_ID, receivedEventID);
+        values.put(EventEntry.COLUMN_DATE, date);
 
         return values;
     }
@@ -360,6 +377,16 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
 
+    }
+
+    private Uri addNewEvent (ContentValues values) {
+
+        Uri uri = getContentResolver().insert(
+                EventEntry.CONTENT_URI,
+                values
+        );
+
+        return uri;
     }
 
     /**
@@ -495,29 +522,6 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
         return cursor;
     }
 
-    private int queryEventID(String event) {
-        int id = -1;
-        Cursor cursor = initFTSCursor();
-        try {
-            SQLiteDatabase db = new DataDbHelper(getApplicationContext()).getReadableDatabase();
-            String query = "SELECT docid," + "* " + " FROM "
-                    + DataContract.EventType_FTSEntry.TABLE_NAME
-                    + " WHERE " + DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + " MATCH '"
-                    + event + "';";
-            cursor = db.rawQuery(query, null);
-            if (cursor.moveToFirst()) {
-                id = cursor.getInt(cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_ROW_ID));
-                Log.v(TAG , DatabaseUtils.dumpCursorToString(cursor));
-            } else throw new CursorIndexOutOfBoundsException("query Event ID failed.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            cursor.close();
-        }
-
-        return id;
-    }
-
     private int getReceivedEventID() {
         return receivedEventID;
     }
@@ -545,5 +549,18 @@ public class EditEventActivity extends FragmentActivity implements LoaderManager
 
         return parseInt(concatenated);
     }
-}
 
+    @Override
+    public void EventNameHolder(String EventName) {
+        // not needed as of now
+    }
+
+    /**
+     *  When firing EventID, the Async result is received thru this interface instance.
+     * @param id
+     */
+    @Override
+    public void EventIDHolder(int id) {
+        receivedEventID = id;
+    }
+}

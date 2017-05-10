@@ -32,6 +32,8 @@ public class ListAdapter extends CursorAdapter implements QueryResponceHandler{
     private EventNameQueryHelper eventNameQueryHelper;
     private static final String TAG = "ListActivityAdapter";
 
+    private int eventID;
+
     public ListAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         eventNameQueryHelper = new EventNameQueryHelper(context);
@@ -103,5 +105,10 @@ public class ListAdapter extends CursorAdapter implements QueryResponceHandler{
     @Override
     public void EventNameHolder(String eventString) {
         this.eventString = eventString;
+    }
+
+    @Override
+    public void EventIDHolder(int id) {
+        this.eventID = id;
     }
 }

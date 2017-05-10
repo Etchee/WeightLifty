@@ -660,8 +660,11 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
                ' || address2 else '' end)) as address,address1,address2,city,state,zipCode from
                CustomerInfo where searchData MATCH 'Piz*';
 
-               My output:
+               My output in here (success):
                SELECT docid as _id,name_event,type_event FROM table_eventType_FTS WHERE name_event MATCH 'dumb';
+
+                From queryEventIDFromName class:
+               SELECT docid as _id,* FROM table_eventType_FTS WHERE name_event MATCH 'press sit-up';
 
                TODO I should make another column that joints all other columns (key_search) to search EVERYTHING
          */
