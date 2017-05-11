@@ -1,6 +1,5 @@
 package etchee.com.weightlifty.Activity;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -8,47 +7,50 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.R;
-import etchee.com.weightlifty.data.DataContract.CalendarEntry;
-import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
+import etchee.com.weightlifty.data.DataContract.CalendarEntry;
+import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
 import etchee.com.weightlifty.data.TextResDecoder;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     Context context;
     private SQLiteOpenHelper dbHelper;
+    private Toolbar toolbar;
     private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         getFragmentManager().beginTransaction().add(
                 R.id.container_fragment_main,
                 new MainActivityFragment()
         ).commit();
         context = getApplicationContext();
         dbHelper = new DataDbHelper(context);
+
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
     }
 
 
@@ -253,7 +255,7 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
