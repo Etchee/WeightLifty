@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,7 +33,7 @@ import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataDbHelper;
 import etchee.com.weightlifty.data.TextResDecoder;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     Context context;
     private SQLiteOpenHelper dbHelper;
@@ -42,18 +43,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getFragmentManager().beginTransaction().add(
+                R.id.container_fragment_main,
+                new MainActivityFragment()
+        ).commit();
         context = getApplicationContext();
         dbHelper = new DataDbHelper(context);
-
-        //"Begin Workout" button to launch listActivity
-        Button begin_workout = (Button)findViewById(R.id.begin_workout_button);
-        begin_workout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), WorkoutListActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
 
@@ -320,6 +315,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Toast.makeText(context, "Debug(Event name): " + str,
                         Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.menu_settings:
+                getFragmentManager().beginTransaction().replace(
+                        R.id.container_fragment_main,
+                        new SettingsActivity()
+                ).addToBackStack(null).commit();
                 break;
 
         }

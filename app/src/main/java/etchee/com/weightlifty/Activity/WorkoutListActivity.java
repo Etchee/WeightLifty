@@ -617,6 +617,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     public boolean onQueryTextChange(String newText) {
         //INITIATE SEARCH
         Log.v(TAG, "Text submitted: " + newText);
+        //so that the search is for every part of the texts
         newText = newText + "*";
         Cursor cursor = queryWorkout(newText);
         listview.setAdapter(searchAdapter);
@@ -635,24 +636,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
      */
     public Cursor queryWorkout(String input) {
         Log.w(TAG, input);
-
-        /*
-                Original sample code:
-                String query = "SELECT docid as _id," +
-                KEY_CUSTOMER + "," +
-                KEY_NAME + "," +
-                "(" + KEY_ADDRESS1 + "||" +
-                "(case when " + KEY_ADDRESS2 + "> '' then '\n' || "
-                + KEY_ADDRESS2 + " else '' end)) as " + KEY_ADDRESS + "," +
-                KEY_ADDRESS1 + "," +
-                KEY_ADDRESS2 + "," +
-                KEY_CITY + "," +
-                KEY_STATE + "," +
-                KEY_ZIP +
-                " from " + FTS_VIRTUAL_TABLE +
-                " where " + KEY_SEARCH + " MATCH '" + inputText + "';";
-         */
-
         /*
                 Original sample code output:
                 SELECT docid as _id,customer,name,(address1||(case when address2> '' then '
@@ -676,8 +659,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
 
         Cursor cursor = new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
-
-        Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
 
         return cursor;
     }

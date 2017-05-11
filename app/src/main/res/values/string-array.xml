@@ -7,4 +7,14 @@
         <item>Ruby</item>
         <item>JavaScript</item>
     </string-array>
+
+    <string-array name="pref_units">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
+
+    <string-array name="pref_units_alias">
+        <item>unit_metric</item>
+        <item>unit_imperial</item>
+    </string-array>
 </resources>

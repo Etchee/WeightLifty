@@ -8,6 +8,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataDbHelper;

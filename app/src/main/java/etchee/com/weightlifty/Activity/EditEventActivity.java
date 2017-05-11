@@ -160,26 +160,8 @@ public class EditEventActivity extends FragmentActivity implements
                 }
             });
 
-
-            if (receivedEventID < 0) Toast.makeText(this, "Event ID query failed.", Toast.LENGTH_SHORT).show();
-
             String event = getIntent().getStringExtra(DataContract.GlobalConstants.PASS_EVENT_STRING);
             name_workout.setText(event);
-
-            //(DEBUG)check if the item id is correct
-//            Cursor cursor = getContentResolver().query(
-//                    DataContract.EventType_FTSEntry.CONTENT_URI,
-//                    new String[]{DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
-//                            DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME},
-//                    DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?",
-//                    new String[]{String.valueOf(receivedEventID)},
-//                    null
-//            );
-//            if (cursor.moveToFirst()){
-//                String temp = cursor.getString(cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME));
-//                cursor.close();
-//                Toast.makeText(this, "Event: " + temp, Toast.LENGTH_SHORT).show();
-//            }
         }
 
         // Case 2: modifying an already existing event → bundle with selection.
