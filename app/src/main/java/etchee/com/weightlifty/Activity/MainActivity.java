@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -42,10 +43,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getFragmentManager().beginTransaction().add(
-                R.id.container_fragment_main,
-                new MainActivityFragment()
-        ).commit();
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.container_fragment_main, new MainActivityFragment()).commit();
         context = getApplicationContext();
         dbHelper = new DataDbHelper(context);
 
@@ -320,10 +320,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.menu_settings:
-                getFragmentManager().beginTransaction().replace(
-                        R.id.container_fragment_main,
-                        new SettingsActivity()
-                ).addToBackStack(null).commit();
+                getFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.animator.slide_in_from_left, R.animator.slide_out_to_right)
+                        .replace(R.id.container_fragment_main, new SettingsActivity())
+                        .addToBackStack(null)
+                        .commit();
                 break;
 
         }
