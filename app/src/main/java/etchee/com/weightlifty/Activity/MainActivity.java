@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportFragmentManager()
+        getFragmentManager()
                 .beginTransaction()
                 .add(R.id.container_fragment_main, new MainActivityFragment()).commit();
         context = getApplicationContext();
@@ -321,12 +321,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.menu_settings:
-                getSupportFragmentManager()
+                getFragmentManager()
                         .beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_from_left,
-                                R.anim.slide_out_to_right,
-                                R.anim.slide_in_from_right,
-                                R.anim.slide_out_to_left
+                        .setCustomAnimations(R.animator.slide_in_from_left,
+                                R.animator.slide_out_to_right,
+                                R.animator.slide_in_from_right,
+                                R.animator.slide_out_to_left
                         )
                         .replace(R.id.container_fragment_main, new SettingsActivity())
                         .addToBackStack(null)

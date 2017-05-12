@@ -3,6 +3,7 @@ package etchee.com.weightlifty.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ import etchee.com.weightlifty.R;
  * Created by rikutoechigoya on 2017/05/11.
  */
 
-public class MainActivityFragment extends android.support.v4.app.Fragment {
+public class MainActivityFragment extends android.app.Fragment {
 
     private Button begin_workout;
 
