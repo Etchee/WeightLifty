@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import etchee.com.weightlifty.R;
 
 /**
+ * Preference screen
  * Created by rikutoechigoya on 2017/05/11.
  */
 

@@ -43,6 +43,7 @@ import etchee.com.weightlifty.data.DataDbHelper;
 public class WorkoutListActivity extends AppCompatActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
+    SearchInitiationListener searchListener;
     private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -103,8 +104,27 @@ public class WorkoutListActivity extends AppCompatActivity implements
         searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setQueryHint(getString(R.string.hint_search_events));
         searchView.setOnQueryTextListener(this);
+        searchView.setOnSearchClickListener(searchViewOnClickSetup());
 
         return true;
+    }
+
+    private View.OnClickListener searchViewOnClickSetup(){
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_from_left,
+                                R.anim.slide_out_to_right,
+                                R.anim.slide_in_from_right,
+                                R.anim.slide_out_to_left)
+                        .replace(R.id.container_fragment_listActivity, new SearchFragment())
+                        .commit();
+            }
+        };
+
+        return listener;
     }
 
     @Override
@@ -267,10 +287,12 @@ public class WorkoutListActivity extends AppCompatActivity implements
      */
     @Override
     public boolean onClose() {
-
-        //call current list fragment
-
+        //call current fragment?
         return false;
+    }
+
+    public interface SearchInitiationListener {
+        void onSearchCursorReceived(Cursor cursor);
     }
 
     @Override
@@ -279,8 +301,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
         query = query + "*";
         Cursor cursor = queryWorkout(query);
         //send off cursor to search fragment
-//        listview.setAdapter(searchAdapter);
-//        searchAdapter.swapCursor(cursor);
+        searchListener.onSearchCursorReceived(cursor);
         return false;
     }
 
@@ -299,8 +320,8 @@ public class WorkoutListActivity extends AppCompatActivity implements
 
 
     /**
-     *  Search method that returns a cursor.
-     *
+     * Search method that returns a cursor.
+     * 
      * @param input User input text sent from the UI
      * @return cursor that contains the results of the search
      * @throws SQLException if search fails.

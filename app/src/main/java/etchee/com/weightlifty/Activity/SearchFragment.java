@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -33,7 +34,9 @@ import etchee.com.weightlifty.data.DataDbHelper;
  * Created by rikutoechigoya on 2017/05/12.
  */
 
-public class SearchFragment extends Fragment implements SearchView.OnCloseListener, SearchView.OnQueryTextListener {
+public class SearchFragment extends android.support.v4.app.Fragment
+        implements SearchView.OnCloseListener, SearchView.OnQueryTextListener,
+        WorkoutListActivity.SearchInitiationListener{
 
     private ListView listview;
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -191,11 +194,17 @@ public class SearchFragment extends Fragment implements SearchView.OnCloseListen
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        Toast.makeText(context, "Wait, I am receiving textsubmit", Toast.LENGTH_SHORT).show();
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+
+    @Override
+    public void onSearchCursorReceived(Cursor cursor) {
+        adapter.swapCursor(cursor);
     }
 }

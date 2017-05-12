@@ -1,7 +1,5 @@
 package etchee.com.weightlifty.Activity;
 
-import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,10 +11,11 @@ import android.widget.Button;
 import etchee.com.weightlifty.R;
 
 /**
+ * The welcome activity fragment
  * Created by rikutoechigoya on 2017/05/11.
  */
 
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends android.support.v4.app.Fragment {
 
     private Button begin_workout;
 

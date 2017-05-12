@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container_fragment_main, new MainActivityFragment()).commit();
         context = getApplicationContext();
@@ -320,12 +321,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.menu_settings:
-                getFragmentManager()
+                getSupportFragmentManager()
                         .beginTransaction()
-                        .setCustomAnimations(R.animator.slide_in_from_left,
-                                R.animator.slide_out_to_right,
-                                R.animator.slide_in_from_right,
-                                R.animator.slide_out_to_left
+                        .setCustomAnimations(R.anim.slide_in_from_left,
+                                R.anim.slide_out_to_right,
+                                R.anim.slide_in_from_right,
+                                R.anim.slide_out_to_left
                         )
                         .replace(R.id.container_fragment_main, new SettingsActivity())
                         .addToBackStack(null)
