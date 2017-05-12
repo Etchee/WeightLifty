@@ -39,7 +39,7 @@ import static java.lang.Integer.parseInt;
 /**
  * Created by rikutoechigoya on 2017/04/07.
  *
- *  From WorkoutListActivity, when user taps on one of the events, this class is called to load the
+ *  From WorkoutListInterface, when user taps on one of the events, this class is called to load the
  *  specific event.
  */
 
@@ -80,7 +80,7 @@ public class EditEventActivity extends FragmentActivity implements
 
     /**
      * Two modes for this activity:
-     * 1. From WorkoutListActivity, tapping on already existing item.
+     * 1. From WorkoutListInterface, tapping on already existing item.
      * → Modify event, bundle w/ selection. Select that in the event table, query, display.
      * <p>
      * 2. From ChooseEventActivity, selecting which workout.
@@ -167,7 +167,7 @@ public class EditEventActivity extends FragmentActivity implements
         // Case 2: modifying an already existing event → bundle with selection.
         else if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
 
-            //currently in WorkoutListActivity, this date is just set as today's date. Just pass another date
+            //currently in WorkoutListInterface, this date is just set as today's date. Just pass another date
             //in future updates.
             final int selectedDate = bundle.getInt(DataContract.GlobalConstants.PASS_SELECTED_DATE);
 

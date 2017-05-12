@@ -1,12 +1,10 @@
 package etchee.com.weightlifty.Activity;
 
 import android.app.Fragment;
-import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -20,12 +18,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.Calendar;
-
 import etchee.com.weightlifty.Adapter.SearchAdapter;
+import etchee.com.weightlifty.Interface.SearchFragmentInterface;
+import etchee.com.weightlifty.Interface.WorkoutListInterface;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
-import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
 
@@ -36,7 +33,7 @@ import etchee.com.weightlifty.data.DataDbHelper;
 
 public class SearchFragment extends Fragment
         implements SearchView.OnCloseListener, SearchView.OnQueryTextListener,
-        WorkoutListActivity.SearchInitiationListener{
+        WorkoutListInterface {
 
     private ListView listview;
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -46,6 +43,7 @@ public class SearchFragment extends Fragment
     private SearchAdapter adapter;
     private ContentResolver contentResolver;
     private SearchView searchView;
+    private SearchFragmentInterface fragmentInterface;
 
 
     //TODO this fragment has to receive inputs from the search bar in the parent Activity
@@ -58,6 +56,8 @@ public class SearchFragment extends Fragment
         super.onCreate(savedInstanceState);
         context = getActivity().getApplicationContext();
         contentResolver = context.getContentResolver();
+        //pass this activity to the parent Activity
+        fragmentInterface.fragmentCallback();
     }
 
 
@@ -185,6 +185,16 @@ public class SearchFragment extends Fragment
         Cursor cursor = new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
 
         return cursor;
+    }
+
+    /**
+     * called when this fragment is attached to the ListActivity.
+     * @param context
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        fragmentInterface.fragmentCallback(this);
     }
 
     @Override

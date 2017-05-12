@@ -1,5 +1,7 @@
 package etchee.com.weightlifty.Activity;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,6 +30,8 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.Calendar;
 import java.util.Random;
 
+import etchee.com.weightlifty.Interface.SearchFragmentInterface;
+import etchee.com.weightlifty.Interface.WorkoutListInterface;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
@@ -41,9 +45,11 @@ import etchee.com.weightlifty.data.DataDbHelper;
  */
 
 public class WorkoutListActivity extends AppCompatActivity implements
-        SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+        SearchView.OnQueryTextListener, SearchView.OnCloseListener,
+        SearchFragmentInterface {
 
-    SearchInitiationListener searchListener;
+    private etchee.com.weightlifty.Activity.SearchFragment fragmentActivity;
+    private Activity activity;
     private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -54,6 +60,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private SearchView searchView;
     private Context context;
+    WorkoutListInterface searchListener;
 
 
     @Override
@@ -64,6 +71,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
         toolbar = (Toolbar) findViewById(R.id.list_toolbar);
         setSupportActionBar(toolbar);
         contentResolver = getContentResolver();
+        activity = this;
 
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.listactivity_fab);
@@ -119,7 +127,8 @@ public class WorkoutListActivity extends AppCompatActivity implements
                                 R.animator.slide_out_to_right,
                                 R.animator.slide_in_from_right,
                                 R.animator.slide_out_to_left)
-                        .replace(R.id.container_fragment_listActivity, new SearchFragment())
+                        .addToBackStack(null)
+                        .replace(R.id.container_fragment_listActivity, new etchee.com.weightlifty.Activity.SearchFragment())
                         .commit();
             }
         };
@@ -287,12 +296,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
      */
     @Override
     public boolean onClose() {
-        //call current fragment?
         return false;
-    }
-
-    public interface SearchInitiationListener {
-        void onSearchCursorReceived(Cursor cursor);
     }
 
     @Override
@@ -301,7 +305,13 @@ public class WorkoutListActivity extends AppCompatActivity implements
         query = query + "*";
         Cursor cursor = queryWorkout(query);
         //send off cursor to search fragment
-        searchListener.onSearchCursorReceived(cursor);
+        try{
+            searchListener = (WorkoutListInterface)fragmentActivity;
+            searchListener.onSearchCursorReceived(cursor);
+        }catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " failed to cast tp " +
+                    "WorkoutListInterface");
+        }
         return false;
     }
 
@@ -317,7 +327,12 @@ public class WorkoutListActivity extends AppCompatActivity implements
         return false;
     }
 
-
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        Toast.makeText(this, "fragment attached.", Toast.LENGTH_SHORT).show();
+        //call OnSearch Interface and pass cursor
+    }
 
     /**
      * Search method that returns a cursor.
@@ -352,5 +367,11 @@ public class WorkoutListActivity extends AppCompatActivity implements
         return cursor;
     }
 
+
+    @Override
+    public void fragmentCallback(etchee.com.weightlifty.Activity.SearchFragment searchFragment) {
+        fragmentActivity = searchFragment;
+        Toast.makeText(activity, "Fragment callback received!", Toast.LENGTH_SHORT).show();
+    }
 }
 
