@@ -8,9 +8,6 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +29,8 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
  * Created by rikutoechigoya on 2017/05/12.
  */
 
-public class CurrentListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class CurrentListFragment extends android.app.Fragment implements
+        android.app.LoaderManager.LoaderCallbacks<Cursor> {
     private ListView listview;
     private FloatingActionButton fab;
 
@@ -62,7 +60,7 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
 
         //for the empty view
         View emptyView = view.findViewById(R.id.view_empty);
-        listview = (ListView)view.findViewById(R.id.listview_fragment_current);
+        listview = (ListView) view.findViewById(R.id.listview_fragment_current);
         listview.setEmptyView(emptyView);
         listview.setAdapter(listAdapter);
 
@@ -73,7 +71,6 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
         Bundle bundle = new Bundle();
         bundle.putInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, getDateAsInt());
         getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
-
     }
 
     @Nullable
@@ -131,16 +128,16 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
                             int index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
                             eventID = Integer.parseInt(cursor.getString(index));
 
-                        }
+                        } else if (!cursor.moveToFirst())
+                            throw new CursorIndexOutOfBoundsException("EventID query: Cursor might be empty");
 
-                        else if (!cursor.moveToFirst()) throw new CursorIndexOutOfBoundsException("EventID query: Cursor might be empty");
-
-                    } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
+                    } else
+                        throw new IllegalArgumentException("Invalid token received at Event ID query.");
                 } catch (CursorIndexOutOfBoundsException e) {
                     e.printStackTrace();
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     cursor.close();
                 }
 
@@ -202,7 +199,7 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
                 projection,
                 null,
                 null,
-                null );
+                null);
         return cursor;
     }
 
@@ -219,13 +216,12 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
     }
 
     /**
-     *
-     * @param id Just select any desired ID. Here I define in the global constant
-     * @param bundle  pass any object in bundle, no need to pass anything in here.
-     * @return  defined cursor
+     * @param id     Just select any desired ID. Here I define in the global constant
+     * @param bundle pass any object in bundle, no need to pass anything in here.
+     * @return defined cursor
      */
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 
         /**
          *  ListView will contain specified date's events.
@@ -254,7 +250,7 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
         String selection = EventEntry.COLUMN_DATE + "=?";
         String selectionArgs[] = new String[]{String.valueOf(date)};
 
-        return new android.support.v4.content.CursorLoader(
+        return new android.content.CursorLoader(
                 context,
                 EventEntry.CONTENT_URI,
                 projection,
@@ -265,13 +261,13 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor) {
         listAdapter.swapCursor(cursor);
         listAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(android.content.Loader<Cursor> loader) {
         listAdapter.swapCursor(null);
     }
 

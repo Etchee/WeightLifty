@@ -34,7 +34,7 @@ import etchee.com.weightlifty.data.DataDbHelper;
  * Created by rikutoechigoya on 2017/05/12.
  */
 
-public class SearchFragment extends android.support.v4.app.Fragment
+public class SearchFragment extends Fragment
         implements SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         WorkoutListActivity.SearchInitiationListener{
 

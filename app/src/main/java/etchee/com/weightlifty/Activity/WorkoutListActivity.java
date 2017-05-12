@@ -78,7 +78,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
             }
         });
 
-        getSupportFragmentManager().beginTransaction().add(
+        getFragmentManager().beginTransaction().add(
                 R.id.container_fragment_listActivity,
                 new CurrentListFragment()
         ).commit();
@@ -113,12 +113,12 @@ public class WorkoutListActivity extends AppCompatActivity implements
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager()
+                getFragmentManager()
                         .beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_from_left,
-                                R.anim.slide_out_to_right,
-                                R.anim.slide_in_from_right,
-                                R.anim.slide_out_to_left)
+                        .setCustomAnimations(R.animator.slide_in_from_left,
+                                R.animator.slide_out_to_right,
+                                R.animator.slide_in_from_right,
+                                R.animator.slide_out_to_left)
                         .replace(R.id.container_fragment_listActivity, new SearchFragment())
                         .commit();
             }
@@ -321,7 +321,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
 
     /**
      * Search method that returns a cursor.
-     * 
+     *
      * @param input User input text sent from the UI
      * @return cursor that contains the results of the search
      * @throws SQLException if search fails.
