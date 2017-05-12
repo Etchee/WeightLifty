@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/current_list_listview"
+        android:layout_marginTop="?android:actionBarSize"
+        android:layout_centerHorizontal="true" />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/current_list_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="17dp"
+        android:layout_marginRight="17dp"
+        android:adjustViewBounds="true"
+        android:background="@color/colorPrimary"
+        android:cropToPadding="true"
+        android:elevation="@dimen/fab_size_normal"
+        android:src="@drawable/fab_add"
+        fab:fab_colorNormal="@color/colorPrimary"
+        fab:fab_colorPressed="@color/colorPrimary"
+        fab:fab_colorRipple="@color/black_semi_transparent" />
+
+</FrameLayout>

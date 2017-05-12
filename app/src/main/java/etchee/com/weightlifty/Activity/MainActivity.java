@@ -322,7 +322,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_settings:
                 getFragmentManager()
                         .beginTransaction()
-                        .setCustomAnimations(R.animator.slide_in_from_left, R.animator.slide_out_to_right)
+                        .setCustomAnimations(R.animator.slide_in_from_left,
+                                R.animator.slide_out_to_right,
+                                R.animator.slide_in_from_right,
+                                R.animator.slide_out_to_left
+                        )
                         .replace(R.id.container_fragment_main, new SettingsActivity())
                         .addToBackStack(null)
                         .commit();
