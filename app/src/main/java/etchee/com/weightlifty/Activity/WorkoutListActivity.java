@@ -11,12 +11,10 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -48,8 +46,6 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.DataMethods.subIDfixHelper;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
-
-import static android.R.attr.data;
 
 /**
  *  From MainActivity -> Loads today's data, display as a list.
@@ -88,7 +84,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         contentResolver = getContentResolver();
 
         //fab setup
-        fab = (FloatingActionButton) findViewById(R.id.list_fab);
+        fab = (FloatingActionButton) findViewById(R.id.listactivity_fab);
 
         /**
          *  on FAB click, enter chooseEventMode
@@ -243,9 +239,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
         return listener;
     }
-
-
-
     /**
      * When user clicks FAB, this method is called.
      * User will direcly start typing their desired events.
