@@ -1,51 +1,31 @@
 package etchee.com.weightlifty.Activity;
 
-import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
 import java.util.Calendar;
-import java.util.Random;
 
-
-import etchee.com.weightlifty.DataMethods.subIDfixHelper;
-import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
-import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.Adapter.ListAdapter;
-import etchee.com.weightlifty.Adapter.SearchAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
-import etchee.com.weightlifty.data.DataDbHelper;
+import etchee.com.weightlifty.data.DataContract.EventEntry;
 
 /**
  * Displays the date's fragment.
@@ -73,7 +53,6 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
         contentResolver = context.getContentResolver();
         //cursor init
         Cursor listCursor = initListCursor();
-
         listAdapter = new ListAdapter(context, listCursor, 0);
     }
 
@@ -81,10 +60,9 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         //for the empty view
         View emptyView = view.findViewById(R.id.view_empty);
-        listview = (ListView)view.findViewById(R.id.listview_workout);
+        listview = (ListView)view.findViewById(R.id.listview_fragment_current);
         listview.setEmptyView(emptyView);
         listview.setAdapter(listAdapter);
 
@@ -100,7 +78,8 @@ public class CurrentListFragment extends Fragment implements LoaderManager.Loade
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
     }
 

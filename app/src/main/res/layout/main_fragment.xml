@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/main_logo_view"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_marginTop="@dimen/list_marginTop"
         android:paddingBottom="20dp"
         android:paddingRight="10dp"

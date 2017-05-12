@@ -1,18 +1,11 @@
 package etchee.com.weightlifty.Activity;
 
-import android.app.LoaderManager;
-import android.app.SearchManager;
-import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
-import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,8 +21,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -37,11 +28,8 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.Calendar;
 import java.util.Random;
 
-import etchee.com.weightlifty.Adapter.ListAdapter;
-import etchee.com.weightlifty.Adapter.SearchAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DBviewer;
-import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.DataMethods.subIDfixHelper;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
@@ -52,10 +40,9 @@ import etchee.com.weightlifty.data.DataDbHelper;
  *  When SearchView is initiated -> Performs a search, then pass the resulting cursor to SearchAdapter
  */
 
-public class WorkoutListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+public class WorkoutListActivity extends AppCompatActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
-    private ListView listview;
     private FloatingActionButton fab;
 
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -63,30 +50,24 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     private int eventID;
     private final int CREATE_LOADER_ID = 1;
     private final String TAG = getClass().getSimpleName();
-    private SearchManager searchManager;
     private Toolbar toolbar;
     private SearchView searchView;
     private Context context;
-    private ListAdapter listAdapter;
-    private SearchAdapter searchAdapter;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_list);
-
         context = getApplicationContext();
-
         toolbar = (Toolbar) findViewById(R.id.list_toolbar);
         setSupportActionBar(toolbar);
-
         contentResolver = getContentResolver();
 
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.listactivity_fab);
 
-        /**
+        /*
          *  on FAB click, enter chooseEventMode
          */
         fab.setOnClickListener(new View.OnClickListener() {
@@ -96,29 +77,10 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
             }
         });
 
-        //for the empty view
-        View emptyView = findViewById(R.id.view_empty);
-        listview = (ListView)findViewById(R.id.listview_workout);
-        listview.setEmptyView(emptyView);
-
-        //cursor init
-        Cursor listCursor = initListCursor();
-        Cursor eventTypeCursor = initEventTypeCursor();
-
-        //adapter initialization
-        searchAdapter = new SearchAdapter(context, eventTypeCursor);
-        listAdapter = new ListAdapter(getApplicationContext(), listCursor, 0);
-        listview.setAdapter(listAdapter);
-
-        //Init the loader
-
-        //only display today's data for now
-        Bundle bundle = new Bundle();
-        bundle.putInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, getDateAsInt());
-        getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
-
-        //listView setup
-        listview.setOnItemClickListener(listViewOnItemClickSetup());
+        getSupportFragmentManager().beginTransaction().add(
+                R.id.container_fragment_listActivity,
+                new CurrentListFragment()
+        ).commit();
     }
 
     @Override
@@ -136,23 +98,15 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_list, menu);
-
-        searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
         final MenuItem item = menu.findItem(R.id.action_search_button);
         MenuItemCompat.expandActionView(item);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listview.setAdapter(null);
-            }
-        });
         searchView.setQueryHint(getString(R.string.hint_search_events));
         searchView.setOnQueryTextListener(this);
 
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -180,66 +134,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     }
 
     /**
-     *  OnClickListener of the listView. Behaves differently depending on which of the two adapters
-     *  are set atm.
-     *
-     *  case 1: listAdapter →　gets the SUB_ID, moves on to EditEventActivity
-     *
-     *  case 2: SearchAdapter → gets the ROW_ID (FTS Table), moves on to EditEventActivity
-     * @return
-     */
-    private AdapterView.OnItemClickListener listViewOnItemClickSetup() {
-        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                //check which adapters are set
-                if (listview.getAdapter() == searchAdapter) {
-                    //I have to get either ROW_ID or just item name here
-                    String event = (String) searchAdapter.getItem(position);
-
-                    //for debug, query the FTS table to see if the item name is correct
-                    String projection[] = new String[]{
-                            EventType_FTSEntry.COLUMN_EVENT_NAME
-                    };
-
-                    String selection = EventType_FTSEntry.COLUMN_EVENT_NAME + "=?";
-                    String selectionArgs[] = new String[]{String.valueOf(event)};
-
-                    String eventName = null;
-                    Cursor cursor = null;
-                    try {
-                        cursor = getContentResolver().query(
-                                DataContract.EventType_FTSEntry.CONTENT_URI,
-                                projection,
-                                selection,
-                                selectionArgs,
-                                null
-                        );
-                        if (cursor.moveToFirst()) {
-                            eventName = cursor.getString(cursor.getColumnIndex(
-                                    EventType_FTSEntry.COLUMN_EVENT_NAME));
-                        }
-
-                    } finally {
-                        if (cursor != null) {
-                            cursor.close();
-                        }
-                    }
-                    launchEditEventActivityWithNewEvent(eventName);
-
-                } else if (listview.getAdapter() == listAdapter) {
-                    launchEditActivityWithEventID(position);
-                    Log.v(TAG, "SUB_ID received as: " + String.valueOf(position));
-                } else {
-                    //adapter null. Do nothing
-                }
-            }
-        };
-
-        return listener;
-    }
-    /**
      * When user clicks FAB, this method is called.
      * User will direcly start typing their desired events.
      *
@@ -249,7 +143,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
      */
     private void enterChooseEventMode() {
         searchView.setIconified(false);
-        listview.setAdapter(null);
     }
 
     private int deleteEventTableDatabase() {
@@ -328,146 +221,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         return sub_id;
     }
 
-
-
-    /**
-     * @param position equals to that of the sub_id in the event table.
-     *                 This method find the specific row with the sub_id, then get the event_id
-     *                 back in that row.
-     */
-    private void launchEditActivityWithEventID(final int position) {
-
-        int date_today = getDateAsInt();
-
-        //Define async query handler
-        AsyncQueryHandler queryHandler = new AsyncQueryHandler(contentResolver) {
-
-            @Override
-            protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-                int eventID = -1;
-
-                try {
-                    //Token will be passed to prevent confusion on multi querying
-                    if (token == DataContract.GlobalConstants.QUERY_EVENT_ID) {
-                        if (cursor.moveToFirst()) {
-                            int index = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_ID);
-                            eventID = Integer.parseInt(cursor.getString(index));
-
-                        }
-
-                        else if (!cursor.moveToFirst()) throw new CursorIndexOutOfBoundsException("EventID query: Cursor might be empty");
-
-                    } else throw new IllegalArgumentException("Invalid token received at Event ID query.");
-                } catch (CursorIndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                }finally {
-                    cursor.close();
-                }
-
-                setEventID(eventID);
-
-                Intent intent = new Intent(getApplicationContext(), EditEventActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putInt(DataContract.GlobalConstants.PASS_EVENT_ID, getEventID());
-                bundle.putInt(DataContract.GlobalConstants.PASS_SUB_ID, position);
-                bundle.putInt(DataContract.GlobalConstants.PASS_SELECTED_DATE, getDateAsInt());
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        };
-
-        //projection
-        String projection[] = new String[]{
-                EventEntry.COLUMN_DATE,
-                EventEntry.COLUMN_SUB_ID,
-                EventEntry.COLUMN_EVENT_ID
-        };
-
-        //selection
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
-
-        //selectionArgs
-        String selectionArgs[] = new String[]{
-                String.valueOf(date_today),
-                String.valueOf(position)
-        };
-
-        //Finally, fire the query!
-        queryHandler.startQuery(
-                DataContract.GlobalConstants.QUERY_EVENT_ID,
-                null,
-                EventEntry.CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                null
-        );
-    }
-
-    //Send contentValues
-    private void launchEditEventActivityWithNewEvent(String eventName) {
-        Intent intent = new Intent(this, EditEventActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(DataContract.GlobalConstants.PASS_EVENT_STRING, eventName);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
-
-    private Cursor initListCursor() {
-        Cursor cursor;
-
-        String projection[] = {
-                EventEntry._ID,
-                EventEntry.COLUMN_WEIGHT_COUNT,
-                EventEntry.COLUMN_REP_COUNT,
-                EventEntry.COLUMN_SUB_ID,
-                EventEntry.COLUMN_SET_COUNT,
-                EventEntry.COLUMN_EVENT_ID
-        };
-
-        cursor = contentResolver.query(
-                EventEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null );
-        return cursor;
-    }
-
-    private Cursor initEventTypeCursor() {
-
-        //Cursor cursor;
-//        String projection[] = {
-//                EventType_FTSEntry.COLUMN_ROW_ID,
-//                EventType_FTSEntry.COLUMN_EVENT_TYPE,
-//                EventType_FTSEntry.COLUMN_EVENT_NAME
-//        };
-//
-//        String selection = EventType_FTSEntry.COLUMN_ROW_ID + "=?";
-//        String selectionArgs[] = new String[]{ String.valueOf(1) };
-//
-//        cursor = contentResolver.query(
-//                EventType_FTSEntry.CONTENT_URI,
-//                projection,
-//                selection,
-//                selectionArgs,
-//                null
-//        );
-
-        //do a rawQuery because I want to specify the hidden docid column
-        Cursor cursor;
-        SQLiteDatabase db = new DataDbHelper(context).getReadableDatabase();
-        String query = "SELECT " + " * " + " FROM "
-                + DataContract.EventType_FTSEntry.TABLE_NAME;
-        cursor = db.rawQuery(query, null);
-
-        if (cursor != null) return cursor;
-        else throw new NullPointerException(TAG + ": FTS table cursor initialization has failed");
-    }
-
     private int getDateAsInt() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -480,77 +233,16 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         return Integer.parseInt(concatenated);
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
         new subIDfixHelper(getApplicationContext()).execute(getDateAsInt());
     }
-
-    /**
-     *
-     * @param id Just select any desired ID. Here I define in the global constant
-     * @param bundle  pass any object in bundle, no need to pass anything in here.
-     * @return  defined cursor
-     */
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-
-        /**
-         *  ListView will contain specified date's events.
-         *  Required components
-         *
-         *  1. date to specify date
-         *  2. event ID to get the workout name
-         *  3. set_count
-         *  4. rep_count
-         *
-         */
-
-        int date;
-
-        date = bundle.getInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE);
-
-        String projection[] = new String[]{
-                EventEntry._ID,
-                EventEntry.COLUMN_DATE,
-                EventEntry.COLUMN_EVENT_ID,
-                EventEntry.COLUMN_WEIGHT_COUNT,
-                EventEntry.COLUMN_SET_COUNT,
-                EventEntry.COLUMN_REP_COUNT
-        };
-
-        String selection = EventEntry.COLUMN_DATE + "=?";
-        String selectionArgs[] = new String[]{String.valueOf(date)};
-
-        return new CursorLoader(
-                this,
-                EventEntry.CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                null
-        );
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        listAdapter.swapCursor(cursor);
-        listAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        listAdapter.swapCursor(null);
-    }
-
-
     //if searchView is expanded, then collapse
     @Override
     public void onBackPressed() {
        if (!searchView.isIconified()) {
            searchView.onActionViewCollapsed();
-           listview.setAdapter(listAdapter);
        } else {
            super.onBackPressed();
        }
@@ -569,21 +261,6 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         delete_all_events.setTitle(string);
     }
 
-    private void eventType_insertDummyValues() {
-
-        ContentValues dummyValues = new ContentValues();
-
-        dummyValues.put(DataContract.EventTypeEntry.COLUMN_EVENT_NAME, "Test Event");
-
-        Uri uri = getContentResolver().insert(DataContract.EventTypeEntry.CONTENT_URI, dummyValues);
-
-        if (uri == null) throw new IllegalArgumentException("Calendar table (inser dummy)" +
-                "failed to insert data. check the MainActivity method and the table.");
-
-
-        Toast.makeText(this, "EventType inserted", Toast.LENGTH_SHORT).show();
-    }
-
     /**
      *      When SearchView is closed, the listView should have the list of today's workouts
      * @return false
@@ -591,7 +268,7 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
     @Override
     public boolean onClose() {
 
-        listview.setAdapter(listAdapter);
+        //call current list fragment
 
         return false;
     }
@@ -601,8 +278,9 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         Log.v(TAG, "Text submitted: " + query);
         query = query + "*";
         Cursor cursor = queryWorkout(query);
-        listview.setAdapter(searchAdapter);
-        searchAdapter.swapCursor(cursor);
+        //send off cursor to search fragment
+//        listview.setAdapter(searchAdapter);
+//        searchAdapter.swapCursor(cursor);
         return false;
     }
 
@@ -613,8 +291,8 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
         //so that the search is for every part of the texts
         newText = newText + "*";
         Cursor cursor = queryWorkout(newText);
-        listview.setAdapter(searchAdapter);
-        searchAdapter.swapCursor(cursor);
+//        listview.setAdapter(searchAdapter);
+//        searchAdapter.swapCursor(cursor);
         return false;
     }
 
@@ -643,16 +321,13 @@ public class WorkoutListActivity extends AppCompatActivity implements LoaderMana
 
                TODO I should make another column that joints all other columns (key_search) to search EVERYTHING
          */
-
         String query = "SELECT docid as _id," +
                 EventType_FTSEntry.COLUMN_EVENT_NAME + "," +
                 EventType_FTSEntry.COLUMN_EVENT_TYPE +
                 " FROM " + EventType_FTSEntry.TABLE_NAME +
                 " WHERE " + EventType_FTSEntry.COLUMN_EVENT_NAME + " MATCH '" + input + "';";
 
-
         Cursor cursor = new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
-
         return cursor;
     }
 

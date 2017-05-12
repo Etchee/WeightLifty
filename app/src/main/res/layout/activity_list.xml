@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/list_toolbar"
-        android:background="@color/colorPrimary"
-        android:layout_width="match_parent"
-        android:layout_height="?android:actionBarSize"
-        android:elevation="4dp"
-        />
-
-    <ListView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/listview_workout"
-        android:layout_marginTop="?android:actionBarSize"
-        android:layout_centerHorizontal="true" />
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/list_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize"
+            android:background="@color/colorPrimary"
+            android:elevation="4dp" />
+
+        <LinearLayout
+            android:id="@+id/container_fragment_listActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </LinearLayout>
 
     <com.github.clans.fab.FloatingActionButton
         android:id="@+id/listactivity_fab"
