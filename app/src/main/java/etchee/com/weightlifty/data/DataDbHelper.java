@@ -18,6 +18,7 @@ import static android.R.attr.version;
 import static etchee.com.weightlifty.data.DataContract.EventType_FTSEntry.TABLE_NAME;
 
 /**
+ * Helper method to create DB
  * Created by rikutoechigoya on 2017/03/24.
  */
 
@@ -55,6 +56,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
                 + EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + EventEntry.COLUMN_DATE + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_FORMATTED_DATE + " TEXT NOT NULL, "
                 + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
                 + EventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, "
                 + EventEntry.COLUMN_SET_COUNT + " INTEGER, "
@@ -70,7 +72,6 @@ public class DataDbHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_EVENT_TYPE_FTS_TABLE);
         db.execSQL(CREATE_CALENDAR_TABLE);
         db.execSQL(CREATE_EVENT_TABLE);
-
     }
 
     @Override

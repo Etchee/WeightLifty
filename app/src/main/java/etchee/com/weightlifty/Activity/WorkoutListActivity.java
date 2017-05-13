@@ -68,7 +68,7 @@ public class WorkoutListActivity extends AppCompatActivity {
 
         //viewpager initialization
         viewPager = (ViewPager)findViewById(R.id.viewPager_fragment_listActivity);
-        viewPagerAdapter = new ListViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter = new ListViewPagerAdapter(getSupportFragmentManager(), context);
         viewPager.setAdapter(viewPagerAdapter);
 
         //hook 'em up with the Tabs
@@ -154,6 +154,19 @@ public class WorkoutListActivity extends AppCompatActivity {
         return numberOfDeletedRows;
     }
 
+    private String getFormattedDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+
+        return concatenated;
+    }
+
     private void event_insertDummyValues() {
 
         ContentValues values = new ContentValues();
@@ -164,6 +177,7 @@ public class WorkoutListActivity extends AppCompatActivity {
         int weight_count = 70;
         int sub_ID = getNextSub_id();
         int eventID = new Random().nextInt(900);
+        String formattedDate = getFormattedDate();
 
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);
@@ -171,6 +185,7 @@ public class WorkoutListActivity extends AppCompatActivity {
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
 
         Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
 

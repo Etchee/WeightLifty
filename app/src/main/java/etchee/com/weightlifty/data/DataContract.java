@@ -102,6 +102,7 @@ public final class DataContract {
         public static final String COLUMN_SET_COUNT = "table_event_set_count";
         public static final String COLUMN_REP_COUNT = "table_event_rep_count";
         public static final String COLUMN_WEIGHT_COUNT = "table_event_weight_count";
+        public static final String COLUMN_FORMATTED_DATE = "formatted_date";
 
     }
 

@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.util.Calendar;
+import java.util.Random;
 
 import etchee.com.weightlifty.Fragment.MainActivityFragment;
 import etchee.com.weightlifty.Fragment.SettingsFragment;
@@ -82,10 +83,25 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+
+    private String getFormattedDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+
+        return concatenated;
+    }
+
     private int getDateAsInt() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int year = calendar.get(Calendar.YEAR);
+
         int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
@@ -114,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     null,
                     null,
                     null
-                    );
+            );
             if (cursor.moveToLast()) {
                 int dateColumnIndex = cursor.getColumnIndex(CalendarEntry.COLUMN_DATE);
                 dateFromLastRow = cursor.getInt(dateColumnIndex);
@@ -125,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
         //check if the date matches to that of today
         int dateOfToday = getDateAsInt();
+        String formattedDate = getFormattedDate();
 
         //if today's date doesn't match to that of the last row in calendar table, insert.
         if (dateFromLastRow != dateOfToday) {
@@ -144,8 +161,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     private void event_insertDummyValues() {
 
         ContentValues values = new ContentValues();
@@ -155,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         int date = getDateAsInt();
         int weight_count = 70;
         int sub_ID = getNextSub_id();
-        int eventID = 2;
+        int eventID = new Random().nextInt(800);
 
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);
@@ -163,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, getFormattedDate());
 
         Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
 

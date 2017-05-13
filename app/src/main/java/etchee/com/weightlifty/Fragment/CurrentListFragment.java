@@ -90,7 +90,6 @@ public class CurrentListFragment extends Fragment implements
 
         if (getArguments() != null) {
             int position = getArguments().getInt(DataContract.GlobalConstants.VIEWPAGER_POSITION);
-            Toast.makeText(context, "args is: " + String.valueOf(position), Toast.LENGTH_SHORT).show();
         } else Toast.makeText(context, "Argument not received", Toast.LENGTH_SHORT).show();
 
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
