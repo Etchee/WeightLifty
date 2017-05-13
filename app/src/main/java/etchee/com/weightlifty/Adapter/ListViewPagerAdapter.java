@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -56,7 +57,6 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
         if (allEventsCursor.moveToPosition(position)) {
             index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_DATE);
         }
-
         args.putInt(DataContract.GlobalConstants.VIEWPAGER_POSITION, allEventsCursor.getInt(index));
 
         return fragment;

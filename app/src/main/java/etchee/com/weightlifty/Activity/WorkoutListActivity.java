@@ -55,6 +55,7 @@ public class WorkoutListActivity extends AppCompatActivity {
     private Context context;
     private ViewPager viewPager;
     private ListViewPagerAdapter viewPagerAdapter;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,7 +73,7 @@ public class WorkoutListActivity extends AppCompatActivity {
         viewPager.setAdapter(viewPagerAdapter);
 
         //hook 'em up with the Tabs
-        TabLayout tabLayout = (TabLayout)findViewById(R.id.list_tab);
+        tabLayout = (TabLayout)findViewById(R.id.list_tab);
         tabLayout.setupWithViewPager(viewPager);
 
         //fab setup
@@ -108,6 +109,8 @@ public class WorkoutListActivity extends AppCompatActivity {
     }
 
     private void enterSearchMode() {
+        //hide the tab
+        tabLayout.setVisibility(View.GONE);
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_from_left,
@@ -238,6 +241,15 @@ public class WorkoutListActivity extends AppCompatActivity {
         String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
 
         return Integer.parseInt(concatenated);
+    }
+
+    @Override
+    public void onBackPressed() {
+        //if in search mode AND the tab is gone, bring it back!
+        if (tabLayout.getVisibility() == View.GONE) {
+            tabLayout.setVisibility(View.VISIBLE);
+            super.onBackPressed();
+        }else super.onBackPressed();
     }
 
     @Override
