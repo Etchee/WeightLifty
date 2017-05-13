@@ -1,6 +1,5 @@
-package etchee.com.weightlifty.Activity;
+package etchee.com.weightlifty.Fragment;
 
-import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,28 +21,20 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import etchee.com.weightlifty.Activity.EditEventActivity;
 import etchee.com.weightlifty.Adapter.SearchAdapter;
-import etchee.com.weightlifty.Interface.SearchFragmentInterface;
-import etchee.com.weightlifty.Interface.WorkoutListInterface;
 import etchee.com.weightlifty.R;
-import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
-
-import static android.R.attr.action;
-import static android.R.attr.cursorVisible;
-import static android.R.attr.defaultHeight;
-import static android.R.attr.key;
 
 /**
  * Launched when searchView is pressed.
  * Created by rikutoechigoya on 2017/05/12.
  */
 
-public class SearchFragment extends Fragment
-        implements SearchView.OnCloseListener, SearchView.OnQueryTextListener,
-        WorkoutListInterface {
+public class SearchFragment extends android.support.v4.app.Fragment
+        implements SearchView.OnCloseListener, SearchView.OnQueryTextListener{
 
     private ListView listview;
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
@@ -53,7 +44,6 @@ public class SearchFragment extends Fragment
     private SearchAdapter adapter;
     private ContentResolver contentResolver;
     private SearchView searchView;
-    private SearchFragmentInterface fragmentInterface;
 
 
     //TODO this fragment has to receive inputs from the search bar in the parent Activity
@@ -161,7 +151,6 @@ public class SearchFragment extends Fragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        fragmentInterface.fragmentCallback(this);
     }
 
     @Override
@@ -209,17 +198,6 @@ public class SearchFragment extends Fragment
         Cursor cursor = queryWorkout(newText);
         adapter.swapCursor(cursor);
         return false;
-    }
-
-    @Override
-    public void onSearchCursorReceived(Cursor cursor) {
-        adapter.swapCursor(cursor);
-    }
-
-    @Override
-    public void onSearchViewImplemented(SearchView searchView) {
-        this.searchView  = searchView;
-        Toast.makeText(getActivity(), "SearchView received!", Toast.LENGTH_SHORT).show();
     }
 
     /**

@@ -1,25 +1,20 @@
 package etchee.com.weightlifty.Activity;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,14 +25,12 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.Calendar;
 import java.util.Random;
 
-import etchee.com.weightlifty.Interface.SearchFragmentInterface;
-import etchee.com.weightlifty.Interface.WorkoutListInterface;
+import etchee.com.weightlifty.DataMethods.subIDfixHelper;
+import etchee.com.weightlifty.Fragment.CurrentListFragment;
+import etchee.com.weightlifty.Fragment.SearchFragment;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
-import etchee.com.weightlifty.DataMethods.subIDfixHelper;
-import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
-import etchee.com.weightlifty.data.DataDbHelper;
 
 /**
  *  From MainActivity -> Loads today's data, display as a list.
@@ -46,7 +39,7 @@ import etchee.com.weightlifty.data.DataDbHelper;
 
 public class WorkoutListActivity extends AppCompatActivity {
 
-    private etchee.com.weightlifty.Activity.SearchFragment fragmentActivity;
+    private SearchFragment fragmentActivity;
     private Activity activity;
     private FloatingActionButton fab;
 
@@ -57,7 +50,6 @@ public class WorkoutListActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
     private Toolbar toolbar;
     private Context context;
-    WorkoutListInterface searchListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,7 +74,7 @@ public class WorkoutListActivity extends AppCompatActivity {
             }
         });
 
-        getFragmentManager().beginTransaction().add(
+        getSupportFragmentManager().beginTransaction().add(
                 R.id.container_fragment_listActivity,
                 new CurrentListFragment()
         ).commit();
@@ -107,14 +99,14 @@ public class WorkoutListActivity extends AppCompatActivity {
     }
 
     private void enterSearchMode() {
-        getFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(R.animator.slide_in_from_left,
-                        R.animator.slide_out_to_right,
-                        R.animator.slide_in_from_right,
-                        R.animator.slide_out_to_left)
+                .setCustomAnimations(R.anim.slide_in_from_left,
+                        R.anim.slide_out_to_right,
+                        R.anim.slide_in_from_right,
+                        R.anim.slide_out_to_left)
                 .addToBackStack(null)
-                .replace(R.id.container_fragment_listActivity, new etchee.com.weightlifty.Activity.SearchFragment())
+                .replace(R.id.container_fragment_listActivity, new SearchFragment())
                 .commit();
     }
 

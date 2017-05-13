@@ -1,5 +1,6 @@
-package etchee.com.weightlifty.Activity;
+package etchee.com.weightlifty.Fragment;
 
+import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -8,6 +9,9 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +23,7 @@ import com.github.clans.fab.FloatingActionButton;
 
 import java.util.Calendar;
 
+import etchee.com.weightlifty.Activity.EditEventActivity;
 import etchee.com.weightlifty.Adapter.ListAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
@@ -29,8 +34,7 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
  * Created by rikutoechigoya on 2017/05/12.
  */
 
-public class CurrentListFragment extends android.app.Fragment implements
-        android.app.LoaderManager.LoaderCallbacks<Cursor> {
+public class CurrentListFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
     private ListView listview;
     private FloatingActionButton fab;
 
@@ -221,7 +225,7 @@ public class CurrentListFragment extends android.app.Fragment implements
      * @return defined cursor
      */
     @Override
-    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 
         /**
          *  ListView will contain specified date's events.
@@ -250,7 +254,7 @@ public class CurrentListFragment extends android.app.Fragment implements
         String selection = EventEntry.COLUMN_DATE + "=?";
         String selectionArgs[] = new String[]{String.valueOf(date)};
 
-        return new android.content.CursorLoader(
+        return new CursorLoader(
                 context,
                 EventEntry.CONTENT_URI,
                 projection,
@@ -261,14 +265,13 @@ public class CurrentListFragment extends android.app.Fragment implements
     }
 
     @Override
-    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         listAdapter.swapCursor(cursor);
         listAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onLoaderReset(android.content.Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         listAdapter.swapCursor(null);
     }
-
 }

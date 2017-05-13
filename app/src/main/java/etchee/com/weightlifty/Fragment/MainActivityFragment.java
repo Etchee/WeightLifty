@@ -1,4 +1,4 @@
-package etchee.com.weightlifty.Activity;
+package etchee.com.weightlifty.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import etchee.com.weightlifty.Activity.WorkoutListActivity;
 import etchee.com.weightlifty.R;
 
 /**

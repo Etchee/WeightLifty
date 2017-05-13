@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +23,7 @@ import android.widget.Toast;
 import java.io.FileNotFoundException;
 import java.util.Calendar;
 
+import etchee.com.weightlifty.Fragment.MainActivityFragment;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
