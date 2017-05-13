@@ -33,6 +33,8 @@ public final class DataContract {
         //From ChooseEventActivity, contentValues will be passed.
         public static final String CONTENT_VALUES = "contentValues";
 
+        public static final String VIEWPAGER_POSITION = "viewpager_position";
+
         //in the inner class in EditEventActivity, "QueryEventName", id for making a loader.
         public static final int QUERY_EVENT_NAME = 0;
         public static final int QUERY_EVENT_TYPE = 2;

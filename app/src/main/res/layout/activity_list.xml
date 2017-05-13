@@ -16,8 +16,8 @@
             android:background="@color/colorPrimary"
             android:elevation="4dp" />
 
-        <LinearLayout
-            android:id="@+id/container_fragment_listActivity"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager_fragment_listActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />

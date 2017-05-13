@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -25,6 +26,7 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.Calendar;
 import java.util.Random;
 
+import etchee.com.weightlifty.Adapter.ListViewPagerAdapter;
 import etchee.com.weightlifty.DataMethods.subIDfixHelper;
 import etchee.com.weightlifty.Fragment.CurrentListFragment;
 import etchee.com.weightlifty.Fragment.SearchFragment;
@@ -50,6 +52,8 @@ public class WorkoutListActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
     private Toolbar toolbar;
     private Context context;
+    private ViewPager viewPager;
+    private ListViewPagerAdapter viewPagerAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,6 +64,11 @@ public class WorkoutListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         contentResolver = getContentResolver();
         activity = this;
+
+        //viewpager initialization
+        viewPager = (ViewPager)findViewById(R.id.viewPager_fragment_listActivity);
+        viewPagerAdapter = new ListViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(viewPagerAdapter);
 
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.listactivity_fab);
@@ -75,7 +84,7 @@ public class WorkoutListActivity extends AppCompatActivity {
         });
 
         getSupportFragmentManager().beginTransaction().add(
-                R.id.container_fragment_listActivity,
+                R.id.viewPager_fragment_listActivity,
                 new CurrentListFragment()
         ).commit();
     }
@@ -106,7 +115,7 @@ public class WorkoutListActivity extends AppCompatActivity {
                         R.anim.slide_in_from_right,
                         R.anim.slide_out_to_left)
                 .addToBackStack(null)
-                .replace(R.id.container_fragment_listActivity, new SearchFragment())
+                .replace(R.id.viewPager_fragment_listActivity, new SearchFragment())
                 .commit();
     }
 

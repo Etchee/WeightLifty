@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
@@ -34,7 +35,9 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
  * Created by rikutoechigoya on 2017/05/12.
  */
 
-public class CurrentListFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
+public class CurrentListFragment extends Fragment implements
+        android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
+
     private ListView listview;
     private FloatingActionButton fab;
 
@@ -46,16 +49,13 @@ public class CurrentListFragment extends Fragment implements android.support.v4.
     private ListAdapter listAdapter;
     private ContentResolver contentResolver;
 
+    public CurrentListFragment() {
+    }
+
     //do non-graphical assignments
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getActivity();
-
-        contentResolver = context.getContentResolver();
-        //cursor init
-        Cursor listCursor = initListCursor();
-        listAdapter = new ListAdapter(context, listCursor, 0);
     }
 
     @Override
@@ -71,6 +71,9 @@ public class CurrentListFragment extends Fragment implements android.support.v4.
         //listView setup
         listview.setOnItemClickListener(listViewOnItemClickSetup());
 
+//        int position = getArguments().getInt(DataContract.GlobalConstants.VIEWPAGER_POSITION);
+//        Toast.makeText(context, "args is: " + String.valueOf(position), Toast.LENGTH_SHORT).show();
+
         //only display today's data for now
         Bundle bundle = new Bundle();
         bundle.putInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, getDateAsInt());
@@ -81,6 +84,12 @@ public class CurrentListFragment extends Fragment implements android.support.v4.
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        context = getActivity();
+        contentResolver = context.getContentResolver();
+        //cursor init
+        Cursor listCursor = initListCursor();
+        listAdapter = new ListAdapter(context, listCursor, 0);
+
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
     }
 
