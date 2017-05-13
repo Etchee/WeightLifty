@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -70,6 +71,10 @@ public class WorkoutListActivity extends AppCompatActivity {
         viewPagerAdapter = new ListViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
 
+        //hook 'em up with the Tabs
+        TabLayout tabLayout = (TabLayout)findViewById(R.id.list_tab);
+        tabLayout.setupWithViewPager(viewPager);
+
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.listactivity_fab);
 
@@ -82,11 +87,6 @@ public class WorkoutListActivity extends AppCompatActivity {
                 enterSearchMode();
             }
         });
-
-        getSupportFragmentManager().beginTransaction().add(
-                R.id.viewPager_fragment_listActivity,
-                new CurrentListFragment()
-        ).commit();
     }
 
     @Override
