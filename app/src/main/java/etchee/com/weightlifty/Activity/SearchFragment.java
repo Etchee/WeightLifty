@@ -9,9 +9,13 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,6 +26,7 @@ import etchee.com.weightlifty.Adapter.SearchAdapter;
 import etchee.com.weightlifty.Interface.SearchFragmentInterface;
 import etchee.com.weightlifty.Interface.WorkoutListInterface;
 import etchee.com.weightlifty.R;
+import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
@@ -57,7 +62,7 @@ public class SearchFragment extends Fragment
         context = getActivity().getApplicationContext();
         contentResolver = context.getContentResolver();
         //pass this activity to the parent Activity
-        fragmentInterface.fragmentCallback();
+        //TODO do this here
     }
 
 
@@ -150,9 +155,57 @@ public class SearchFragment extends Fragment
         else throw new NullPointerException(TAG + ": FTS table cursor initialization has failed");
     }
 
+    /**
+     * called when this fragment is attached to the ListActivity.
+     * @param context
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        fragmentInterface.fragmentCallback(this);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_list, menu);
+        final MenuItem item = menu.findItem(R.id.action_search_button);
+        MenuItemCompat.expandActionView(item);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setQueryHint(getString(R.string.hint_search_events));
+        searchView.setOnQueryTextListener(this);
+        searchView.setIconified(false);
+    }
+
+    @Override
+    public boolean onClose() {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        Toast.makeText(context, "Wait, I am receiving textsubmit", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        Toast.makeText(getActivity(), "Text detected from the fragment!!!!", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+    @Override
+    public void onSearchCursorReceived(Cursor cursor) {
+        adapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onSearchViewImplemented(SearchView searchView) {
+        this.searchView  = searchView;
+        Toast.makeText(getActivity(), "SearchView received!", Toast.LENGTH_SHORT).show();
+    }
 
     /**
-     *  Search method that returns a cursor.
+     * Search method that returns a cursor.
      *
      * @param input User input text sent from the UI
      * @return cursor that contains the results of the search
@@ -174,47 +227,13 @@ public class SearchFragment extends Fragment
 
                TODO I should make another column that joints all other columns (key_search) to search EVERYTHING
          */
-
         String query = "SELECT docid as _id," +
                 EventType_FTSEntry.COLUMN_EVENT_NAME + "," +
                 EventType_FTSEntry.COLUMN_EVENT_TYPE +
                 " FROM " + EventType_FTSEntry.TABLE_NAME +
                 " WHERE " + EventType_FTSEntry.COLUMN_EVENT_NAME + " MATCH '" + input + "';";
 
-
         Cursor cursor = new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
-
         return cursor;
-    }
-
-    /**
-     * called when this fragment is attached to the ListActivity.
-     * @param context
-     */
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        fragmentInterface.fragmentCallback(this);
-    }
-
-    @Override
-    public boolean onClose() {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        Toast.makeText(context, "Wait, I am receiving textsubmit", Toast.LENGTH_SHORT).show();
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
-    }
-
-    @Override
-    public void onSearchCursorReceived(Cursor cursor) {
-        adapter.swapCursor(cursor);
     }
 }

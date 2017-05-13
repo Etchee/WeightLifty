@@ -62,7 +62,6 @@ public class WorkoutListActivity extends AppCompatActivity implements
     private Context context;
     WorkoutListInterface searchListener;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +81,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enterChooseEventMode();
+                enterSearchMode();
             }
         });
 
@@ -112,28 +111,19 @@ public class WorkoutListActivity extends AppCompatActivity implements
         searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setQueryHint(getString(R.string.hint_search_events));
         searchView.setOnQueryTextListener(this);
-        searchView.setOnSearchClickListener(searchViewOnClickSetup());
-
         return true;
     }
 
-    private View.OnClickListener searchViewOnClickSetup(){
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getFragmentManager()
-                        .beginTransaction()
-                        .setCustomAnimations(R.animator.slide_in_from_left,
-                                R.animator.slide_out_to_right,
-                                R.animator.slide_in_from_right,
-                                R.animator.slide_out_to_left)
-                        .addToBackStack(null)
-                        .replace(R.id.container_fragment_listActivity, new etchee.com.weightlifty.Activity.SearchFragment())
-                        .commit();
-            }
-        };
-
-        return listener;
+    private void enterSearchMode() {
+        getFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.animator.slide_in_from_left,
+                        R.animator.slide_out_to_right,
+                        R.animator.slide_in_from_right,
+                        R.animator.slide_out_to_left)
+                .addToBackStack(null)
+                .replace(R.id.container_fragment_listActivity, new etchee.com.weightlifty.Activity.SearchFragment())
+                .commit();
     }
 
     @Override
@@ -142,7 +132,7 @@ public class WorkoutListActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
 
             case R.id.action_search_button:
-                onSearchRequested();
+
                 break;
 
             case R.id.menu_delete_all_events:
@@ -160,18 +150,6 @@ public class WorkoutListActivity extends AppCompatActivity implements
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * When user clicks FAB, this method is called.
-     * User will direcly start typing their desired events.
-     *
-     *  1. searchView must open
-     *  2. Wipe the contents in the listView.
-     *  3. Hook up a new adapter.
-     */
-    private void enterChooseEventMode() {
-        searchView.setIconified(false);
     }
 
     private int deleteEventTableDatabase() {
@@ -305,13 +283,13 @@ public class WorkoutListActivity extends AppCompatActivity implements
         query = query + "*";
         Cursor cursor = queryWorkout(query);
         //send off cursor to search fragment
-        try{
-            searchListener = (WorkoutListInterface)fragmentActivity;
-            searchListener.onSearchCursorReceived(cursor);
-        }catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " failed to cast tp " +
-                    "WorkoutListInterface");
-        }
+//        try{
+//            searchListener = (WorkoutListInterface)activity;
+//            searchListener.onSearchCursorReceived(cursor);
+//        }catch (ClassCastException e) {
+//            throw new ClassCastException(activity.toString() + " failed to cast tp " +
+//                    "WorkoutListInterface");
+//        }
         return false;
     }
 
@@ -330,8 +308,13 @@ public class WorkoutListActivity extends AppCompatActivity implements
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-        Toast.makeText(this, "fragment attached.", Toast.LENGTH_SHORT).show();
         //call OnSearch Interface and pass cursor
+        try {
+            ((WorkoutListInterface) activity).onSearchViewImplemented(searchView);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(activity, "Couldn't interface searchview.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
