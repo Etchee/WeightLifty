@@ -44,9 +44,7 @@ import etchee.com.weightlifty.data.DataDbHelper;
  *  When SearchView is initiated -> Performs a search, then pass the resulting cursor to SearchAdapter
  */
 
-public class WorkoutListActivity extends AppCompatActivity implements
-        SearchView.OnQueryTextListener, SearchView.OnCloseListener,
-        SearchFragmentInterface {
+public class WorkoutListActivity extends AppCompatActivity {
 
     private etchee.com.weightlifty.Activity.SearchFragment fragmentActivity;
     private Activity activity;
@@ -58,7 +56,6 @@ public class WorkoutListActivity extends AppCompatActivity implements
     private final int CREATE_LOADER_ID = 1;
     private final String TAG = getClass().getSimpleName();
     private Toolbar toolbar;
-    private SearchView searchView;
     private Context context;
     WorkoutListInterface searchListener;
 
@@ -106,11 +103,6 @@ public class WorkoutListActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_list, menu);
-        final MenuItem item = menu.findItem(R.id.action_search_button);
-        MenuItemCompat.expandActionView(item);
-        searchView = (SearchView) MenuItemCompat.getActionView(item);
-        searchView.setQueryHint(getString(R.string.hint_search_events));
-        searchView.setOnQueryTextListener(this);
         return true;
     }
 
@@ -159,14 +151,6 @@ public class WorkoutListActivity extends AppCompatActivity implements
                 null
         );
         return numberOfDeletedRows;
-    }
-
-    private int getEventID() {
-        return eventID;
-    }
-
-    private void setEventID(int eventID) {
-        this.eventID = eventID;
     }
 
     private void event_insertDummyValues() {
@@ -245,15 +229,6 @@ public class WorkoutListActivity extends AppCompatActivity implements
         super.onResume();
         new subIDfixHelper(getApplicationContext()).execute(getDateAsInt());
     }
-    //if searchView is expanded, then collapse
-    @Override
-    public void onBackPressed() {
-       if (!searchView.isIconified()) {
-           searchView.onActionViewCollapsed();
-       } else {
-           super.onBackPressed();
-       }
-    }
 
     private void deleteOptionRed(Menu menu) {
         //set delete menu text to red color
@@ -266,95 +241,6 @@ public class WorkoutListActivity extends AppCompatActivity implements
                 Spanned.SPAN_PRIORITY);
 
         delete_all_events.setTitle(string);
-    }
-
-    /**
-     *      When SearchView is closed, the listView should have the list of today's workouts
-     * @return false
-     */
-    @Override
-    public boolean onClose() {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        Log.v(TAG, "Text submitted: " + query);
-        query = query + "*";
-        Cursor cursor = queryWorkout(query);
-        //send off cursor to search fragment
-//        try{
-//            searchListener = (WorkoutListInterface)activity;
-//            searchListener.onSearchCursorReceived(cursor);
-//        }catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString() + " failed to cast tp " +
-//                    "WorkoutListInterface");
-//        }
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        //INITIATE SEARCH
-        Log.v(TAG, "Text submitted: " + newText);
-        //so that the search is for every part of the texts
-        newText = newText + "*";
-        Cursor cursor = queryWorkout(newText);
-//        listview.setAdapter(searchAdapter);
-//        searchAdapter.swapCursor(cursor);
-        return false;
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-        //call OnSearch Interface and pass cursor
-        try {
-            ((WorkoutListInterface) activity).onSearchViewImplemented(searchView);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(activity, "Couldn't interface searchview.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Search method that returns a cursor.
-     *
-     * @param input User input text sent from the UI
-     * @return cursor that contains the results of the search
-     * @throws SQLException if search fails.
-     */
-    public Cursor queryWorkout(String input) {
-        Log.w(TAG, input);
-        /*
-                Original sample code output:
-                SELECT docid as _id,customer,name,(address1||(case when address2> '' then '
-               ' || address2 else '' end)) as address,address1,address2,city,state,zipCode from
-               CustomerInfo where searchData MATCH 'Piz*';
-
-               My output in here (success):
-               SELECT docid as _id,name_event,type_event FROM table_eventType_FTS WHERE name_event MATCH 'dumb';
-
-                From queryEventIDFromName class:
-               SELECT docid as _id,* FROM table_eventType_FTS WHERE name_event MATCH 'press sit-up';
-
-               TODO I should make another column that joints all other columns (key_search) to search EVERYTHING
-         */
-        String query = "SELECT docid as _id," +
-                EventType_FTSEntry.COLUMN_EVENT_NAME + "," +
-                EventType_FTSEntry.COLUMN_EVENT_TYPE +
-                " FROM " + EventType_FTSEntry.TABLE_NAME +
-                " WHERE " + EventType_FTSEntry.COLUMN_EVENT_NAME + " MATCH '" + input + "';";
-
-        Cursor cursor = new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
-        return cursor;
-    }
-
-
-    @Override
-    public void fragmentCallback(etchee.com.weightlifty.Activity.SearchFragment searchFragment) {
-        fragmentActivity = searchFragment;
-        Toast.makeText(activity, "Fragment callback received!", Toast.LENGTH_SHORT).show();
     }
 }
 

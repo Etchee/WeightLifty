@@ -31,6 +31,11 @@ import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
 
+import static android.R.attr.action;
+import static android.R.attr.cursorVisible;
+import static android.R.attr.defaultHeight;
+import static android.R.attr.key;
+
 /**
  * Launched when searchView is pressed.
  * Created by rikutoechigoya on 2017/05/12.
@@ -74,12 +79,14 @@ public class SearchFragment extends Fragment
         listview = (ListView)view.findViewById(R.id.listview_fragment_search);
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(listViewListenerInit());
+        Toast.makeText(context, "View creaeted.", Toast.LENGTH_SHORT).show();
     }
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_search_layout, container, false);
     }
 
@@ -126,14 +133,6 @@ public class SearchFragment extends Fragment
         return listener;
     }
 
-    private int getEventID() {
-        return eventID;
-    }
-
-    private void setEventID(int eventID) {
-        this.eventID = eventID;
-    }
-
     //Send contentValues
     private void launchEditEventActivityWithNewEvent(String eventName) {
         Intent intent = new Intent(getActivity(), EditEventActivity.class);
@@ -167,13 +166,30 @@ public class SearchFragment extends Fragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_list, menu);
-        final MenuItem item = menu.findItem(R.id.action_search_button);
+        inflater.inflate(R.menu.menu_search_fragment, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search_button);
         MenuItemCompat.expandActionView(item);
+        item.setIcon(R.drawable.ic_search_black_24dp);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setQueryHint(getString(R.string.hint_search_events));
         searchView.setOnQueryTextListener(this);
         searchView.setIconified(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_search_button:
+                Toast.makeText(context, "Search View tapped.", Toast.LENGTH_SHORT).show();
+                break;
+
+            default: throw new IllegalArgumentException("Menu ID was invalid.");
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -183,13 +199,15 @@ public class SearchFragment extends Fragment
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Toast.makeText(context, "Wait, I am receiving textsubmit", Toast.LENGTH_SHORT).show();
+        Cursor cursor = queryWorkout(query);
+        adapter.swapCursor(cursor);
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Toast.makeText(getActivity(), "Text detected from the fragment!!!!", Toast.LENGTH_SHORT).show();
+        Cursor cursor = queryWorkout(newText);
+        adapter.swapCursor(cursor);
         return false;
     }
 

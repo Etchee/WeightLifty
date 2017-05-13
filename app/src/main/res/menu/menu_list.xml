@@ -2,14 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <item android:id="@+id/action_search_button"
-        android:icon="@drawable/ic_add_list"
-        android:orderInCategory="100"
-        android:title="@string/search_events"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="ifRoom" />
-
     <item
         android:id="@+id/menu_insert_event"
         android:title="@string/insert_random_values"
