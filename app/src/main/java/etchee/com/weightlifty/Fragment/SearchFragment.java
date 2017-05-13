@@ -38,7 +38,6 @@ public class SearchFragment extends android.support.v4.app.Fragment
 
     private ListView listview;
     //To make sure that there is only one instance because OpenHelper will serialize requests anyways
-    private int eventID;
     private final String TAG = getClass().getSimpleName();
     private Context context;
     private SearchAdapter adapter;
@@ -69,7 +68,6 @@ public class SearchFragment extends android.support.v4.app.Fragment
         listview = (ListView)view.findViewById(R.id.listview_fragment_search);
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(listViewListenerInit());
-        Toast.makeText(context, "View creaeted.", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -188,6 +186,7 @@ public class SearchFragment extends android.support.v4.app.Fragment
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        query = query + "*";
         Cursor cursor = queryWorkout(query);
         adapter.swapCursor(cursor);
         return false;
@@ -195,6 +194,7 @@ public class SearchFragment extends android.support.v4.app.Fragment
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        newText = newText + "*";
         Cursor cursor = queryWorkout(newText);
         adapter.swapCursor(cursor);
         return false;

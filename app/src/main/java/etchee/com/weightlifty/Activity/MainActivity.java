@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.util.Calendar;
 
 import etchee.com.weightlifty.Fragment.MainActivityFragment;
+import etchee.com.weightlifty.Fragment.SettingsFragment;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private static final String TAG = "MainActivity";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+
     }
 
 
@@ -328,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
                                 R.animator.slide_in_from_right,
                                 R.animator.slide_out_to_left
                         )
-                        .replace(R.id.container_fragment_main, new SettingsActivity())
+                        .replace(R.id.container_fragment_main, new SettingsFragment())
                         .addToBackStack(null)
                         .commit();
                 break;

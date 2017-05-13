@@ -1,4 +1,4 @@
-package etchee.com.weightlifty.Activity;
+package etchee.com.weightlifty.Fragment;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -16,7 +16,7 @@ import etchee.com.weightlifty.R;
  * Created by rikutoechigoya on 2017/05/11.
  */
 
-public class SettingsActivity extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +27,7 @@ public class SettingsActivity extends PreferenceFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
+
 
 
 }

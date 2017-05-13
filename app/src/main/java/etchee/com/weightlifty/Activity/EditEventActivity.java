@@ -2,6 +2,7 @@ package etchee.com.weightlifty.Activity;
 
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.net.Uri;
@@ -53,6 +54,7 @@ public class EditEventActivity extends FragmentActivity implements
     private TextView weight_count;
     private Button button_add_event;
     private Button button_delete_event;
+    private final String NAME_PREF_FILE = "preferences";
 
     private static final int SET_MAXVALUE = 30;
     private static final int SET_MINVALUE = 1;
@@ -101,7 +103,11 @@ public class EditEventActivity extends FragmentActivity implements
         weight_count = (EditText) findViewById(R.id.input_weight_number);
         button_add_event = (Button) findViewById(R.id.add_event);
         button_delete_event = (Button) findViewById(R.id.delete_workout);
-
+        //get user pref for weight unit
+        SharedPreferences sharedPreferences = getApplicationContext().
+                getSharedPreferences("etchee.com.weightlifty", MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.pref_unit), null);
+        Toast.makeText(this, "Pref is: " + str, Toast.LENGTH_SHORT).show();
         defineQueryHandler();
 
         Bundle bundle = getIntent().getExtras();
@@ -212,6 +218,20 @@ public class EditEventActivity extends FragmentActivity implements
                     "selection columns nor contentValues to make a new event");
         }
 
+    }
+
+    private int convertKiloToPound(int kilo) {
+        double temp;
+        temp = kilo*2.20462;
+        int pound = Integer.parseInt(String.valueOf(Math.round(temp)));
+        return pound;
+    }
+
+    private int convertPoundToKilo(int pound) {
+        double temp;
+        temp = pound/2.20462;
+        int kilo = Integer.parseInt(String.valueOf(Math.round(temp)));
+        return kilo;
     }
 
     private void defineQueryHandler() {

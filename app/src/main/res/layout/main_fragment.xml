@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
     <!--ImageView to hold the pretty icon for the app-->
+
     <ImageView
         android:id="@+id/main_logo_view"
         android:layout_width="@dimen/main_logo_width"
@@ -22,4 +23,5 @@
         android:paddingRight="10dp"
         android:paddingTop="20dp"
         android:text="@string/begin_workout" />
+
 </RelativeLayout>

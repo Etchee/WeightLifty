@@ -2,11 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:title="@string/ui"
-        android:key="pref_key_ui_settings">
+        >
 
         <ListPreference
             android:entries="@array/pref_units"
             android:entryValues="@array/pref_units_alias"
+            android:key="@string/pref_unit"
             android:title="@string/unit"
             android:summary="@string/unit_hint_text"
             />

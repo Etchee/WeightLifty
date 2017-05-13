@@ -18,4 +18,5 @@
     <dimen name="edit_set_hint_margintop">15dp</dimen>
     <dimen name="edit_set_hint_marginLeft">30dp</dimen>
     <dimen name="add_event_margin_right">10dp</dimen>
+    <dimen name="tiny_ic_value">10dp</dimen>
 </resources>

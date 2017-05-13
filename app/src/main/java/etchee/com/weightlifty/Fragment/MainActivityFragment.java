@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import etchee.com.weightlifty.Activity.WorkoutListActivity;
 import etchee.com.weightlifty.R;
@@ -20,6 +24,7 @@ import etchee.com.weightlifty.R;
 public class MainActivityFragment extends android.app.Fragment {
 
     private Button begin_workout;
+    private SubsamplingScaleImageView imageView;
 
     @Nullable
     @Override
@@ -30,7 +35,6 @@ public class MainActivityFragment extends android.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
