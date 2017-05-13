@@ -71,8 +71,6 @@ public class CurrentListFragment extends Fragment implements
         //listView setup
         listview.setOnItemClickListener(listViewOnItemClickSetup());
 
-//        int position = getArguments().getInt(DataContract.GlobalConstants.VIEWPAGER_POSITION);
-//        Toast.makeText(context, "args is: " + String.valueOf(position), Toast.LENGTH_SHORT).show();
 
         //only display today's data for now
         Bundle bundle = new Bundle();
@@ -89,6 +87,11 @@ public class CurrentListFragment extends Fragment implements
         //cursor init
         Cursor listCursor = initListCursor();
         listAdapter = new ListAdapter(context, listCursor, 0);
+
+        if (getArguments() != null) {
+            int position = getArguments().getInt(DataContract.GlobalConstants.VIEWPAGER_POSITION);
+            Toast.makeText(context, "args is: " + String.valueOf(position), Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(context, "Argument not received", Toast.LENGTH_SHORT).show();
 
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
     }
