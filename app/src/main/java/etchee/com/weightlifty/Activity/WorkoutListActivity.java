@@ -156,7 +156,7 @@ public class WorkoutListActivity extends AppCompatActivity {
         return numberOfDeletedRows;
     }
 
-    public String getFormattedDate() {
+    private String getFormattedDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int year = calendar.get(Calendar.YEAR);

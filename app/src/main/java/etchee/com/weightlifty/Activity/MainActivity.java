@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String getFormattedDate() {
+    public String getFormattedDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int year = calendar.get(Calendar.YEAR);

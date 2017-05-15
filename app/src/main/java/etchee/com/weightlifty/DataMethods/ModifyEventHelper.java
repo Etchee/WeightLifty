@@ -19,13 +19,14 @@ public class ModifyEventHelper extends AsyncTask<ContentValues, Void, Integer> {
     private int set_count, rep_count, weight_count;
     private String workout_name;
 
-    private int date, sub_id;
+    private int sub_id;
+    private String formattedDate;
 
-    public ModifyEventHelper(Context context, Activity activity, int date, int sub_id) {
+    public ModifyEventHelper(Context context, Activity activity, String formattedDate, int sub_id) {
         super();
         this.context = context;
         this.activity = activity;
-        this.date = date;
+        this.formattedDate = formattedDate;
         this.sub_id = sub_id;
     }
 
@@ -33,9 +34,9 @@ public class ModifyEventHelper extends AsyncTask<ContentValues, Void, Integer> {
     protected Integer doInBackground(ContentValues... values) {
         int numberOfRowsUpdated;
 
-        String selection = DataContract.EventEntry.COLUMN_DATE + "=?" + " AND " + DataContract.EventEntry.COLUMN_SUB_ID + "=?";
+        String selection = DataContract.EventEntry.COLUMN_FORMATTED_DATE + "=?" + " AND " + DataContract.EventEntry.COLUMN_SUB_ID + "=?";
         String selectionArgs[] = new String[] {
-                String.valueOf(date),
+                formattedDate,
                 String.valueOf(sub_id)
         };
 

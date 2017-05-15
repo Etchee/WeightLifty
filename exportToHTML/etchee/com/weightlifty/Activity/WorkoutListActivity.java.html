@@ -229,13 +229,13 @@ WorkoutListActivity.java</FONT>
  
         </span><span class="s0">int </span><span class="s1">rep_count = </span><span class="s4">7</span><span class="s0">;</span><span class="s1"> 
         </span><span class="s0">int </span><span class="s1">set_count = </span><span class="s4">5</span><span class="s0">;</span><span class="s1"> 
-        </span><span class="s0">int </span><span class="s1">date = getDateAsInt()</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">formattedDate = getDateAsInt()</span><span class="s0">;</span><span class="s1">
         </span><span class="s0">int </span><span class="s1">weight_count = </span><span class="s4">70</span><span class="s0">;</span><span class="s1"> 
         </span><span class="s0">int </span><span class="s1">sub_ID = getNextSub_id()</span><span class="s0">;</span><span class="s1"> 
         </span><span class="s0">int </span><span class="s1">eventID = </span><span class="s4">5</span><span class="s0">;</span><span class="s1"> 
  
         values.put(EventEntry.COLUMN_SUB_ID</span><span class="s0">, </span><span class="s1">sub_ID)</span><span class="s0">;</span><span class="s1"> 
-        values.put(EventEntry.COLUMN_DATE</span><span class="s0">, </span><span class="s1">date)</span><span class="s0">;</span><span class="s1"> 
+        values.put(EventEntry.COLUMN_DATE</span><span class="s0">, </span><span class="s1">formattedDate)</span><span class="s0">;</span><span class="s1">
         values.put(EventEntry.COLUMN_EVENT_ID</span><span class="s0">, </span><span class="s1">eventID)</span><span class="s0">;</span><span class="s1"> 
         values.put(EventEntry.COLUMN_REP_COUNT</span><span class="s0">, </span><span class="s1">rep_count)</span><span class="s0">;</span><span class="s1"> 
         values.put(EventEntry.COLUMN_SET_COUNT</span><span class="s0">, </span><span class="s1">set_count)</span><span class="s0">;</span><span class="s1"> 
@@ -249,11 +249,11 @@ WorkoutListActivity.java</FONT>
     } 
  <hr class="ls0">    </span><span class="s0">private int </span><span class="s1">getNextSub_id() { 
         </span><span class="s0">int </span><span class="s1">sub_id</span><span class="s0">;</span><span class="s1"> 
-        </span><span class="s0">int </span><span class="s1">date = getDateAsInt()</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">formattedDate = getDateAsInt()</span><span class="s0">;</span><span class="s1">
  
         String projection[] = </span><span class="s0">new </span><span class="s1">String[]{EventEntry.COLUMN_DATE</span><span class="s0">, </span><span class="s1">EventEntry.COLUMN_SUB_ID}</span><span class="s0">;</span><span class="s1"> 
         String selection = EventEntry.COLUMN_DATE + </span><span class="s6">&quot;=?&quot;</span><span class="s0">;</span><span class="s1"> 
-        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{String.valueOf(date)}</span><span class="s0">;</span><span class="s1"> 
+        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{String.valueOf(formattedDate)}</span><span class="s0">;</span><span class="s1">
         Cursor cursor = </span><span class="s0">null;</span><span class="s1"> 
  
         </span><span class="s0">try </span><span class="s1">{ 
@@ -427,19 +427,19 @@ WorkoutListActivity.java</FONT>
     </span><span class="s0">public </span><span class="s1">Loader&lt;Cursor&gt; onCreateLoader(</span><span class="s0">int </span><span class="s1">id</span><span class="s0">, </span><span class="s1">Bundle bundle) { 
  
         </span><span class="s2">/** 
-         *  ListView will contain specified date's events. 
+         *  ListView will contain specified formattedDate's events.
          *  Required components 
          * 
-         *  1. date to specify date 
+         *  1. formattedDate to specify formattedDate
          *  2. event ID to get the workout name 
          *  3. set_count 
          *  4. rep_count 
          * 
          */</span><span class="s1"> 
  
-        </span><span class="s0">int </span><span class="s1">date</span><span class="s0">;</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">formattedDate</span><span class="s0">;</span><span class="s1">
  
-        date = bundle.getInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE)</span><span class="s0">;</span><span class="s1"> 
+        formattedDate = bundle.getInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE)</span><span class="s0">;</span><span class="s1">
  
         String projection[] = </span><span class="s0">new </span><span class="s1">String[]{ 
                 EventEntry._ID</span><span class="s0">,</span><span class="s1"> 
@@ -451,7 +451,7 @@ WorkoutListActivity.java</FONT>
         }</span><span class="s0">;</span><span class="s1"> 
  
         String selection = EventEntry.COLUMN_DATE + </span><span class="s6">&quot;=?&quot;</span><span class="s0">;</span><span class="s1"> 
-        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{String.valueOf(date)}</span><span class="s0">;</span><span class="s1"> 
+        String selectionArgs[] = </span><span class="s0">new </span><span class="s1">String[]{String.valueOf(formattedDate)}</span><span class="s0">;</span><span class="s1">
  
         </span><span class="s0">return new </span><span class="s1">CursorLoader( 
                 </span><span class="s0">this,</span><span class="s1"> 

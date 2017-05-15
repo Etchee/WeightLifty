@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +36,9 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_CODE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_EXISTING;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_NEW;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.PASS_EVENT_ID;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.PASS_EVENT_STRING;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.PASS_SELECTED_DATE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_SETS_NUMBER;
@@ -73,6 +77,7 @@ public class EditEventActivity extends FragmentActivity implements
     private static final int LOADER_MODIFY_EVENT_MODE = 1;
 
     private String eventType;
+    private String formattedDate;
 
     private int receivedEventID = -1;
 
@@ -81,7 +86,6 @@ public class EditEventActivity extends FragmentActivity implements
     private int sub_ID;
 
     private String eventString;
-    private QueryResponceHandler queryResponceHandler;
     private DeleteActionHelper deleteHelper;
 
     /**
@@ -118,12 +122,10 @@ public class EditEventActivity extends FragmentActivity implements
 
         Bundle bundle = getIntent().getExtras();
 
-        int launchMode = bundle.getInt(LAUNCH_EDIT_CODE);
+        int launchMode = bundle.getInt(LAUNCH_EDIT_CODE, -1);
 
         switch (launchMode) {
-            case LAUNCH_EDIT_NEW:
-                // Case 1: creating a new event → bundle with Event String.
-
+            case LAUNCH_EDIT_NEW:   //launching a new event
                 Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
                 eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
                 //first thing fire the asyncTask to get the id
@@ -140,25 +142,23 @@ public class EditEventActivity extends FragmentActivity implements
                     @Override
                     public void onClick(View v) {
                         //make correct contentValues here
-                        Uri uri = addNewEvent(getUserInputsAsContentValues(getDateAsInt()));
-                        Toast.makeText(EditEventActivity.this, "New event added in: " + uri.toString(),
+                        Uri uri = addNewEvent(getUserInputsAsContentValues(getFormattedDate()));
+                        Toast.makeText(EditEventActivity.this, eventString + " added." + uri.toString(),
                                 Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 });
 
-                String event = getIntent().getStringExtra(DataContract.GlobalConstants.PASS_EVENT_STRING);
+                String event = getIntent().getStringExtra(PASS_EVENT_STRING);
                 name_workout.setText(event);
                 break;
 
             case LAUNCH_EDIT_EXISTING:
-                // Case 2: modifying an already existing event → bundle with selection.
-                Toast.makeText(this, "Edit!", Toast.LENGTH_SHORT).show();
-                //currently in WorkoutListInterface, this date is just set as today's date. Just pass another date
-                //in future updates.
-                final int selectedDate = bundle.getInt(DataContract.GlobalConstants.PASS_SELECTED_DATE);
+                Toast.makeText(this, "Edit mode", Toast.LENGTH_SHORT).show();   //Editing an existing event
 
-                //Not create event but modify event
+                formattedDate = bundle.getString(PASS_SELECTED_DATE);
+
+                //change button texts so that they make sense
                 button_add_event.setText(R.string.update_event);
                 button_add_event.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -166,32 +166,42 @@ public class EditEventActivity extends FragmentActivity implements
                         new ModifyEventHelper(
                                 getApplicationContext(),
                                 EditEventActivity.this,
-                                selectedDate,
+                                formattedDate,
                                 sub_ID
-                        ).execute(getUserInputsAsContentValues(selectedDate));
+                        ).execute(getUserInputsAsContentValues(formattedDate));
                     }
                 });
 
-                setReceivedEventID(bundle.getInt(DataContract.GlobalConstants.PASS_EVENT_ID));
+                receivedEventID = bundle.getInt(PASS_EVENT_ID, -1);
                 if (receivedEventID < 0 ) {
-                    throw new IllegalArgumentException("Null contentValues");
+                    Toast.makeText(this, "Invalid event ID.", Toast.LENGTH_SHORT).show();
+                    Log.e("TAG", "Edit mode, but bundle did not have any event ID info");
                 }
-                sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID);
+                sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID, -1);
+                if (sub_ID < 0 ) {
+                    Toast.makeText(this, "Invalid SUB_ID.", Toast.LENGTH_SHORT).show();
+                    Log.e("TAG", "Edit mode, but bundle did not have any SUB_ID info");
+                }
 
                 //init the loader
                 getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
 
                 //then show the event String
-                queryEventType(getReceivedEventID());
+                queryEventType(receivedEventID);
 
                 //set the number of sets
-                queryNumberOfSets(getDateAsInt(), sub_ID);
+                queryNumberOfSets(sub_ID);
 
                 //set the number of reps
-                queryNumberOfReps(getDateAsInt(), sub_ID);
+                queryNumberOfReps(sub_ID);
 
                 //set the weight figure
-                queryWeightCount(getDateAsInt(), sub_ID);
+                queryWeightCount(sub_ID);
+                break;
+
+            case -1:
+                Toast.makeText(this, "Error loading data.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Did not receive a bundle of launch mode.");
                 break;
 
             default: throw new IllegalArgumentException(TAG + ": EditEventActivity could not recognize" +
@@ -305,7 +315,7 @@ public class EditEventActivity extends FragmentActivity implements
         };
     }
 
-    private ContentValues getUserInputsAsContentValues(int date) {
+    private ContentValues getUserInputsAsContentValues(String date) {
         ContentValues values = new ContentValues();
         /*
              From DataContract:
@@ -329,7 +339,8 @@ public class EditEventActivity extends FragmentActivity implements
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
         values.put(EventEntry.COLUMN_EVENT_ID, receivedEventID);
-        values.put(EventEntry.COLUMN_DATE, date);
+        values.put(EventEntry.COLUMN_DATE, getDateAsInt());
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, date);
         //subID doesn't matter because this will be organized onResume for ListActivity anyways
         values.put(EventEntry.COLUMN_SUB_ID, 0);
 
@@ -341,7 +352,7 @@ public class EditEventActivity extends FragmentActivity implements
     /**
      * If modifying data, fire up loader for background thread data loading.
      *
-     * @param id     onCreate sets this to 1
+     * @param id     not needed. Set to 1 in onCreate()
      * @param bundle bundle received from the UI thread. Open this magic box to get specific item
      * @return passes cursor to onLoadFinished
      */
@@ -460,20 +471,20 @@ public class EditEventActivity extends FragmentActivity implements
     }
 
 
-    private void queryNumberOfSets(int date, int subID) {
+    private void queryNumberOfSets(int subID) {
         //projection
         String projection[] = new String[]{
-                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_FORMATTED_DATE,
                 EventEntry.COLUMN_SUB_ID,
                 EventEntry.COLUMN_SET_COUNT
         };
 
         //select row by eventID
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+        String selection = EventEntry.COLUMN_FORMATTED_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
 
         //eventID will be thrown in the parameter
         String selectionArgs[] = new String[]{
-                String.valueOf(date),
+                formattedDate,
                 String.valueOf(subID)
         };
 
@@ -490,20 +501,20 @@ public class EditEventActivity extends FragmentActivity implements
         );
     }
 
-    private void queryNumberOfReps(int date, int subID) {
+    private void queryNumberOfReps(int subID) {
         //projection
         String projection[] = new String[]{
-                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_FORMATTED_DATE,
                 EventEntry.COLUMN_SUB_ID,
                 EventEntry.COLUMN_REP_COUNT
         };
 
         //selection
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+        String selection = EventEntry.COLUMN_FORMATTED_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
 
         //selectionArgs
         String selectionArgs[] = new String[]{
-                String.valueOf(date),
+                formattedDate,
                 String.valueOf(subID)
         };
 
@@ -518,20 +529,20 @@ public class EditEventActivity extends FragmentActivity implements
         );
     }
 
-    private void queryWeightCount(int date, int subID) {
+    private void queryWeightCount(int subID) {
         //projection
         String projection[] = new String[]{
-                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_FORMATTED_DATE,
                 EventEntry.COLUMN_SUB_ID,
                 EventEntry.COLUMN_WEIGHT_COUNT
         };
 
         //selection
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+        String selection = EventEntry.COLUMN_FORMATTED_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
 
         //selectionArgs
         String selectionArgs[] = new String[]{
-                String.valueOf(date),
+                formattedDate,
                 String.valueOf(subID)
         };
 
@@ -596,5 +607,17 @@ public class EditEventActivity extends FragmentActivity implements
         receivedEventID = Integer.parseInt(id);
     }
 
+    private String getFormattedDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+
+        return concatenated;
+    }
 
 }
