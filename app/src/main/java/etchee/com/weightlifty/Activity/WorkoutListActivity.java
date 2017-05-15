@@ -182,7 +182,6 @@ public class WorkoutListActivity extends AppCompatActivity {
         String formattedDate = getFormattedDate();
 
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
-        values.put(EventEntry.COLUMN_DATE, date);
         values.put(EventEntry.COLUMN_EVENT_ID, eventID);
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
@@ -198,11 +197,11 @@ public class WorkoutListActivity extends AppCompatActivity {
 
     private int getNextSub_id() {
         int sub_id;
-        int date = getDateAsInt();
+        String date = getFormattedDate();
 
-        String projection[] = new String[]{EventEntry.COLUMN_DATE, EventEntry.COLUMN_SUB_ID};
-        String selection = EventEntry.COLUMN_DATE + "=?";
-        String selectionArgs[] = new String[]{String.valueOf(date)};
+        String projection[] = new String[]{EventEntry.COLUMN_FORMATTED_DATE, EventEntry.COLUMN_SUB_ID};
+        String selection = EventEntry.COLUMN_FORMATTED_DATE + "=?";
+        String selectionArgs[] = new String[]{date};
         Cursor cursor = null;
 
         try {
@@ -254,7 +253,7 @@ public class WorkoutListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        new subIDfixHelper(getApplicationContext()).execute(getDateAsInt());
+        new subIDfixHelper(getApplicationContext()).execute(getFormattedDate());
     }
 
     private void deleteOptionRed(Menu menu) {

@@ -248,7 +248,6 @@ public class CurrentListFragment extends Fragment implements
 
         String projection[] = new String[]{
                 EventEntry._ID,
-                EventEntry.COLUMN_DATE,
                 EventEntry.COLUMN_FORMATTED_DATE,
                 EventEntry.COLUMN_EVENT_ID,
                 EventEntry.COLUMN_WEIGHT_COUNT,

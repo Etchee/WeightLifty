@@ -482,13 +482,13 @@ public class DataProvider extends ContentProvider {
      *      This method sorts sub_ID in EventEntry correctly.
      *       Deleting a row causes sub_id to "skip" which leads to crash when passing position in
      *       ListView. So call this whenever a row is added.
-     * @param date check which date in the EventEntry to "fix" the IDs.
+     * @param formattedDate check which formattedDate in the EventEntry to "fix" the IDs.
      */
-    private void updateEventIDs(int date) {
+    private void updateEventIDs(String formattedDate) {
         /**
          *  Steps
          *  1. Look in the EventEntry
-         *  2. Acquire all rows in the specified date in a cursor
+         *  2. Acquire all rows in the specified formattedDate in a cursor
          *  3. Check which row has "skip" ID
          *  4. From there to the end of cursor, update ID with correct number.
          */
@@ -498,12 +498,12 @@ public class DataProvider extends ContentProvider {
 
         //Step 1 Look in the Event Entry
         String projection[] = new String[]{
-                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_FORMATTED_DATE,
                 EventEntry.COLUMN_SUB_ID
         };
 
-        String selection = EventEntry.COLUMN_DATE + "=?";
-        String selectionArgs[] = new String[]{String.valueOf(date)};
+        String selection = EventEntry.COLUMN_FORMATTED_DATE + "=?";
+        String selectionArgs[] = new String[]{formattedDate};
 
         Cursor cursor = database.query(
                 EventEntry.TABLE_NAME,

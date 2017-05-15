@@ -339,7 +339,6 @@ public class EditEventActivity extends FragmentActivity implements
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
         values.put(EventEntry.COLUMN_EVENT_ID, receivedEventID);
-        values.put(EventEntry.COLUMN_DATE, getDateAsInt());
         values.put(EventEntry.COLUMN_FORMATTED_DATE, date);
         //subID doesn't matter because this will be organized onResume for ListActivity anyways
         values.put(EventEntry.COLUMN_SUB_ID, 0);

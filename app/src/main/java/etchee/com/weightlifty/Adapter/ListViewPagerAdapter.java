@@ -31,7 +31,7 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
         this.context = context;
         allEventsCursor = context.getContentResolver().query(
                 EventEntry.CONTENT_URI,
-                new String[]{EventEntry.COLUMN_DATE, EventEntry.COLUMN_SUB_ID, EventEntry.COLUMN_FORMATTED_DATE},
+                new String[]{EventEntry.COLUMN_SUB_ID, EventEntry.COLUMN_FORMATTED_DATE},
                 EventEntry.COLUMN_SUB_ID + "=?",
                 new String[]{String.valueOf(0)},
                 null

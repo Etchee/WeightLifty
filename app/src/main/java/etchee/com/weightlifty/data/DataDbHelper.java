@@ -55,7 +55,6 @@ public class DataDbHelper extends SQLiteOpenHelper {
         final String CREATE_EVENT_TABLE =
                 "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " ("
                 + EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + EventEntry.COLUMN_DATE + " INTEGER NOT NULL, "
                 + EventEntry.COLUMN_FORMATTED_DATE + " TEXT NOT NULL, "
                 + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
                 + EventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, "

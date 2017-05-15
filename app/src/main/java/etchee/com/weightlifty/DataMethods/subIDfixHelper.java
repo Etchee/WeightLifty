@@ -17,7 +17,7 @@ import etchee.com.weightlifty.data.DataContract;
  *
  *  for(i = 0; i < actual number of events; i++) update sub_id
  */
-public class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
+public class subIDfixHelper extends AsyncTask<String, Void, Integer> {
 
     private Context context;
     private int subId;
@@ -28,19 +28,19 @@ public class subIDfixHelper extends AsyncTask<Integer, Void, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(Integer... dateSelection) {
+    protected Integer doInBackground(String... dateSelection) {
         //get the date
-        int date = dateSelection[0];
+        String date = dateSelection[0];
 
         //set up the query to get the number of rows. Any column is okay
 
         String projection[] = new String[]{
                 DataContract.EventEntry._ID,
-                DataContract.EventEntry.COLUMN_DATE
+                DataContract.EventEntry.COLUMN_FORMATTED_DATE
         };
 
-        String selection = DataContract.EventEntry.COLUMN_DATE + "=?";
-        String selectionArgs[] = new String[]{ String.valueOf(date) };
+        String selection = DataContract.EventEntry.COLUMN_FORMATTED_DATE + "=?";
+        String selectionArgs[] = new String[]{ date};
         Cursor cursor = null;
         int numOfRowsToUpdate;
         int columnIndex_ID;

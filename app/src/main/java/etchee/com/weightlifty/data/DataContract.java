@@ -101,7 +101,6 @@ public final class DataContract {
 
         //and the columns
         public static final String COLUMN_SUB_ID = "table_event_sub_id";
-        public static final String COLUMN_DATE = "table_event_date";
         public static final String COLUMN_EVENT_ID = "table_event_event_id";
         public static final String COLUMN_SET_COUNT = "table_event_set_count";
         public static final String COLUMN_REP_COUNT = "table_event_rep_count";
