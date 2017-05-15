@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -56,6 +57,11 @@ public class CurrentListFragment extends Fragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
+        //get the position in the viewPager
+        if (getArguments() != null) {
+            displayDate = getArguments().getString(DataContract.GlobalConstants.VIEWPAGER_POSITION_AS_DATE);
+        } else Log.e(TAG, "Argument not received");
+
     }
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -65,9 +71,8 @@ public class CurrentListFragment extends Fragment implements
         View emptyView = view.findViewById(R.id.view_empty);
         listview = (ListView) view.findViewById(R.id.listview_fragment_current);
         listview.setEmptyView(emptyView);
-        listAdapter = new ListAdapter(context, null, 0);
+        listAdapter = new ListAdapter(context, null, 0);    //cursor will be swapped later
         listview.setAdapter(listAdapter);
-        
         //listView setup
         listview.setOnItemClickListener(listViewOnItemClickSetup());
     }
@@ -85,16 +90,8 @@ public class CurrentListFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        context = getActivity();
         contentResolver = context.getContentResolver();
 
-        //get the position in the viewPager
-        if (getArguments() != null) {
-            displayDate = getArguments().getString(DataContract.GlobalConstants.VIEWPAGER_POSITION_AS_DATE);
-        } else Toast.makeText(context, "Argument not received", Toast.LENGTH_SHORT).show();
-
-
-        //pass viewPager's position to the loader to come back with the correct date's cursor.
         Bundle bundle = new Bundle();
         bundle.putString(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, displayDate);
         getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
@@ -289,6 +286,7 @@ public class CurrentListFragment extends Fragment implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
         listAdapter.swapCursor(cursor);
         listAdapter.notifyDataSetChanged();
     }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -40,6 +41,7 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     //make a new fragment, with the variable being the position
+    //And pass the cursor to inflate the view from
     @Override
     public Fragment getItem(int position) {
         Fragment fragment = new CurrentListFragment();
@@ -51,6 +53,7 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
             index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_FORMATTED_DATE);
             date = allEventsCursor.getString(index);
         }
+
         args.putString(DataContract.GlobalConstants.VIEWPAGER_POSITION_AS_DATE, date);
 
         fragment.setArguments(args);
