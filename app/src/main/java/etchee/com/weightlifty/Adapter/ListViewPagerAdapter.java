@@ -74,16 +74,4 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
         }
         return allEventsCursor.getString(index);
     }
-
-    private int getDateAsInt() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        String concatenated = String.valueOf(year) + String.valueOf(month) + String.valueOf(day);
-
-        return Integer.parseInt(concatenated);
-    }
 }

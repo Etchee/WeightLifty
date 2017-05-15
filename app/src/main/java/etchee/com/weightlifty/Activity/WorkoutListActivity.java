@@ -128,7 +128,6 @@ public class WorkoutListActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case R.id.action_search_button:
-
                 break;
 
             case R.id.menu_delete_all_events:

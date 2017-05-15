@@ -176,25 +176,100 @@ public class MainActivity extends AppCompatActivity {
 
         ContentValues values = new ContentValues();
 
-        int rep_count = 7;
-        int set_count = 5;
-        int date = getDateAsInt();
+        int rep_count = new Random().nextInt(10);
+        int set_count = new Random().nextInt(20);
+        int date = getDateAsInt() - 3;
         int weight_count = 70;
         int sub_ID = getNextSub_id();
-        int eventID = new Random().nextInt(800);
+        int eventID = new Random().nextInt(900);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE, -3);
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String formattedDate = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
 
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);
-        values.put(EventEntry.COLUMN_FORMATTED_DATE, getFormattedDate());
         values.put(EventEntry.COLUMN_EVENT_ID, eventID);
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
 
         Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
 
         if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
                 "failed to insert data. check the MainActivity method and the table.");
+
+    }
+
+    private void event_insertDummyValues2() {
+
+        ContentValues values = new ContentValues();
+
+        int rep_count = new Random().nextInt(10);
+        int set_count = new Random().nextInt(20);
+        int date = getDateAsInt() - 2;
+        int weight_count = 70;
+        int sub_ID = getNextSub_id();
+        int eventID = new Random().nextInt(900);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE, -2);
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String formattedDate = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+
+        values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        values.put(EventEntry.COLUMN_DATE, date);
+        values.put(EventEntry.COLUMN_EVENT_ID, eventID);
+        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
+        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
+        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
+
+        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
+
+        if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
+                "failed to insert data. check the MainActivity method and the table.");
+
+    }
+
+
+    private void event_insertDummyValues3() {
+
+        ContentValues values = new ContentValues();
+
+        int rep_count = new Random().nextInt(10);
+        int set_count = new Random().nextInt(20);
+        int date = getDateAsInt();
+        int weight_count = 70;
+        int sub_ID = getNextSub_id();
+        int eventID = new Random().nextInt(900);
+        String formattedDate = getFormattedDate();
+
+        values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+        values.put(EventEntry.COLUMN_DATE, date);
+        values.put(EventEntry.COLUMN_EVENT_ID, eventID);
+        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
+        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
+        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
+
+        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
+
+        if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
+                "failed to insert data. check the MainActivity method and the table.");
+
 
     }
 
@@ -301,6 +376,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu_insert_event:
                 event_insertDummyValues();
+                event_insertDummyValues2();
+                event_insertDummyValues3();
                 break;
             case R.id.menu_insert_event_type:
                 eventType_insertDummyValues();

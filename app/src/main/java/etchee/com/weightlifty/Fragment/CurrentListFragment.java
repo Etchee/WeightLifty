@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -74,7 +75,12 @@ public class CurrentListFragment extends Fragment implements
         listAdapter = new ListAdapter(context, null, 0);    //cursor will be swapped later
         listview.setAdapter(listAdapter);
         //listView setup
-        listview.setOnItemClickListener(listViewOnItemClickSetup());
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                launchEditActivityWithEventID(position);
+            }
+        });
     }
 
 
@@ -99,23 +105,6 @@ public class CurrentListFragment extends Fragment implements
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
     }
 
-    private AdapterView.OnItemClickListener listViewOnItemClickSetup() {
-        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                if (listview.getAdapter() == listAdapter) {
-                    launchEditActivityWithEventID(position);
-                    Log.v(TAG, "SUB_ID received as: " + String.valueOf(position));
-                } else {
-                    //adapter null. Do nothing
-                }
-            }
-        };
-
-        return listener;
-    }
-
     private int getEventID() {
         return eventID;
     }
@@ -125,13 +114,11 @@ public class CurrentListFragment extends Fragment implements
     }
 
     /**
-     * @param position equals to that of the sub_id in the event table.
-     *                 This method find the specific row with the sub_id, then get the event_id
-     *                 back in that row.
+     * @param position = SUB_ID in the Event Table.
+     *                 What row? = specify by the formatted date shown in the viewPager title.
+     *                 How to get what row? = use field variable "displayDate".
      */
     private void launchEditActivityWithEventID(final int position) {
-
-        int date_today = getDateAsInt();
 
         //Define async query handler
         AsyncQueryHandler queryHandler = new AsyncQueryHandler(contentResolver) {
@@ -174,17 +161,17 @@ public class CurrentListFragment extends Fragment implements
 
         //projection
         String projection[] = new String[]{
-                EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_FORMATTED_DATE,
                 EventEntry.COLUMN_SUB_ID,
                 EventEntry.COLUMN_EVENT_ID
         };
 
         //selection
-        String selection = EventEntry.COLUMN_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
+        String selection = EventEntry.COLUMN_FORMATTED_DATE + "=?" + " AND " + EventEntry.COLUMN_SUB_ID + "=?";
 
         //selectionArgs
         String selectionArgs[] = new String[]{
-                String.valueOf(date_today),
+                displayDate,
                 String.valueOf(position)
         };
 
@@ -286,7 +273,6 @@ public class CurrentListFragment extends Fragment implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        Log.v(TAG, DatabaseUtils.dumpCursorToString(cursor));
         listAdapter.swapCursor(cursor);
         listAdapter.notifyDataSetChanged();
     }
