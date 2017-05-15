@@ -2,13 +2,10 @@ package etchee.com.weightlifty.Adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -24,7 +21,6 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
 
     private Context context;
-    private int todayDate;
     private Cursor allEventsCursor;
     private final String TAG = getClass().getSimpleName();
     private int count;
@@ -32,7 +28,6 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
     public ListViewPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
-        todayDate = getDateAsInt();
         allEventsCursor = context.getContentResolver().query(
                 EventEntry.CONTENT_URI,
                 new String[]{EventEntry.COLUMN_DATE, EventEntry.COLUMN_SUB_ID, EventEntry.COLUMN_FORMATTED_DATE},
@@ -40,25 +35,25 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
                 new String[]{String.valueOf(0)},
                 null
         );
-        if (allEventsCursor != null)count = allEventsCursor.getCount();
+        if (allEventsCursor.moveToFirst())count = allEventsCursor.getCount();
         else count = 0;
     }
-
-
 
     //make a new fragment, with the variable being the position
     @Override
     public Fragment getItem(int position) {
         Fragment fragment = new CurrentListFragment();
         Bundle args = new Bundle();
-        fragment.setArguments(args);
 
-        int index = 0;
+        int index;
+        String date = null;
         if (allEventsCursor.moveToPosition(position)) {
-            index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_DATE);
+            index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_FORMATTED_DATE);
+            date = allEventsCursor.getString(index);
         }
-        args.putInt(DataContract.GlobalConstants.VIEWPAGER_POSITION, allEventsCursor.getInt(index));
+        args.putString(DataContract.GlobalConstants.VIEWPAGER_POSITION_AS_DATE, date);
 
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -70,7 +65,6 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-
         int index = 0;
         if (allEventsCursor.moveToPosition(position)) {
             index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_FORMATTED_DATE);

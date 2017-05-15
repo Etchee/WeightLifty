@@ -1,6 +1,5 @@
 package etchee.com.weightlifty.Fragment;
 
-import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -36,7 +35,7 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
  */
 
 public class CurrentListFragment extends Fragment implements
-        android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
+        android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor>{
 
     private ListView listview;
     private FloatingActionButton fab;
@@ -48,7 +47,7 @@ public class CurrentListFragment extends Fragment implements
     private Context context;
     private ListAdapter listAdapter;
     private ContentResolver contentResolver;
-
+    private String displayDate;
     public CurrentListFragment() {
     }
 
@@ -56,8 +55,8 @@ public class CurrentListFragment extends Fragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getContext();
     }
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -66,31 +65,39 @@ public class CurrentListFragment extends Fragment implements
         View emptyView = view.findViewById(R.id.view_empty);
         listview = (ListView) view.findViewById(R.id.listview_fragment_current);
         listview.setEmptyView(emptyView);
+        listAdapter = new ListAdapter(context, null, 0);
         listview.setAdapter(listAdapter);
-
+        
         //listView setup
         listview.setOnItemClickListener(listViewOnItemClickSetup());
-
-
-        //only display today's data for now
-        Bundle bundle = new Bundle();
-        bundle.putInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, getDateAsInt());
-        getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
     }
 
+
+    /**
+     *  This fragment is called from ListViewPagerAdapter.
+     *  getArgument() gets the bundle which contains the position of this fragment in the viewPager.
+     * @param inflater inflater
+     * @param container container of this fragment
+     * @param savedInstanceState savedInstanceState
+     * @return  View of the fragment to onViewCreated
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = getActivity();
         contentResolver = context.getContentResolver();
-        //cursor init
-        Cursor listCursor = initListCursor();
-        listAdapter = new ListAdapter(context, listCursor, 0);
 
+        //get the position in the viewPager
         if (getArguments() != null) {
-            int position = getArguments().getInt(DataContract.GlobalConstants.VIEWPAGER_POSITION);
+            displayDate = getArguments().getString(DataContract.GlobalConstants.VIEWPAGER_POSITION_AS_DATE);
         } else Toast.makeText(context, "Argument not received", Toast.LENGTH_SHORT).show();
+
+
+        //pass viewPager's position to the loader to come back with the correct date's cursor.
+        Bundle bundle = new Bundle();
+        bundle.putString(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE, displayDate);
+        getLoaderManager().initLoader(CREATE_LOADER_ID, bundle, this);
 
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
     }
@@ -162,7 +169,7 @@ public class CurrentListFragment extends Fragment implements
                 Bundle bundle = new Bundle();
                 bundle.putInt(DataContract.GlobalConstants.PASS_EVENT_ID, getEventID());
                 bundle.putInt(DataContract.GlobalConstants.PASS_SUB_ID, position);
-                bundle.putInt(DataContract.GlobalConstants.PASS_SELECTED_DATE, getDateAsInt());
+                bundle.putInt(DataContract.GlobalConstants.PASS_SELECTED_DATE, 0);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -230,7 +237,22 @@ public class CurrentListFragment extends Fragment implements
         return Integer.parseInt(concatenated);
     }
 
+    private String getFormattedDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+
+        return concatenated;
+    }
+
     /**
+     *  The bundle contains the position of the fragment in the viewPager.
+     *  0 = today, 1 = yesterday, 2 = the day before yesterday, etc.
      * @param id     Just select any desired ID. Here I define in the global constant
      * @param bundle pass any object in bundle, no need to pass anything in here.
      * @return defined cursor
@@ -238,32 +260,22 @@ public class CurrentListFragment extends Fragment implements
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 
-        /**
-         *  ListView will contain specified date's events.
-         *  Required components
-         *
-         *  1. date to specify date
-         *  2. event ID to get the workout name
-         *  3. set_count
-         *  4. rep_count
-         *
-         */
+        //method to convert position into date
 
-        int date;
-
-        date = bundle.getInt(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE);
+        String date  = bundle.getString(DataContract.GlobalConstants.PASS_CREATE_LOADER_DATE);
 
         String projection[] = new String[]{
                 EventEntry._ID,
                 EventEntry.COLUMN_DATE,
+                EventEntry.COLUMN_FORMATTED_DATE,
                 EventEntry.COLUMN_EVENT_ID,
                 EventEntry.COLUMN_WEIGHT_COUNT,
                 EventEntry.COLUMN_SET_COUNT,
                 EventEntry.COLUMN_REP_COUNT
         };
 
-        String selection = EventEntry.COLUMN_DATE + "=?";
-        String selectionArgs[] = new String[]{String.valueOf(date)};
+        String selection = EventEntry.COLUMN_FORMATTED_DATE + "=?";
+        String selectionArgs[] = new String[]{date};
 
         return new CursorLoader(
                 context,

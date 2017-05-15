@@ -21,7 +21,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 import etchee.com.weightlifty.Fragment.MainActivityFragment;
@@ -110,6 +112,15 @@ public class MainActivity extends AppCompatActivity {
         return Integer.parseInt(concatenated);
     }
 
+    private String getDateString() {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date now = new Date();
+        String date = simpleDateFormat.format(now);
+        Log.v(TAG, date);
+        return date;
+    }
+
     /**
      *  This method does the following:
      *  1. Checks if the last row in the calendar entry is today
@@ -174,11 +185,11 @@ public class MainActivity extends AppCompatActivity {
 
         values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
         values.put(EventEntry.COLUMN_DATE, date);
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, getFormattedDate());
         values.put(EventEntry.COLUMN_EVENT_ID, eventID);
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
-        values.put(EventEntry.COLUMN_FORMATTED_DATE, getFormattedDate());
 
         Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
 
