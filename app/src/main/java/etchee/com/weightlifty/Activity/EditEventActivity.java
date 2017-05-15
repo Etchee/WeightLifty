@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.IllegalFormatException;
 
 import etchee.com.weightlifty.DataMethods.DeleteActionHelper;
 import etchee.com.weightlifty.DataMethods.ModifyEventHelper;
@@ -31,6 +32,9 @@ import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_CODE;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_EXISTING;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_NEW;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVENT_TYPE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_SETS_NUMBER;
@@ -93,6 +97,7 @@ public class EditEventActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_edit);
 
+        //View Initialization
         numberPicker_set = (NumberPicker) findViewById(R.id.set_numberPicker);
         numberPicker_set.setMaxValue(SET_MAXVALUE);
         numberPicker_set.setMinValue(SET_MINVALUE);
@@ -103,6 +108,7 @@ public class EditEventActivity extends FragmentActivity implements
         weight_count = (EditText) findViewById(R.id.input_weight_number);
         button_add_event = (Button) findViewById(R.id.add_event);
         button_delete_event = (Button) findViewById(R.id.delete_workout);
+
         //get user pref for weight unit
         SharedPreferences sharedPreferences = getApplicationContext().
                 getSharedPreferences("etchee.com.weightlifty", MODE_PRIVATE);
@@ -111,6 +117,86 @@ public class EditEventActivity extends FragmentActivity implements
         defineQueryHandler();
 
         Bundle bundle = getIntent().getExtras();
+
+        int launchMode = bundle.getInt(LAUNCH_EDIT_CODE);
+
+        switch (launchMode) {
+            case LAUNCH_EDIT_NEW:
+                // Case 1: creating a new event → bundle with Event String.
+
+                Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
+                eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
+                //first thing fire the asyncTask to get the id
+                QueryEventIDFromName queryEventIDFromName =
+                        new QueryEventIDFromName(getApplicationContext(), this);
+                queryEventIDFromName.queryResponceHandler = this;
+                queryEventIDFromName.execute(eventString);
+
+                //not "delete", but "cancel"
+                button_delete_event.setText(R.string.cancel);
+
+                //add button behavior
+                button_add_event.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //make correct contentValues here
+                        Uri uri = addNewEvent(getUserInputsAsContentValues(getDateAsInt()));
+                        Toast.makeText(EditEventActivity.this, "New event added in: " + uri.toString(),
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+
+                String event = getIntent().getStringExtra(DataContract.GlobalConstants.PASS_EVENT_STRING);
+                name_workout.setText(event);
+                break;
+
+            case LAUNCH_EDIT_EXISTING:
+                // Case 2: modifying an already existing event → bundle with selection.
+                Toast.makeText(this, "Edit!", Toast.LENGTH_SHORT).show();
+                //currently in WorkoutListInterface, this date is just set as today's date. Just pass another date
+                //in future updates.
+                final int selectedDate = bundle.getInt(DataContract.GlobalConstants.PASS_SELECTED_DATE);
+
+                //Not create event but modify event
+                button_add_event.setText(R.string.update_event);
+                button_add_event.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new ModifyEventHelper(
+                                getApplicationContext(),
+                                EditEventActivity.this,
+                                selectedDate,
+                                sub_ID
+                        ).execute(getUserInputsAsContentValues(selectedDate));
+                    }
+                });
+
+                setReceivedEventID(bundle.getInt(DataContract.GlobalConstants.PASS_EVENT_ID));
+                if (receivedEventID < 0 ) {
+                    throw new IllegalArgumentException("Null contentValues");
+                }
+                sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID);
+
+                //init the loader
+                getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
+
+                //then show the event String
+                queryEventType(getReceivedEventID());
+
+                //set the number of sets
+                queryNumberOfSets(getDateAsInt(), sub_ID);
+
+                //set the number of reps
+                queryNumberOfReps(getDateAsInt(), sub_ID);
+
+                //set the weight figure
+                queryWeightCount(getDateAsInt(), sub_ID);
+                break;
+
+            default: throw new IllegalArgumentException(TAG + ": EditEventActivity could not recognize" +
+                    "the launch mode.");
+        }
 
         button_delete_event.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,83 +226,6 @@ public class EditEventActivity extends FragmentActivity implements
                 return false;
             }
         });
-
-        // Case 1: creating a new event → bundle with Event String.
-        if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_STRING) != null) {
-            Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
-            eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
-            //first thing fire the asyncTask to get the id
-            QueryEventIDFromName queryEventIDFromName =
-                    new QueryEventIDFromName(getApplicationContext(), this);
-            queryEventIDFromName.queryResponceHandler = this;
-            queryEventIDFromName.execute(eventString);
-
-            //not "delete", but "cancel"
-            button_delete_event.setText(R.string.cancel);
-
-            //add button behavior
-            button_add_event.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //make correct contentValues here
-                    Uri uri = addNewEvent(getUserInputsAsContentValues(getDateAsInt()));
-                    Toast.makeText(EditEventActivity.this, "New event added in: " + uri.toString(),
-                            Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            });
-
-            String event = getIntent().getStringExtra(DataContract.GlobalConstants.PASS_EVENT_STRING);
-            name_workout.setText(event);
-        }
-
-        // Case 2: modifying an already existing event → bundle with selection.
-        else if (bundle.get(DataContract.GlobalConstants.PASS_EVENT_ID) != null) {
-
-            //currently in WorkoutListInterface, this date is just set as today's date. Just pass another date
-            //in future updates.
-            final int selectedDate = bundle.getInt(DataContract.GlobalConstants.PASS_SELECTED_DATE);
-
-            //Not create event but modify event
-            button_add_event.setText(R.string.update_event);
-            button_add_event.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new ModifyEventHelper(
-                            getApplicationContext(),
-                            EditEventActivity.this,
-                            selectedDate,
-                            sub_ID
-                            ).execute(getUserInputsAsContentValues(selectedDate));
-                }
-            });
-
-            setReceivedEventID(bundle.getInt(DataContract.GlobalConstants.PASS_EVENT_ID));
-            if (receivedEventID < 0 ) {
-                throw new IllegalArgumentException("Null contentValues");
-            }
-            sub_ID = bundle.getInt(DataContract.GlobalConstants.PASS_SUB_ID);
-
-            //init the loader
-            getSupportLoaderManager().initLoader(LOADER_MODIFY_EVENT_MODE, bundle, this);
-
-            //then show the event String
-            queryEventType(getReceivedEventID());
-
-            //set the number of sets
-            queryNumberOfSets(getDateAsInt(), sub_ID);
-
-            //set the number of reps
-            queryNumberOfReps(getDateAsInt(), sub_ID);
-
-            //set the weight figure
-            queryWeightCount(getDateAsInt(), sub_ID);
-
-
-        } else {
-            throw new IllegalArgumentException("EditEventActivity did not receive bundle of" +
-                    "selection columns nor contentValues to make a new event");
-        }
 
     }
 

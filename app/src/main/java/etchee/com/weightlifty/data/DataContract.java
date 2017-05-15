@@ -44,6 +44,10 @@ public final class DataContract {
         public static final int QUERY_REPS_COUNT = 16;
         public static final int QUERY_WEIGHT_COUNT = 32;
 
+        public static final int LAUNCH_EDIT_NEW = 0;
+        public static final int LAUNCH_EDIT_EXISTING = 1;
+        public static final String LAUNCH_EDIT_CODE = "LAUNCHEDIT";
+
         public static final String PASS_SUB_ID = "subIDpassed";
         public static final String PASS_SELECTED_DATE = "Date";
 

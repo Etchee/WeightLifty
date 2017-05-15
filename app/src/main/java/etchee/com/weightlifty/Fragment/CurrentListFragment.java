@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
@@ -18,8 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
@@ -30,6 +28,13 @@ import etchee.com.weightlifty.Adapter.ListAdapter;
 import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
+import etchee.com.weightlifty.data.DataContract.GlobalConstants;
+
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_CODE;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_EXISTING;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.PASS_EVENT_ID;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.PASS_SELECTED_DATE;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.PASS_SUB_ID;
 
 /**
  * Displays the date's fragment.
@@ -105,10 +110,6 @@ public class CurrentListFragment extends Fragment implements
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
     }
 
-    private int getEventID() {
-        return eventID;
-    }
-
     private void setEventID(int eventID) {
         this.eventID = eventID;
     }
@@ -141,19 +142,16 @@ public class CurrentListFragment extends Fragment implements
                         throw new IllegalArgumentException("Invalid token received at Event ID query.");
                 } catch (CursorIndexOutOfBoundsException e) {
                     e.printStackTrace();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
                 } finally {
                     cursor.close();
                 }
 
-                setEventID(eventID);
-
                 Intent intent = new Intent(context, EditEventActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putInt(DataContract.GlobalConstants.PASS_EVENT_ID, getEventID());
-                bundle.putInt(DataContract.GlobalConstants.PASS_SUB_ID, position);
-                bundle.putInt(DataContract.GlobalConstants.PASS_SELECTED_DATE, 0);
+                bundle.putInt(PASS_EVENT_ID, eventID);
+                bundle.putInt(PASS_SUB_ID, position);
+                bundle.putString(PASS_SELECTED_DATE, displayDate);
+                bundle.putInt(LAUNCH_EDIT_CODE, LAUNCH_EDIT_EXISTING);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
