@@ -174,34 +174,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void event_insertDummyValues() {
 
-        ContentValues values = new ContentValues();
+        for (int i  = 0; i < new Random().nextInt(10); i++) {
+            ContentValues values = new ContentValues();
 
-        int rep_count = new Random().nextInt(10);
-        int set_count = new Random().nextInt(20);
-        int weight_count = 70;
-        int sub_ID = getNextSub_id();
-        int eventID = new Random().nextInt(900);
+            int rep_count = new Random().nextInt(10);
+            int set_count = new Random().nextInt(20);
+            int weight_count = 70;
+            int sub_ID = getNextSub_id();
+            int eventID = new Random().nextInt(900);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
 
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        String formattedDate = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+            String formattedDate = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
 
-        values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
-        values.put(EventEntry.COLUMN_EVENT_ID, eventID);
-        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
-        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
-        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
-        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
+            values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
+            values.put(EventEntry.COLUMN_EVENT_ID, eventID);
+            values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
+            values.put(EventEntry.COLUMN_SET_COUNT, set_count);
+            values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
+            values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
 
-        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
-
-        if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
-                "failed to insert data. check the MainActivity method and the table.");
+            Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
+            if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
+                    "failed to insert data. check the MainActivity method and the table.");
+        }
 
     }
 

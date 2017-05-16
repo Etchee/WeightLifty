@@ -33,13 +33,14 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
         this.context = context;
         allEventsCursor = context.getContentResolver().query(
                 EventEntry.CONTENT_URI,
-                new String[]{EventEntry.COLUMN_SUB_ID, EventEntry.COLUMN_FORMATTED_DATE},
+                new String[]{EventEntry.COLUMN_SUB_ID, EventEntry.COLUMN_FORMATTED_DATE, EventEntry._ID},
                 EventEntry.COLUMN_SUB_ID + "=?",
                 new String[]{String.valueOf(0)},
                 EventEntry._ID + DataContract.GlobalConstants.ORDER_DESCENDING
         );
         if (allEventsCursor.moveToFirst()){
             count = allEventsCursor.getCount();
+            Log.v(TAG, DatabaseUtils.dumpCursorToString(allEventsCursor));
         } else count = 0;
     }
 
@@ -53,7 +54,6 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
         int index;
         String date = null;
         if (allEventsCursor.moveToPosition(getCount() - 1 - position)) {
-            Log.v(TAG, DatabaseUtils.dumpCursorToString(allEventsCursor));
             index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_FORMATTED_DATE);
             date = allEventsCursor.getString(index);
         }
