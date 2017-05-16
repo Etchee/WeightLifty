@@ -105,4 +105,13 @@
         android:layout_alignStart="@id/input_weight_number"
         android:text="@string/weight" />
 
+    <TextView
+        android:id="@+id/hint_text_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/weight_hint_text"
+        android:layout_toEndOf="@+id/weight_hint_text"
+        android:layout_toRightOf="@+id/weight_hint_text"
+        android:text="@string/kg" />
+
 </RelativeLayout>

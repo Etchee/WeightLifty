@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -23,7 +24,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.IllegalFormatException;
 
 import etchee.com.weightlifty.DataMethods.DeleteActionHelper;
 import etchee.com.weightlifty.DataMethods.ModifyEventHelper;
@@ -43,6 +43,8 @@ import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_EVE
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_REPS_COUNT;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_SETS_NUMBER;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.QUERY_WEIGHT_COUNT;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.UNIT_IMPEREIAL;
+import static etchee.com.weightlifty.data.DataContract.GlobalConstants.UNIT_METRIC;
 import static java.lang.Integer.parseInt;
 
 /**
@@ -60,6 +62,7 @@ public class EditEventActivity extends FragmentActivity implements
     private NumberPicker numberPicker_rep;
     private TextView name_workout;
     private TextView weight_count;
+    private TextView hint_unit_text;
     private Button button_add_event;
     private Button button_delete_event;
     private final String NAME_PREF_FILE = "preferences";
@@ -76,6 +79,8 @@ public class EditEventActivity extends FragmentActivity implements
     private static final int LOADER_CREATE_NEW_EVENT_MODE = 0;
     private static final int LOADER_MODIFY_EVENT_MODE = 1;
 
+    private int LAUNCH_MODE;
+
     private String eventType;
     private String formattedDate;
 
@@ -84,6 +89,8 @@ public class EditEventActivity extends FragmentActivity implements
     private AsyncQueryHandler queryHandler; // for querying data
 
     private int sub_ID;
+
+    private String unit_pref;
 
     private String eventString;
     private DeleteActionHelper deleteHelper;
@@ -112,12 +119,27 @@ public class EditEventActivity extends FragmentActivity implements
         weight_count = (EditText) findViewById(R.id.input_weight_number);
         button_add_event = (Button) findViewById(R.id.add_event);
         button_delete_event = (Button) findViewById(R.id.delete_workout);
+        hint_unit_text = (TextView)findViewById(R.id.hint_text_unit);
 
-        //get user pref for weight unit
-        SharedPreferences sharedPreferences = getApplicationContext().
-                getSharedPreferences("etchee.com.weightlifty", MODE_PRIVATE);
-        String str = sharedPreferences.getString(getString(R.string.pref_unit), null);
-        Toast.makeText(this, "Pref is: " + str, Toast.LENGTH_SHORT).show();
+        //get user pref for weight unit_pref
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        unit_pref = sharedPreferences.getString(getResources().getString(R.string.pref_unit), null);
+
+        //default is metric. if imperial, replace the hint text with lbs unit_pref sign, then when saving,
+        // do some conversion.
+
+        switch (unit_pref) {
+            case UNIT_IMPEREIAL:
+                hint_unit_text.setText(getResources().getText(R.string.lb));
+                break;
+
+            case UNIT_METRIC:
+                //do nothing
+                break;
+
+            default: Log.e(TAG, "Unit info could not be retrieved.");
+        }
+
         defineQueryHandler();
 
         Bundle bundle = getIntent().getExtras();
@@ -127,6 +149,7 @@ public class EditEventActivity extends FragmentActivity implements
         switch (launchMode) {
             case LAUNCH_EDIT_NEW:   //launching a new event
                 Toast.makeText(this, "Create new event mode", Toast.LENGTH_SHORT).show();
+                LAUNCH_MODE = LAUNCH_EDIT_NEW;
                 eventString = bundle.getString(DataContract.GlobalConstants.PASS_EVENT_STRING);
                 //first thing fire the asyncTask to get the id
                 QueryEventIDFromName queryEventIDFromName =
@@ -151,11 +174,19 @@ public class EditEventActivity extends FragmentActivity implements
 
                 String event = getIntent().getStringExtra(PASS_EVENT_STRING);
                 name_workout.setText(event);
+
+
+                button_delete_event.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditEventActivity.super.onBackPressed();
+                    }
+                });
                 break;
 
             case LAUNCH_EDIT_EXISTING:
                 Toast.makeText(this, "Edit mode", Toast.LENGTH_SHORT).show();   //Editing an existing event
-
+                LAUNCH_MODE = LAUNCH_EDIT_EXISTING;
                 formattedDate = bundle.getString(PASS_SELECTED_DATE);
 
                 //change button texts so that they make sense
@@ -197,6 +228,28 @@ public class EditEventActivity extends FragmentActivity implements
 
                 //set the weight figure
                 queryWeightCount(sub_ID);
+
+                button_delete_event.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        deleteHelper = new DeleteActionHelper(
+                                getApplicationContext(),
+                                EditEventActivity.this
+                        );
+
+                        String array[] = new String[]{
+                                String.valueOf(getDateAsInt()),
+                                String.valueOf(sub_ID)
+                        };
+                        ArrayList<String> list = new ArrayList<>(2);
+                        list.add(0, String.valueOf(getDateAsInt()));
+                        list.add(1, String.valueOf(sub_ID));
+
+                        deleteHelper.execute(list);
+                        finish();
+                    }
+                });
+
                 break;
 
             case -1:
@@ -207,27 +260,6 @@ public class EditEventActivity extends FragmentActivity implements
             default: throw new IllegalArgumentException(TAG + ": EditEventActivity could not recognize" +
                     "the launch mode.");
         }
-
-        button_delete_event.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteHelper = new DeleteActionHelper(
-                        getApplicationContext(),
-                        EditEventActivity.this
-                );
-
-                String array[] = new String[]{
-                        String.valueOf(getDateAsInt()),
-                        String.valueOf(sub_ID)
-                };
-                ArrayList<String> list = new ArrayList<>(2);
-                list.add(0, String.valueOf(getDateAsInt()));
-                list.add(1, String.valueOf(sub_ID));
-
-                deleteHelper.execute(list);
-                finish();
-            }
-        });
 
         weight_count.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -248,7 +280,7 @@ public class EditEventActivity extends FragmentActivity implements
 
     private int convertPoundToKilo(int pound) {
         double temp;
-        temp = pound/2.20462;
+        temp = (1/2.20462) * pound;
         int kilo = Integer.parseInt(String.valueOf(Math.round(temp)));
         return kilo;
     }
@@ -300,6 +332,10 @@ public class EditEventActivity extends FragmentActivity implements
                         if (cursor.moveToFirst()) {
                             int index = cursor.getColumnIndex(EventEntry.COLUMN_WEIGHT_COUNT);
                             int weight_count = cursor.getInt(index);
+                            //if imperial, do conversion and then show
+                            if (unit_pref.equals(UNIT_IMPEREIAL)) {
+                                weight_count = convertKiloToPound(weight_count);
+                            }
                             EditEventActivity.this.weight_count.setText(String.valueOf(weight_count));
                         }
 
@@ -333,7 +369,27 @@ public class EditEventActivity extends FragmentActivity implements
 
         int set_count = numberPicker_set.getValue();
         int rep_count = numberPicker_rep.getValue();
-        int weight_count = Integer.parseInt(this.weight_count.getText().toString());
+
+        //base on the unit_pref pref for weight
+        int weight_count = 0;
+        switch (unit_pref) {
+            case UNIT_IMPEREIAL:
+                //do the conversion
+                int weight_imperial = Integer.parseInt(this.weight_count.getText().toString());
+                int weight_metric = convertPoundToKilo(weight_imperial);
+                weight_count = weight_metric;
+                break;
+
+            case UNIT_METRIC:
+                //normal
+                weight_count = Integer.parseInt(this.weight_count.getText().toString());
+                break;
+
+            default: Log.e(TAG, "CONVERSION HAS FAILED.");
+        }
+
+        if (weight_count == 0) Log.e(TAG, "There is something wrong with unit conversion when" +
+                "saving. OOOOOOOOPS");
 
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);

@@ -59,6 +59,10 @@ public final class DataContract {
 
         public static final String ORDER_DESCENDING = " DESC";
         public static final String ORDER_ASCENDING = " ASC";
+
+        public static final String NAME_PREFERENCE_FILE = "etchee.com.PREFERENCE_KEY";
+        public static final String UNIT_METRIC = "unit_metric";
+        public static final String UNIT_IMPEREIAL = "unit_imperial";
     }
 
     public static final class EventSuggestion_Provider {

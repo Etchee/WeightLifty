@@ -17,6 +17,10 @@ import etchee.com.weightlifty.R;
  */
 
 public class SettingsFragment extends PreferenceFragment {
+
+    public SettingsFragment() {
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +31,8 @@ public class SettingsFragment extends PreferenceFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
+
+
 
 
 
