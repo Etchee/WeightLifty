@@ -56,7 +56,6 @@ public class WorkoutListActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private ListViewPagerAdapter viewPagerAdapter;
     private TabLayout tabLayout;
-    private SearchFragment searchFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,8 +75,6 @@ public class WorkoutListActivity extends AppCompatActivity {
         //hook 'em up with the Tabs
         tabLayout = (TabLayout)findViewById(R.id.list_tab);
         tabLayout.setupWithViewPager(viewPager);
-
-        searchFragment = new SearchFragment();
 
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.listactivity_fab);
@@ -122,7 +119,7 @@ public class WorkoutListActivity extends AppCompatActivity {
                         R.anim.slide_out_to_right,
                         R.anim.slide_in_from_right,
                         R.anim.slide_out_to_left)
-                .add(R.id.container_fragment_list, searchFragment)
+                .add(R.id.container_fragment_list, new SearchFragment())
                 .commit();
     }
 
@@ -249,12 +246,9 @@ public class WorkoutListActivity extends AppCompatActivity {
     public void onBackPressed() {
         //if in search mode AND the tab is gone, bring it back!
         if (tabLayout.getVisibility() == View.GONE) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .remove(searchFragment)
-                    .commit();
             tabLayout.setVisibility(View.VISIBLE);
             viewPager.setVisibility(View.VISIBLE);
+            super.onBackPressed();
         }else super.onBackPressed();
     }
 
