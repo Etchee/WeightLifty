@@ -16,6 +16,12 @@
             android:background="@color/colorPrimary"
             android:elevation="4dp" />
 
+        <LinearLayout
+            android:id="@+id/container_fragment_list"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <android.support.design.widget.TabLayout
             android:id="@+id/list_tab"
             fab:tabMode="scrollable"
