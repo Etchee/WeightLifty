@@ -111,14 +111,15 @@ public class WorkoutListActivity extends AppCompatActivity {
     private void enterSearchMode() {
         //hide the tab
         tabLayout.setVisibility(View.GONE);
+        //and the viewPager
+        viewPager.setVisibility(View.GONE);
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_from_left,
                         R.anim.slide_out_to_right,
                         R.anim.slide_in_from_right,
                         R.anim.slide_out_to_left)
-                .addToBackStack(null)
-                .replace(R.id.viewPager_fragment_listActivity, new SearchFragment())
+                .add(R.id.container_fragment_list, new SearchFragment())
                 .commit();
     }
 
@@ -246,6 +247,7 @@ public class WorkoutListActivity extends AppCompatActivity {
         //if in search mode AND the tab is gone, bring it back!
         if (tabLayout.getVisibility() == View.GONE) {
             tabLayout.setVisibility(View.VISIBLE);
+            viewPager.setVisibility(View.VISIBLE);
             super.onBackPressed();
         }else super.onBackPressed();
     }
