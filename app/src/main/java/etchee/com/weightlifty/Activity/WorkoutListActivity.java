@@ -76,6 +76,8 @@ public class WorkoutListActivity extends AppCompatActivity {
         tabLayout = (TabLayout)findViewById(R.id.list_tab);
         tabLayout.setupWithViewPager(viewPager);
 
+
+
         //fab setup
         fab = (FloatingActionButton) findViewById(R.id.listactivity_fab);
 
@@ -148,12 +150,11 @@ public class WorkoutListActivity extends AppCompatActivity {
     }
 
     private int deleteEventTableDatabase() {
-        int numberOfDeletedRows = getContentResolver().delete(
+        return getContentResolver().delete(
                 EventEntry.CONTENT_URI,
                 null,
                 null
         );
-        return numberOfDeletedRows;
     }
 
     private String getFormattedDate() {
@@ -164,9 +165,7 @@ public class WorkoutListActivity extends AppCompatActivity {
         int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        String concatenated = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
-
-        return concatenated;
+        return String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
     }
 
     private void event_insertDummyValues() {

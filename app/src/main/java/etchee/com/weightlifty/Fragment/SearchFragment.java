@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -29,7 +30,7 @@ import etchee.com.weightlifty.data.DataContract.EventType_FTSEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
 
 /**
- * Launched when searchView is pressed.
+ * Launched when the FAB is pressed.
  * Created by rikutoechigoya on 2017/05/12.
  */
 
@@ -37,26 +38,18 @@ public class SearchFragment extends android.support.v4.app.Fragment
         implements SearchView.OnCloseListener, SearchView.OnQueryTextListener{
 
     private ListView listview;
-    //To make sure that there is only one instance because OpenHelper will serialize requests anyways
     private final String TAG = getClass().getSimpleName();
     private Context context;
     private SearchAdapter adapter;
     private ContentResolver contentResolver;
     private SearchView searchView;
 
-
-    //TODO this fragment has to receive inputs from the search bar in the parent Activity
-    /*
-         So create a interface in the activity and implement in here
-     */
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity().getApplicationContext();
         contentResolver = context.getContentResolver();
-        //pass this activity to the parent Activity
-        //TODO do this here
+        adapter = new SearchAdapter(context, initEventTypeCursor());
     }
 
 
@@ -64,7 +57,6 @@ public class SearchFragment extends android.support.v4.app.Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = new SearchAdapter(context, initEventTypeCursor());
         listview = (ListView)view.findViewById(R.id.listview_fragment_search);
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(listViewListenerInit());
@@ -81,7 +73,7 @@ public class SearchFragment extends android.support.v4.app.Fragment
 
     private AdapterView.OnItemClickListener listViewListenerInit() {
 
-        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+        return new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //I have to get either ROW_ID or just item name here
@@ -99,7 +91,7 @@ public class SearchFragment extends android.support.v4.app.Fragment
                 Cursor cursor = null;
                 try {
                     cursor = contentResolver.query(
-                            DataContract.EventType_FTSEntry.CONTENT_URI,
+                            EventType_FTSEntry.CONTENT_URI,
                             projection,
                             selection,
                             selectionArgs,
@@ -109,7 +101,6 @@ public class SearchFragment extends android.support.v4.app.Fragment
                         eventName = cursor.getString(cursor.getColumnIndex(
                                 EventType_FTSEntry.COLUMN_EVENT_NAME));
                     }
-
                 } finally {
                     if (cursor != null) {
                         cursor.close();
@@ -118,7 +109,6 @@ public class SearchFragment extends android.support.v4.app.Fragment
                 launchEditEventActivityWithNewEvent(eventName);
             }
         };
-        return listener;
     }
 
     //Send contentValues
@@ -229,7 +219,6 @@ public class SearchFragment extends android.support.v4.app.Fragment
                 " FROM " + EventType_FTSEntry.TABLE_NAME +
                 " WHERE " + EventType_FTSEntry.COLUMN_EVENT_NAME + " MATCH '" + input + "';";
 
-        Cursor cursor = new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
-        return cursor;
+        return new DataDbHelper(context).getReadableDatabase().rawQuery(query, null);
     }
 }

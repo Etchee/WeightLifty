@@ -32,7 +32,6 @@ public class SearchAdapter extends BaseAdapter {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.cursor = cursor;
         this.context = context;
-        // get the workout name String
     }
 
     @Override
@@ -48,7 +47,6 @@ public class SearchAdapter extends BaseAdapter {
         if (cursor.moveToPosition(position)) {
             event = cursor.getString(index);
         }
-
         return event;
     }
 
@@ -64,7 +62,7 @@ public class SearchAdapter extends BaseAdapter {
         // no view at this position so create a new one.
         if (convertView == null) {
             //get the layout information
-            convertView = layoutInflater.inflate(R.layout.item_single_search, null);
+            convertView = layoutInflater.inflate(R.layout.item_single_search, viewGroup, false);
             holder = new ViewHolder();
 
             //assign component IDs
@@ -77,7 +75,6 @@ public class SearchAdapter extends BaseAdapter {
             holder = (ViewHolder)convertView.getTag();
         }
 
-        //        int index_number = cursor.getColumnIndex("rowid");
         int index_name = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
         int index_hint = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_TYPE);
 
@@ -85,20 +82,16 @@ public class SearchAdapter extends BaseAdapter {
         if (cursor.moveToPosition(position)) {
             workout = cursor.getString(index_name);
             hint_string = cursor.getString(index_hint);
-//            number_String = String.valueOf(cursor.getInt(index_number));
         }
 
         //set the item name on the TextView.
         //prevent NullPointer on fast scrolling?
         if (holder.workout_textView != null) {
-
             holder.workout_textView.setText(workout);
             holder.hint_textView.setText(hint_string);
-//                holder.number_textView.setText(number_String);
         }
 
         return convertView;
-
     }
 
     public void swapCursor(Cursor newCursor) {
@@ -108,9 +101,7 @@ public class SearchAdapter extends BaseAdapter {
 
 
     private static class ViewHolder {
-
         private TextView workout_textView;
         private TextView hint_textView;
-        private TextView number_textView;
     }
 }
