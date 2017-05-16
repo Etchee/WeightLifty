@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
@@ -67,7 +68,12 @@ public class SearchFragment extends android.support.v4.app.Fragment
         adapter = new SearchAdapter(context, initEventTypeCursor());
         listview = (ListView)view.findViewById(R.id.listview_fragment_search);
         listview.setAdapter(adapter);
-        listview.setOnItemClickListener(listViewListenerInit());
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                launchEditEventActivityWithNewEvent(String.valueOf(adapter.getItem(position)));
+            }
+        });
     }
 
 
@@ -78,53 +84,11 @@ public class SearchFragment extends android.support.v4.app.Fragment
         return inflater.inflate(R.layout.fragment_search_layout, container, false);
     }
 
-
-    private AdapterView.OnItemClickListener listViewListenerInit() {
-
-        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //I have to get either ROW_ID or just item name here
-                String event = (String) adapter.getItem(position);
-
-                //for debug, query the FTS table to see if the item name is correct
-                String projection[] = new String[]{
-                        EventType_FTSEntry.COLUMN_EVENT_NAME
-                };
-
-                String selection = EventType_FTSEntry.COLUMN_EVENT_NAME + "=?";
-                String selectionArgs[] = new String[]{String.valueOf(event)};
-
-                String eventName = null;
-                Cursor cursor = null;
-                try {
-                    cursor = contentResolver.query(
-                            DataContract.EventType_FTSEntry.CONTENT_URI,
-                            projection,
-                            selection,
-                            selectionArgs,
-                            null
-                    );
-                    if (cursor.moveToFirst()) {
-                        eventName = cursor.getString(cursor.getColumnIndex(
-                                EventType_FTSEntry.COLUMN_EVENT_NAME));
-                    }
-
-                } finally {
-                    if (cursor != null) {
-                        cursor.close();
-                    }
-                }
-                launchEditEventActivityWithNewEvent(eventName);
-            }
-        };
-        return listener;
-    }
-
     //Send contentValues
     private void launchEditEventActivityWithNewEvent(String eventName) {
         Intent intent = new Intent(getActivity(), EditEventActivity.class);
         Bundle bundle = new Bundle();
+        bundle.putInt(DataContract.GlobalConstants.LAUNCH_EDIT_CODE, DataContract.GlobalConstants.LAUNCH_EDIT_NEW);
         bundle.putString(DataContract.GlobalConstants.PASS_EVENT_STRING, eventName);
         intent.putExtras(bundle);
         startActivity(intent);
