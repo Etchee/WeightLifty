@@ -24,4 +24,35 @@
         android:paddingTop="20dp"
         android:text="@string/begin_workout" />
 
+    <TextView
+        android:id="@+id/hint_update_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/begin_workout_button"
+        android:layout_marginTop="@dimen/main_logo_marginTop"
+        android:text="@string/hint_text_progress"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/hint_number_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_100"
+        android:visibility="gone"
+        android:layout_below="@id/hint_update_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/main_logo_marginTop" />
+
+    <TextView
+        android:id="@+id/hint_text_update_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignTop="@+id/hint_number_update"
+        android:layout_toEndOf="@+id/hint_number_update"
+        android:layout_toRightOf="@+id/hint_number_update"
+        android:text="@string/percent_symbol" />
+
 </RelativeLayout>

@@ -47,4 +47,7 @@
     <string name="pref_unit">pref_unit</string>
     <string name="kg">(kg)</string>
     <string name="lb">(lb)</string>
+    <string name="hint_text_progress">Creating your workout database:</string>
+    <string name="_100">100</string>
+    <string name="percent_symbol">%</string>
 </resources>

@@ -55,12 +55,6 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
         dbHelper = new DataDbHelper(context);
 
-        if (!checkEventData()) {
-            // parse database
-        } else {
-            //do nothing. Happy happy database exists
-        }
-
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
@@ -277,33 +271,6 @@ public class MainActivity extends AppCompatActivity {
         );
         Toast.makeText(context, String.valueOf(numberOfDeletedRows) + " rows deleted.", Toast.LENGTH_SHORT).show();
         return numberOfDeletedRows;
-    }
-
-    private Boolean checkEventData() {
-        String tester = "";
-        Cursor cursor = null;
-        try {
-             cursor = getContentResolver().query(
-                    DataContract.EventType_FTSEntry.CONTENT_URI,
-                    new String[]{DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME},
-                    DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME + "=?",
-                    new String[]{"zercher squats"},
-                    null
-            );
-            if (cursor.moveToFirst()) {
-                tester = cursor.getString(cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            cursor.close();
-        }
-
-        if (tester.equals("zercher squats")) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override
