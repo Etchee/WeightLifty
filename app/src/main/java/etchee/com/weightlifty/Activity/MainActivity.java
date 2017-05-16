@@ -178,14 +178,12 @@ public class MainActivity extends AppCompatActivity {
 
         int rep_count = new Random().nextInt(10);
         int set_count = new Random().nextInt(20);
-        int date = getDateAsInt() - 3;
         int weight_count = 70;
         int sub_ID = getNextSub_id();
         int eventID = new Random().nextInt(900);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.DATE, -3);
 
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
@@ -372,8 +370,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu_insert_event:
                 event_insertDummyValues();
-                event_insertDummyValues2();
-                event_insertDummyValues3();
                 break;
             case R.id.menu_insert_event_type:
                 eventType_insertDummyValues();
