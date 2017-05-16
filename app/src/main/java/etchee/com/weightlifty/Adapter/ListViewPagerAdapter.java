@@ -2,10 +2,12 @@ package etchee.com.weightlifty.Adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -34,10 +36,11 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
                 new String[]{EventEntry.COLUMN_SUB_ID, EventEntry.COLUMN_FORMATTED_DATE},
                 EventEntry.COLUMN_SUB_ID + "=?",
                 new String[]{String.valueOf(0)},
-                null
+                EventEntry._ID + DataContract.GlobalConstants.ORDER_DESCENDING
         );
-        if (allEventsCursor.moveToFirst())count = allEventsCursor.getCount();
-        else count = 0;
+        if (allEventsCursor.moveToFirst()){
+            count = allEventsCursor.getCount();
+        } else count = 0;
     }
 
     //make a new fragment, with the variable being the position
@@ -49,7 +52,8 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
 
         int index;
         String date = null;
-        if (allEventsCursor.moveToPosition(position)) {
+        if (allEventsCursor.moveToPosition(getCount() - 1 - position)) {
+            Log.v(TAG, DatabaseUtils.dumpCursorToString(allEventsCursor));
             index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_FORMATTED_DATE);
             date = allEventsCursor.getString(index);
         }
@@ -69,7 +73,7 @@ public class ListViewPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         int index = 0;
-        if (allEventsCursor.moveToPosition(position)) {
+        if (allEventsCursor.moveToPosition(getCount() - 1 - position)) {
             index = allEventsCursor.getColumnIndex(EventEntry.COLUMN_FORMATTED_DATE);
         }
         return allEventsCursor.getString(index);
