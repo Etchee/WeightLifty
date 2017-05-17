@@ -169,8 +169,7 @@ public class EditEventActivity extends FragmentActivity implements
                         //make correct contentValues here
 
                         if (weightIsValid()) {
-                            Uri uri = addNewEvent(getUserInputsAsContentValues(getFormattedDate()));
-                            Toast.makeText(EditEventActivity.this, eventString + " added." + uri.toString(),
+                            Toast.makeText(EditEventActivity.this, eventString + " added.",
                                     Toast.LENGTH_SHORT).show();
                             finish();
                         } else {
@@ -251,14 +250,9 @@ public class EditEventActivity extends FragmentActivity implements
                                 getApplicationContext(),
                                 EditEventActivity.this
                         );
-
-                        String array[] = new String[]{
-                                String.valueOf(getDateAsInt()),
-                                String.valueOf(sub_ID)
-                        };
                         ArrayList<String> list = new ArrayList<>(2);
-                        list.add(0, String.valueOf(getDateAsInt()));
-                        list.add(1, String.valueOf(sub_ID));
+                        list.add(0, formattedDate);
+                        list.add(1, String.valueOf(receivedEventID));
 
                         deleteHelper.execute(list);
                         finish();

@@ -69,4 +69,6 @@
     </string>
     <string name="Author_text">Author: Etchee. ( https://github.com/Etchee )</string>
     <string name="delete_workouts_of_today">Delete workouts of today</string>
+    <string name="delete_workout_database_will_be_restored_after_re_launch">Delete Workout Database (Will be restored after re-launch)</string>
+    <string name="delete_workout_database">Delete Workout Database</string>
 </resources>

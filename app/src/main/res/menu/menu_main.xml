@@ -5,7 +5,7 @@
     tools:context=".Activity.MainActivity"
     >
 
-    <item android:title="@string/reset_fts_table"
+    <item android:title="@string/delete_workout_database"
         android:id="@+id/reset_FTS_table"
         app:showAsAction="never" />
     <item android:title="@string/settings"
