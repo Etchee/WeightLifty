@@ -164,6 +164,8 @@ public class SearchFragment extends android.support.v4.app.Fragment
         return false;
     }
 
+
+
     /**
      * Search method that returns a cursor.
      *

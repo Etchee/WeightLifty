@@ -13,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -56,6 +57,7 @@ public class WorkoutListActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private ListViewPagerAdapter viewPagerAdapter;
     private TabLayout tabLayout;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -248,7 +250,10 @@ public class WorkoutListActivity extends AppCompatActivity {
         if (tabLayout.getVisibility() == View.GONE) {
             tabLayout.setVisibility(View.VISIBLE);
             viewPager.setVisibility(View.VISIBLE);
-            super.onBackPressed();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(getSupportFragmentManager().findFragmentById(R.id.container_fragment_list))
+                    .commit();
         }else super.onBackPressed();
     }
 

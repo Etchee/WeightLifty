@@ -9,11 +9,15 @@ import android.database.SQLException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -42,67 +46,29 @@ public class TextResDecoder {
     }
 
     public void main() {
-        if (!checkIfEventTypeIsOk()) {
-            Log.v(TAG, "Optimizing db process starts:");
+            Log.v(TAG, "Optimizing db process initiated.");
             //fire AsyncTask here
-            new AsyncEventTypleInsertProcess(context).execute();
-        } else Toast.makeText(activity, "EventType data optimized!", Toast.LENGTH_SHORT).show();
+            new AsyncEventTypleInsertProcess(context, activity).execute();
     }
 
-    /**
-     *  This method checks if the raw workout file has already been input in the FTS table.
-     *
-     *  Checking method: get the 40th item (randomly selected... and if the name exists, then it's a pass.)
-     *
-     * @return if the database is okay, true. If not okay, false.
-     */
-    private boolean checkIfEventTypeIsOk () {
-        Boolean TF = null;
-        Cursor cursor = null;
-        try {
-            String eventName;
-
-            String projection[] = new String[]{
-                    DataContract.EventType_FTSEntry.COLUMN_ROW_ID,
-                    DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME
-            };
-            String selection = DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?";
-            String selectionArgs[] = new String[]{ String.valueOf(40) };
-
-            cursor = context.getContentResolver().query(
-                    DataContract.EventType_FTSEntry.CONTENT_URI,
-                    projection,
-                    selection,
-                    selectionArgs,
-                    null
-            );
-            int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
-
-            if (cursor.moveToFirst()){
-                eventName = cursor.getString(index);
-                if (!eventName.equals("")) TF = true;
-                else TF = false;
-            } else{
-                TF = false;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            cursor.close();
-        }
-
-        return TF;
-    }
 }
 
-class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
+class AsyncEventTypleInsertProcess extends AsyncTask<Void, Integer, Integer> {
 
     private String TAG = getClass().getSimpleName();
     private Context context;
+    private Activity activity;
 
-    public AsyncEventTypleInsertProcess(Context context) {
+    private TextView number_textView, hint_text, hint_percent;
+    private Button begin_workout;
+
+    public AsyncEventTypleInsertProcess(Context context, Activity activity) {
         this.context = context;
+        this.activity = activity;
+        number_textView = (TextView) activity.findViewById(R.id.hint_number_update);
+        hint_text = (TextView)activity.findViewById(R.id.hint_update_text);
+        hint_percent = (TextView)activity.findViewById(R.id.hint_text_update_percent);
+        begin_workout = (Button)activity.findViewById(R.id.begin_workout_button);
     }
 
     @Override
@@ -122,7 +88,7 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
         Uri uri;
         ContentValues values = new ContentValues();
         int counter = 0;
-        while(counter < jsonArray.length()){
+        while(counter < (jsonArray != null ? jsonArray.length() : 0)){
             //if even, then Event Name
             //if odd, then Event Type
             try {
@@ -142,6 +108,7 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
             values.clear();
             numOfUpdatedRow++;
             counter += 2;
+            if (numOfUpdatedRow % 9 == 0) publishProgress(numOfUpdatedRow / 9);
         }
 
         if (errorFlag == 1) {
@@ -152,13 +119,24 @@ class AsyncEventTypleInsertProcess extends AsyncTask<Void, Void, Integer> {
     }
 
     @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+        number_textView.setText(String.valueOf(values[0]));
+    }
+
+    @Override
     protected void onPostExecute(Integer result) {
         super.onPostExecute(result);
-        Toast.makeText(context, "Inserted: " + String.valueOf(result) + " rows.",
+        Toast.makeText(context, "Workout database ready with 900 workouts!",
                 Toast.LENGTH_SHORT).show();
 
-        //Debug purpose
-        Toast.makeText(context, "(Debug) Item 259 is: " + queryFTSforDebug(), Toast.LENGTH_SHORT).show();
+        //Hint texts can all go away now
+        number_textView.setVisibility(View.GONE);
+        hint_text.setVisibility(View.GONE);
+        hint_percent.setVisibility(View.GONE);
+
+        //and start workout button now should be enabled
+        begin_workout.setEnabled(true);
     }
 
     private String queryFTSforDebug() {

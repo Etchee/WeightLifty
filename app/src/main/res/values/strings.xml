@@ -32,7 +32,7 @@
     <string name="suggestion_provider_authority">suggestion_provider_authority</string>
     <string name="input_event">Input Event</string>
     <string name="launch_searchactivity">Launch SearchActivity</string>
-    <string name="reset_fts_table">Reset FTS Table</string>
+    <string name="reset_fts_table">Delete EventType Table</string>
     <string name="test_eventtype_db">Test EventType DB</string>
     <string name="number">No.</string>
     <string name="nulltext">null</string>
@@ -45,4 +45,27 @@
     <string name="unit">Unit</string>
     <string name="unit_hint_text">Choose preferred unit</string>
     <string name="pref_unit">pref_unit</string>
+    <string name="unit_metric">unit_metric</string>
+    <string name="unit_imperial">unit_imperial</string>
+    <string name="kg">(kg)</string>
+    <string name="lb">(lb)</string>
+    <string name="hint_text_progress">Creating your workout database:</string>
+    <string name="_100">100</string>
+    <string name="percent_symbol">%</string>
+    <string name="about">About</string>
+    <string name="about_content_text">
+        \n \n
+        Thank you a lot for using this app! \n \n \n I am a university student in Tokyo.
+        I know this isn\'t
+        the prettiest app out there — however, I\'m hoping to improve this app into something
+        everybody can use stress-free, everyday. \n \n \n
+        You are one of the first users - amazing! Please come check out this app from time to time -
+        This will definitely be updated for improvements. \n \n \n
+    </string>
+    <string name="about_credits_text">
+        Credits:
+        The awesome WeightLifty icon was created by: freepik from http://www.flaticon.com/authors/freepik.
+        http://www.flaticon.com is an awesome website where you can download all kinds of icons for free. \n \n
+    </string>
+    <string name="Author_text">Author: Etchee. ( https://github.com/Etchee )</string>
 </resources>
