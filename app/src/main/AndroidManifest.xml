@@ -46,11 +46,6 @@
 
         </activity>
 
-        <provider
-            android:name=".Search.SuggestionProvider"
-            android:authorities="suggestionProviderAuthority"
-            android:syncable="false" />
-
         <activity android:name=".Activity.EditEventActivity" />
 
         <provider

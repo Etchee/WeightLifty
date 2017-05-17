@@ -10,6 +10,7 @@
             android:key="@string/pref_unit"
             android:title="@string/unit"
             android:summary="@string/unit_hint_text"
+            android:defaultValue="@string/unit_metric"
             />
 
     </PreferenceCategory>

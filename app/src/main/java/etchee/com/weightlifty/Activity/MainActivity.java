@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
+import etchee.com.weightlifty.Fragment.AboutFragment;
 import etchee.com.weightlifty.Fragment.MainActivityFragment;
 import etchee.com.weightlifty.Fragment.SettingsFragment;
 import etchee.com.weightlifty.R;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         calendar_insertTodaysRow();
     }
 
-    private void testEventNameQuery() {
+    private void testEventName() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String projection[] = new String[]{
                 DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME,
@@ -206,69 +207,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void event_insertDummyValues2() {
-
-        ContentValues values = new ContentValues();
-
-        int rep_count = new Random().nextInt(10);
-        int set_count = new Random().nextInt(20);
-        int date = getDateAsInt() - 2;
-        int weight_count = 70;
-        int sub_ID = getNextSub_id();
-        int eventID = new Random().nextInt(900);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.DATE, -2);
-
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        String formattedDate = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
-
-        values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
-        values.put(EventEntry.COLUMN_EVENT_ID, eventID);
-        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
-        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
-        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
-        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
-
-        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
-
-        if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
-                "failed to insert data. check the MainActivity method and the table.");
-
-    }
-
-
-    private void event_insertDummyValues3() {
-
-        ContentValues values = new ContentValues();
-
-        int rep_count = new Random().nextInt(10);
-        int set_count = new Random().nextInt(20);
-        int date = getDateAsInt();
-        int weight_count = 70;
-        int sub_ID = getNextSub_id();
-        int eventID = new Random().nextInt(900);
-        String formattedDate = getFormattedDate();
-
-        values.put(EventEntry.COLUMN_SUB_ID, sub_ID);
-        values.put(EventEntry.COLUMN_EVENT_ID, eventID);
-        values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
-        values.put(EventEntry.COLUMN_SET_COUNT, set_count);
-        values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
-        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
-
-        Uri uri = getContentResolver().insert(EventEntry.CONTENT_URI, values);
-
-        if (uri == null) throw new IllegalArgumentException("Calendar table (insert dummy)" +
-                "failed to insert data. check the MainActivity method and the table.");
-
-
-    }
-
     private int getNextSub_id() {
         int sub_id;
 
@@ -337,23 +275,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        //set delete menu text to red color
-        MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events);
-        SpannableString string = new SpannableString(delete_all_events.getTitle());
-        string.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary)),
-                0,
-                string.length(),
-                Spanned.SPAN_PRIORITY);
-
-        delete_all_events.setTitle(string);
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -364,60 +285,8 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
 
-            case R.id.menu_delete_all_events:
-                int numOfDeletedRows = deleteEventTable();
-                Toast.makeText(context, String.valueOf(numOfDeletedRows) + " deleted.",
-                        Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.menu_insert_event:
-                event_insertDummyValues();
-                break;
-            case R.id.menu_insert_event_type:
-                eventType_insertDummyValues();
-                /**
-                 * V/MainActivity: Columns in FTS are: [table_eventType_event_name, table_eventType_event_type]
-                 */
-                break;
-
-            case R.id.menu_view_tables:
-                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
-                startActivity(intent);
-                break;
-
-            case R.id.decode_workout_res:
-                try {
-                    TextResDecoder decoder = new TextResDecoder(context, this);
-                    decoder.main();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                break;
-
             case R.id.reset_FTS_table:
                 deleteEventTypeTable();
-                break;
-
-            case R.id.test_eventType_db:
-//                Cursor cursor = getContentResolver().query(
-//                        DataContract.EventType_FTSEntry.CONTENT_URI,
-//                        new String[]{DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME,
-//                                DataContract.EventType_FTSEntry.COLUMN_ROW_ID},
-//                        DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?",
-//                        new String[]{String.valueOf(872)},
-//                        null
-//                );
-                Cursor cursor = getContentResolver().query(
-                        DataContract.EventType_FTSEntry.CONTENT_URI,
-                        null, null, null, null
-                );
-                int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
-                String str = null;
-                if (cursor.moveToLast()) {
-                    cursor.moveToPrevious();
-                    str = cursor.getString(index);
-                }
-                Toast.makeText(context, "Debug(Event name): " + str,
-                        Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.menu_settings:
@@ -429,6 +298,19 @@ public class MainActivity extends AppCompatActivity {
                                 R.animator.slide_out_to_left
                         )
                         .replace(R.id.container_fragment_main, new SettingsFragment())
+                        .addToBackStack(null)
+                        .commit();
+                break;
+
+            case R.id.menu_about:
+                getFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.animator.slide_in_from_left,
+                                R.animator.slide_out_to_right,
+                                R.animator.slide_in_from_right,
+                                R.animator.slide_out_to_left
+                        )
+                        .replace(R.id.container_fragment_main, new AboutFragment())
                         .addToBackStack(null)
                         .commit();
                 break;

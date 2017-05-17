@@ -4,34 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Activity.MainActivity"
     >
-    <item
-        android:title="@string/insert_random_values"
-        android:id="@+id/menu_insert_event"
-        app:showAsAction="never" />
-    <item android:title="@string/insert_type_event"
-        android:id="@+id/menu_insert_event_type"
-        app:showAsAction="never" />
-    <item android:title="@string/delete_all_events"
-        android:id="@+id/menu_delete_all_events"
-        app:showAsAction="never" />
-    <item android:title="@string/view_tables"
-        android:id="@+id/menu_view_tables"
-        app:showAsAction="never" />
-    <item android:title="@string/launch_searchactivity"
-        android:id="@+id/menu_launch_searchactivity"
-        app:showAsAction="never" />
-    <item android:title="Decode Workout Resource"
-        android:id="@+id/decode_workout_res"
-        app:showAsAction="never" />
-    <item android:title="@string/reset_fts_table"
+
+    <item android:title="@string/delete_workout_database"
         android:id="@+id/reset_FTS_table"
-        app:showAsAction="never" />
-    <item android:title="@string/test_eventtype_db"
-        android:id="@+id/test_eventType_db"
         app:showAsAction="never" />
     <item android:title="@string/settings"
         android:id="@+id/menu_settings"
         app:showAsAction="never"
         />
+    <item android:title="@string/about"
+        android:id="@+id/menu_about"
+        app:showAsAction="never" />
 
 </menu>

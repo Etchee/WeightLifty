@@ -37,7 +37,8 @@ public class DeleteActionHelper extends AsyncTask<ArrayList, Void, Integer> {
         String formattedate = String.valueOf(date);
         int SubIdAsInt = Integer.parseInt(sub_id.toString());
 
-        String selection = DataContract.EventEntry.COLUMN_FORMATTED_DATE + "=?" + " AND " + DataContract.EventEntry.COLUMN_SUB_ID + "=?";
+        String selection = DataContract.EventEntry.COLUMN_FORMATTED_DATE + "=?" + " AND "
+                + DataContract.EventEntry.COLUMN_EVENT_ID + "=?";
         String selectionArgs[] = new String[]{
                 formattedate,
                 String.valueOf(SubIdAsInt)
