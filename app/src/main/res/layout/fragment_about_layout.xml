@@ -8,10 +8,19 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="@dimen/about_logo_size"
+            android:layout_height="@dimen/about_logo_size"
+            android:id="@+id/logo_about"
+            android:src="@drawable/ic_app_logo"
+            android:layout_gravity="center"
+            />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/about_text"
+            android:textAlignment="center"
             android:text="@string/about_content_text"
             />
 
@@ -19,7 +28,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/about_credits_text"
+            android:autoLink="web"
             android:text="@string/about_credits_text"
+            android:textAlignment="center"
             />
         <TextView
             android:layout_width="match_parent"
@@ -27,6 +38,7 @@
             android:id="@+id/about_author_text"
             android:text="@string/Author_text"
             android:autoLink="web"
+            android:textAlignment="center"
             />
     </LinearLayout>
 

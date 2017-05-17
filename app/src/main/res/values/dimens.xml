@@ -19,4 +19,5 @@
     <dimen name="edit_set_hint_marginLeft">30dp</dimen>
     <dimen name="add_event_margin_right">10dp</dimen>
     <dimen name="tiny_ic_value">10dp</dimen>
+    <dimen name="about_logo_size">200dp</dimen>
 </resources>

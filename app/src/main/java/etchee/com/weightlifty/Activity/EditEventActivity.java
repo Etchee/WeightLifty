@@ -123,7 +123,7 @@ public class EditEventActivity extends FragmentActivity implements
 
         //get user pref for weight unit_pref
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        unit_pref = sharedPreferences.getString(getResources().getString(R.string.pref_unit), null);
+        unit_pref = sharedPreferences.getString(getResources().getString(R.string.pref_unit), DataContract.GlobalConstants.UNIT_METRIC);
 
         //default is metric. if imperial, replace the hint text with lbs unit_pref sign, then when saving,
         // do some conversion.
