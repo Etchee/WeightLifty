@@ -121,6 +121,8 @@ public class EditEventActivity extends FragmentActivity implements
         button_delete_event = (Button) findViewById(R.id.delete_workout);
         hint_unit_text = (TextView)findViewById(R.id.hint_text_unit);
 
+
+
         //get user pref for weight unit_pref
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         unit_pref = sharedPreferences.getString(getResources().getString(R.string.pref_unit), DataContract.GlobalConstants.UNIT_METRIC);
@@ -165,10 +167,16 @@ public class EditEventActivity extends FragmentActivity implements
                     @Override
                     public void onClick(View v) {
                         //make correct contentValues here
-                        Uri uri = addNewEvent(getUserInputsAsContentValues(getFormattedDate()));
-                        Toast.makeText(EditEventActivity.this, eventString + " added." + uri.toString(),
-                                Toast.LENGTH_SHORT).show();
-                        finish();
+
+                        if (weightIsValid()) {
+                            Uri uri = addNewEvent(getUserInputsAsContentValues(getFormattedDate()));
+                            Toast.makeText(EditEventActivity.this, eventString + " added." + uri.toString(),
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(EditEventActivity.this, "Please input integer for weight.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
 
@@ -194,12 +202,19 @@ public class EditEventActivity extends FragmentActivity implements
                 button_add_event.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        new ModifyEventHelper(
-                                getApplicationContext(),
-                                EditEventActivity.this,
-                                formattedDate,
-                                sub_ID
-                        ).execute(getUserInputsAsContentValues(formattedDate));
+
+                        if (weightIsValid()) {
+                            new ModifyEventHelper(
+                                    getApplicationContext(),
+                                    EditEventActivity.this,
+                                    formattedDate,
+                                    sub_ID
+                            ).execute(getUserInputsAsContentValues(formattedDate));
+                            finish();
+                        } else {
+                            Toast.makeText(EditEventActivity.this, "Please input integer for weight.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
 
@@ -261,6 +276,7 @@ public class EditEventActivity extends FragmentActivity implements
                     "the launch mode.");
         }
 
+        weight_count.setText("0");
         weight_count.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -269,6 +285,17 @@ public class EditEventActivity extends FragmentActivity implements
             }
         });
 
+    }
+
+    private Boolean weightIsValid() {
+
+        CharSequence input = weight_count.getText();
+        try {
+            int weight = Integer.parseInt(String.valueOf(input));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private int convertKiloToPound(int kilo) {

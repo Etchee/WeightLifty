@@ -24,7 +24,7 @@
     <string name="delete_all_events">Delete All Events</string>
     <string name="add_event">Add Event</string>
     <string name="update_event">Update Event</string>
-    <string name="insert_random_values">Insert Random Values</string>
+    <string name="insert_random_values">Insert A Random Event</string>
     <string name="insert_type_event">Insert Event Type</string>
     <string name="search_events">Search Events</string>
     <string name="hint_search_events">Search Events...</string>
@@ -68,4 +68,5 @@
         http://www.flaticon.com is an awesome website where you can download all kinds of icons for free. \n \n
     </string>
     <string name="Author_text">Author: Etchee. ( https://github.com/Etchee )</string>
+    <string name="delete_workouts_of_today">Delete workouts of today</string>
 </resources>

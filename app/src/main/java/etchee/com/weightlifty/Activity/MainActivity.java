@@ -275,23 +275,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        //set delete menu text to red color
-        MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events);
-        SpannableString string = new SpannableString(delete_all_events.getTitle());
-        string.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary)),
-                0,
-                string.length(),
-                Spanned.SPAN_PRIORITY);
-
-        delete_all_events.setTitle(string);
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -301,27 +284,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-
-            case R.id.menu_delete_all_events:
-                int numOfDeletedRows = deleteEventTable();
-                Toast.makeText(context, String.valueOf(numOfDeletedRows) + " deleted.",
-                        Toast.LENGTH_SHORT).show();
-                break;
-
-
-            case R.id.menu_view_tables:
-                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
-                startActivity(intent);
-                break;
-
-            case R.id.decode_workout_res:
-                try {
-                    TextResDecoder decoder = new TextResDecoder(context, this);
-                    decoder.main();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                break;
 
             case R.id.reset_FTS_table:
                 deleteEventTypeTable();

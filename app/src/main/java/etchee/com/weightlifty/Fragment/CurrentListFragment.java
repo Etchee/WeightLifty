@@ -110,8 +110,10 @@ public class CurrentListFragment extends Fragment implements
         return inflater.inflate(R.layout.fragment_current_list_layout, container, false);
     }
 
-    private void setEventID(int eventID) {
-        this.eventID = eventID;
+    @Override
+    public void onResume() {
+        super.onResume();
+        listAdapter.notifyDataSetChanged();
     }
 
     /**

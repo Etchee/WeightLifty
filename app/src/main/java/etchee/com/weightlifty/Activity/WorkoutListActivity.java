@@ -92,23 +92,6 @@ public class WorkoutListActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        deleteOptionRed(menu);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-
-    /**
-     *  When creating the option, define the searchView. (Pretty sure this is done right)
-     * @param menu menu layout
-     * @return  true
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_list, menu);
-        return true;
-    }
 
     private void enterSearchMode() {
         //hide the tab
@@ -125,6 +108,17 @@ public class WorkoutListActivity extends AppCompatActivity {
                 .commit();
     }
 
+    /**
+     *  When creating the option, define the searchView. (Pretty sure this is done right)
+     * @param menu menu layout
+     * @return  true
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_list, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -133,19 +127,46 @@ public class WorkoutListActivity extends AppCompatActivity {
             case R.id.action_search_button:
                 break;
 
-            case R.id.menu_delete_all_events:
-                int numOfDeletedRows = deleteEventTableDatabase();
-                Toast.makeText(WorkoutListActivity.this, String.valueOf(numOfDeletedRows) + " deleted.",
-                        Toast.LENGTH_SHORT).show();
-                break;
             case R.id.menu_insert_event:
                 event_insertDummyValues();
                 break;
 
-            case R.id.menu_view_tables:
-                Intent intent = new Intent(getApplicationContext(), DBviewer.class);
-                startActivity(intent);
+            case R.id.delete_today_workout:
+                //get tab show date format
+                //if tabLayout is shown (data is there), perform deletion.
+                String lastDate = null;
+                if (tabLayout.getSelectedTabPosition() != -1) {
+                    Cursor cursor = null;
+
+                    try {
+                        cursor = getContentResolver().query(
+                            EventEntry.CONTENT_URI,
+                                new String[]{EventEntry.COLUMN_FORMATTED_DATE},
+                                null,
+                                null,
+                                null
+                        );
+                        if (cursor.moveToLast()) {
+                            lastDate = cursor.getString(cursor.getColumnIndex(EventEntry.COLUMN_FORMATTED_DATE));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        cursor.close();
+                    }
+                }else Toast.makeText(activity, "No Event Records.", Toast.LENGTH_SHORT).show();
+
+
+                int numOfDeletedRows = getContentResolver().delete(
+                        EventEntry.CONTENT_URI,
+                        EventEntry.COLUMN_FORMATTED_DATE + "=?",
+                        new String[]{lastDate}
+                );
+
+                Toast.makeText(activity, String.valueOf(numOfDeletedRows) +
+                        " events deleted.", Toast.LENGTH_SHORT).show();
                 break;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -263,17 +284,5 @@ public class WorkoutListActivity extends AppCompatActivity {
         new subIDfixHelper(getApplicationContext()).execute(getFormattedDate());
     }
 
-    private void deleteOptionRed(Menu menu) {
-        //set delete menu text to red color
-        MenuItem delete_all_events = menu.findItem(R.id.menu_delete_all_events);
-        SpannableString string = new SpannableString(delete_all_events.getTitle());
-        string.setSpan(
-                new ForegroundColorSpan(ContextCompat.getColor(WorkoutListActivity.this, R.color.colorPrimary)),
-                0,
-                string.length(),
-                Spanned.SPAN_PRIORITY);
-
-        delete_all_events.setTitle(string);
-    }
 }
 

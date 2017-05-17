@@ -8,13 +8,8 @@
         app:showAsAction="never"
         />
 
-    <item android:id="@+id/menu_view_tables"
-        android:title="@string/view_tables"
-        app:showAsAction="never" />
-
     <item
-        android:id="@+id/menu_delete_all_events"
-        android:title="@string/delete_all_events"
+        android:id="@+id/delete_today_workout"
+        android:title="@string/delete_workouts_of_today"
         app:showAsAction="never" />
-
 </menu>

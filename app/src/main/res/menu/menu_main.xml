@@ -4,19 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Activity.MainActivity"
     >
-    <item
-        android:title="@string/insert_random_values"
-        android:id="@+id/menu_insert_event"
-        app:showAsAction="never" />
-    <item android:title="@string/delete_all_events"
-        android:id="@+id/menu_delete_all_events"
-        app:showAsAction="never" />
-    <item android:title="@string/view_tables"
-        android:id="@+id/menu_view_tables"
-        app:showAsAction="never" />
-    <item android:title="Decode Workout Resource"
-        android:id="@+id/decode_workout_res"
-        app:showAsAction="never" />
+
     <item android:title="@string/reset_fts_table"
         android:id="@+id/reset_FTS_table"
         app:showAsAction="never" />
