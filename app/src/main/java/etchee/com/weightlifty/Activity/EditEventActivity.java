@@ -33,6 +33,8 @@ import etchee.com.weightlifty.R;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 
+import static android.R.attr.format;
+import static android.R.attr.launchMode;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_CODE;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_EXISTING;
 import static etchee.com.weightlifty.data.DataContract.GlobalConstants.LAUNCH_EDIT_NEW;
@@ -127,6 +129,7 @@ public class EditEventActivity extends FragmentActivity implements
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         unit_pref = sharedPreferences.getString(getResources().getString(R.string.pref_unit), DataContract.GlobalConstants.UNIT_METRIC);
 
+
         //default is metric. if imperial, replace the hint text with lbs unit_pref sign, then when saving,
         // do some conversion.
 
@@ -145,6 +148,8 @@ public class EditEventActivity extends FragmentActivity implements
         defineQueryHandler();
 
         Bundle bundle = getIntent().getExtras();
+
+        formattedDate = bundle.getString(PASS_SELECTED_DATE);
 
         int launchMode = bundle.getInt(LAUNCH_EDIT_CODE, -1);
 
@@ -169,6 +174,7 @@ public class EditEventActivity extends FragmentActivity implements
                         //make correct contentValues here
 
                         if (weightIsValid()) {
+                            addNewEvent(getUserInputsAsContentValues(formattedDate));
                             Toast.makeText(EditEventActivity.this, eventString + " added.",
                                     Toast.LENGTH_SHORT).show();
                             finish();
@@ -397,8 +403,7 @@ public class EditEventActivity extends FragmentActivity implements
             case UNIT_IMPEREIAL:
                 //do the conversion
                 int weight_imperial = Integer.parseInt(this.weight_count.getText().toString());
-                int weight_metric = convertPoundToKilo(weight_imperial);
-                weight_count = weight_metric;
+                weight_count = convertPoundToKilo(weight_imperial);
                 break;
 
             case UNIT_METRIC:
@@ -412,13 +417,23 @@ public class EditEventActivity extends FragmentActivity implements
         if (weight_count == 0) Log.e(TAG, "There is something wrong with unit conversion when" +
                 "saving. OOOOOOOOPS");
 
+        /* From DB helper:
+        *    + EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + EventEntry.COLUMN_FORMATTED_DATE + " TEXT NOT NULL, "
+                + EventEntry.COLUMN_SUB_ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_EVENT_ID + " INTEGER NOT NULL, "
+                + EventEntry.COLUMN_SET_COUNT + " INTEGER, "
+                + EventEntry.COLUMN_REP_COUNT + " INTEGER, "
+                + EventEntry.COLUMN_WEIGHT_COUNT + " INTEGER);";
+        * */
+
+        values.put(EventEntry.COLUMN_FORMATTED_DATE, formattedDate);
+        //subID doesn't matter because this will be organized onResume for ListActivity anyways
+        values.put(EventEntry.COLUMN_SUB_ID, 0);
+        values.put(EventEntry.COLUMN_EVENT_ID, receivedEventID);
         values.put(EventEntry.COLUMN_SET_COUNT, set_count);
         values.put(EventEntry.COLUMN_REP_COUNT, rep_count);
         values.put(EventEntry.COLUMN_WEIGHT_COUNT, weight_count);
-        values.put(EventEntry.COLUMN_EVENT_ID, receivedEventID);
-        values.put(EventEntry.COLUMN_FORMATTED_DATE, date);
-        //subID doesn't matter because this will be organized onResume for ListActivity anyways
-        values.put(EventEntry.COLUMN_SUB_ID, 0);
 
         return values;
     }
@@ -683,17 +698,5 @@ public class EditEventActivity extends FragmentActivity implements
         receivedEventID = Integer.parseInt(id);
     }
 
-    private String getFormattedDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        int year = calendar.get(Calendar.YEAR);
-
-        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        String concatenated = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
-
-        return concatenated;
-    }
 
 }

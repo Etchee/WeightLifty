@@ -55,6 +55,7 @@ public class CurrentListFragment extends Fragment implements
     private ListAdapter listAdapter;
     private ContentResolver contentResolver;
     private String displayDate;
+
     public CurrentListFragment() {
     }
 

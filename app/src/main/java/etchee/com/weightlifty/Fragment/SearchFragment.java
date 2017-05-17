@@ -22,6 +22,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 import etchee.com.weightlifty.Activity.EditEventActivity;
 import etchee.com.weightlifty.Adapter.SearchAdapter;
 import etchee.com.weightlifty.R;
@@ -90,8 +92,23 @@ public class SearchFragment extends android.support.v4.app.Fragment
         Bundle bundle = new Bundle();
         bundle.putInt(DataContract.GlobalConstants.LAUNCH_EDIT_CODE, DataContract.GlobalConstants.LAUNCH_EDIT_NEW);
         bundle.putString(DataContract.GlobalConstants.PASS_EVENT_STRING, eventName);
+        bundle.putString(DataContract.GlobalConstants.PASS_SELECTED_DATE, getFormattedDate());
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+
+    private String getFormattedDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH) + 1;   //month starts from zero
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String concatenated = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+
+        return concatenated;
     }
 
     private Cursor initEventTypeCursor() {
