@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
+import etchee.com.weightlifty.Fragment.AboutFragment;
 import etchee.com.weightlifty.Fragment.MainActivityFragment;
 import etchee.com.weightlifty.Fragment.SettingsFragment;
 import etchee.com.weightlifty.R;
@@ -306,15 +307,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(context, String.valueOf(numOfDeletedRows) + " deleted.",
                         Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.menu_insert_event:
-                event_insertDummyValues();
-                break;
-            case R.id.menu_insert_event_type:
-                eventType_insertDummyValues();
-                /**
-                 * V/MainActivity: Columns in FTS are: [table_eventType_event_name, table_eventType_event_type]
-                 */
-                break;
+
 
             case R.id.menu_view_tables:
                 Intent intent = new Intent(getApplicationContext(), DBviewer.class);
@@ -334,29 +327,6 @@ public class MainActivity extends AppCompatActivity {
                 deleteEventTypeTable();
                 break;
 
-            case R.id.test_eventType_db:
-//                Cursor cursor = getContentResolver().query(
-//                        DataContract.EventType_FTSEntry.CONTENT_URI,
-//                        new String[]{DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME,
-//                                DataContract.EventType_FTSEntry.COLUMN_ROW_ID},
-//                        DataContract.EventType_FTSEntry.COLUMN_ROW_ID + "=?",
-//                        new String[]{String.valueOf(872)},
-//                        null
-//                );
-                Cursor cursor = getContentResolver().query(
-                        DataContract.EventType_FTSEntry.CONTENT_URI,
-                        null, null, null, null
-                );
-                int index = cursor.getColumnIndex(DataContract.EventType_FTSEntry.COLUMN_EVENT_NAME);
-                String str = null;
-                if (cursor.moveToLast()) {
-                    cursor.moveToPrevious();
-                    str = cursor.getString(index);
-                }
-                Toast.makeText(context, "Debug(Event name): " + str,
-                        Toast.LENGTH_SHORT).show();
-                break;
-
             case R.id.menu_settings:
                 getFragmentManager()
                         .beginTransaction()
@@ -366,6 +336,19 @@ public class MainActivity extends AppCompatActivity {
                                 R.animator.slide_out_to_left
                         )
                         .replace(R.id.container_fragment_main, new SettingsFragment())
+                        .addToBackStack(null)
+                        .commit();
+                break;
+
+            case R.id.menu_about:
+                getFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.animator.slide_in_from_left,
+                                R.animator.slide_out_to_right,
+                                R.animator.slide_in_from_right,
+                                R.animator.slide_out_to_left
+                        )
+                        .replace(R.id.container_fragment_main, new AboutFragment())
                         .addToBackStack(null)
                         .commit();
                 break;
