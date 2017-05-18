@@ -18,7 +18,7 @@ import etchee.com.weightlifty.data.DataContract.EventEntry;
 
 /**
  * Adapter for viewPager
- * Created by rikutoechigoya on 2017/05/13.
+ * Created by etchee on 2017/05/13.
  */
 
 public class ListViewPagerAdapter extends FragmentStatePagerAdapter {

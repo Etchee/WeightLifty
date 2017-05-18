@@ -50,7 +50,7 @@ import static etchee.com.weightlifty.data.DataContract.GlobalConstants.UNIT_METR
 import static java.lang.Integer.parseInt;
 
 /**
- * Created by rikutoechigoya on 2017/04/07.
+ * Created by etchee on 2017/04/07.
  *
  *  From WorkoutListInterface, when user taps on one of the events, this class is called to load the
  *  specific event.

@@ -2,25 +2,18 @@ package etchee.com.weightlifty.Activity;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,12 +23,10 @@ import etchee.com.weightlifty.Fragment.AboutFragment;
 import etchee.com.weightlifty.Fragment.MainActivityFragment;
 import etchee.com.weightlifty.Fragment.SettingsFragment;
 import etchee.com.weightlifty.R;
-import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract;
 import etchee.com.weightlifty.data.DataContract.CalendarEntry;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 import etchee.com.weightlifty.data.DataDbHelper;
-import etchee.com.weightlifty.data.TextResDecoder;
 
 public class MainActivity extends AppCompatActivity {
 

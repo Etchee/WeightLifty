@@ -4,20 +4,15 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,13 +25,12 @@ import java.util.Random;
 
 import etchee.com.weightlifty.Adapter.ListViewPagerAdapter;
 import etchee.com.weightlifty.DataMethods.subIDfixHelper;
-import etchee.com.weightlifty.Fragment.CurrentListFragment;
 import etchee.com.weightlifty.Fragment.SearchFragment;
 import etchee.com.weightlifty.R;
-import etchee.com.weightlifty.data.DBviewer;
 import etchee.com.weightlifty.data.DataContract.EventEntry;
 
 /**
+ * Created by etchee.
  *  From MainActivity -> Loads today's data, display as a list.
  *  When SearchView is initiated -> Performs a search, then pass the resulting cursor to SearchAdapter
  */
